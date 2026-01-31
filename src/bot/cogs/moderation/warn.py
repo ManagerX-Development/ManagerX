@@ -7,9 +7,18 @@ import discord
 from discord import slash_command, Option
 import os
 import datetime
+import datetime
 import ezcord
 import asyncio
 from typing import Optional
+
+# Importiere zentrale Konstanten
+from src.bot.core import (
+    SUCCESS_COLOR, ERROR_COLOR, WARN_COLOR, INFO_COLOR,
+    emoji_yes, emoji_no, emoji_warn, emoji_info, 
+    emoji_member, emoji_staff, emoji_summary, emoji_slowmode,
+    emoji_circleinfo, AUTHOR, FLOOTER
+)
 
 
 # ───────────────────────────────────────────────
@@ -98,7 +107,7 @@ class WarnSystem(ezcord.Cog, group="moderation"):
 
     def _create_error_embed(self, title: str, message: str) -> discord.Embed:
         """Erstellt ein einheitliches Error-Embed"""
-        embed = discord.Embed(title=title, color=ERROR_COLOR)
+        embed = discord.Embed(title=title, color=ERROR_COLOR, timestamp=datetime.datetime.now(datetime.timezone.utc))
         embed.set_author(name=AUTHOR)
         embed.add_field(name=f"{emoji_no} {title}", value=message, inline=False)
         embed.set_footer(text=FLOOTER)
