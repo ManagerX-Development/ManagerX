@@ -1,16 +1,16 @@
 import { memo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  ArrowLeft, Activity, Globe, Cpu, Layers, 
-  CheckCircle2, XCircle, Mail, Github 
+import {
+  ArrowLeft, Activity, Globe, Cpu, Layers,
+  CheckCircle2, XCircle, Mail, Github
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { motion } from "framer-motion";
 const Status = memo(function Status() {
   // State für die Live-Daten vom Bot
-  const [data, setData] = useState({ 
-    status: "loading", 
+  const [data, setData] = useState({
+    status: "loading",
     latency: "--",
     uptime: "--",
     guilds: 0,
@@ -26,7 +26,7 @@ const Status = memo(function Status() {
         // Abfrage an die neue FastAPI-Route für echte Bot-Daten
         const response = await fetch("http://localhost:8040/api/v1/managerx/stats");
         if (!response.ok) throw new Error("Offline");
-        
+
         const result = await response.json();
         setData({
           status: result.status || "online",
@@ -76,20 +76,20 @@ const Status = memo(function Status() {
   ];
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-background flex flex-col"
     >
       <Navbar />
-      
+
       <main className="flex-grow container relative z-10 px-4 pt-32 pb-24 text-white">
         <div className="max-w-4xl mx-auto">
-          
-          <div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-            <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 group text-sm font-medium">
+
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
+            <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-all mb-12 group text-sm font-black uppercase tracking-widest">
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Zurück zur Zentrale
             </Link>
-          </div>
+          </motion.div>
 
           <header className="mb-16 text-center md:text-left">
             <div className="flex flex-col md:flex-row items-center gap-5 mb-6">
@@ -127,7 +127,7 @@ const Status = memo(function Status() {
 
           <div className="grid gap-4 mb-16">
             {systems.map((system, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -158,11 +158,11 @@ const Status = memo(function Status() {
                       {system.isParent && data.status === "online" ? `${data.latency}` : system.latency}
                     </p>
                   </div>
-                  
+
                   <div className={cn(
                     "px-4 py-2 rounded-xl border flex items-center gap-2 min-w-[110px] justify-center",
-                    system.status === "online" 
-                      ? "bg-green-500/10 border-green-500/20 text-green-500" 
+                    system.status === "online"
+                      ? "bg-green-500/10 border-green-500/20 text-green-500"
                       : "bg-red-500/10 border-red-500/20 text-red-500"
                   )}>
                     {system.status === "online" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}

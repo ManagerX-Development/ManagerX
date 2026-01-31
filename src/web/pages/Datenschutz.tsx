@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Shield, Mail, Lock, Database, Server } from "lucide-react";
+import { ArrowLeft, Shield, Mail, Lock, Database, Server, CheckCircle, Github, User, Activity, FileText } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { motion } from "framer-motion";
@@ -9,26 +9,31 @@ export const Datenschutz = memo(function Datenschutz() {
   const sections = [
     {
       title: "1. Verantwortliche Stelle",
+      icon: User,
       content: (
-        <div className="space-y-2">
-          <p className="font-medium text-foreground">OPPRO.NET Network</p>
-          <p>Verantwortlicher im Sinne der DSGVO:</p>
-          <p className="text-sm">
-            Lenny Steiger<br />
-            E-Mail:{" "}
-            <a href="mailto:contact@oppro-network.de" className="text-primary hover:underline">
-              contact@oppro-network.de
-            </a>
-          </p>
+        <div className="space-y-4">
+          <p className="font-extrabold text-white text-xl tracking-tight">OPPRO.NET Network</p>
+          <div className="space-y-1 text-sm text-muted-foreground font-medium">
+            <p className="text-foreground">Lenny Steiger</p>
+            <p>Eulauer Str. 24</p>
+            <p>04523 Pegau, Deutschland</p>
+            <p className="mt-4">
+              E-Mail:{" "}
+              <a href="mailto:contact@oppro-network.de" className="text-primary hover:underline font-black">
+                contact@oppro-network.de
+              </a>
+            </p>
+          </div>
         </div>
       ),
     },
     {
       title: "2. Datenschutzbeauftragter",
+      icon: Shield,
       content: (
-        <div className="space-y-2">
+        <div className="space-y-2 text-sm">
           <p>Bei Datenschutzfragen können Sie sich an:</p>
-          <p className="text-sm">
+          <p className="font-bold text-foreground">
             E-Mail:{" "}
             <a href="mailto:legal@oppro-network.de" className="text-primary hover:underline">
               legal@oppro-network.de
@@ -38,180 +43,183 @@ export const Datenschutz = memo(function Datenschutz() {
       ),
     },
     {
-      title: "3. Erhobene Personenbezogene Daten",
+      title: "3. Erhobene Daten",
+      icon: Database,
       content: (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <p>Bei der Nutzung von ManagerX verarbeiten wir folgende Daten:</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2 text-sm">
-            <li><strong>Discord-IDs:</strong> Nutzer-ID, Server-ID zur eindeutigen Identifikation</li>
-            <li><strong>Benutzername & Avatar:</strong> Für Logging und Audit-Trail</li>
-            <li><strong>Server-Konfigurationen:</strong> Einstellungen wie Willkommenskanäle, Automoderation, Rollen</li>
-            <li><strong>Moderationsdaten:</strong> Verwarnungen, Kicks, Bans mit Gründen und Zeitstempel</li>
-            <li><strong>XP/Level-Daten:</strong> Aktivitätsstatistiken zur Gamification</li>
-            <li><strong>Voice-Channel-Daten:</strong> Temporäre Kanäle und deren Einstellungen</li>
-            <li><strong>Log-Daten:</strong> Timestamps und Fehlerdiagnose-Informationen</li>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+            <li className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Discord-IDs</li>
+            <li className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Username & Avatar</li>
+            <li className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Server-Settings</li>
+            <li className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Moderationsdaten</li>
+            <li className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> XP/Level-Daten</li>
+            <li className="flex items-center gap-2 p-3 rounded-xl bg-white/5 border border-white/5"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Log-Daten (Timestamps)</li>
           </ul>
         </div>
       ),
     },
     {
-      title: "4. Zweck der Datenverarbeitung",
+      title: "4. Zweck der Verarbeitung",
+      icon: Activity,
       content: (
-        <div className="space-y-3">
+        <div className="space-y-3 text-sm leading-relaxed">
           <p>Die Daten werden ausschließlich für folgende Zwecke verarbeitet:</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2 text-sm">
-            <li>Bereitstellung und Verwaltung der Bot-Funktionen</li>
-            <li>Nachvollziehbarkeit von Moderationsmaßnahmen (Audit-Trail)</li>
-            <li>Fehlerdiagnose und technische Optimierung</li>
-            <li>Statistiken und Leistungsanalyse</li>
-            <li>Compliance mit Discord-Richtlinien</li>
+          <ul className="space-y-1 text-muted-foreground ml-2">
+            <li>• Bereitstellung und Verwaltung der Bot-Funktionen</li>
+            <li>• Nachvollziehbarkeit von Moderationsmaßnahmen (Audit-Trail)</li>
+            <li>• Fehlerdiagnose und technische Optimierung</li>
+            <li>• Statistiken und Leistungsanalyse</li>
+            <li>• Compliance mit Discord-Richtlinien</li>
           </ul>
         </div>
       ),
     },
     {
-      title: "5. Rechtsgrundlage der Verarbeitung",
+      title: "5. Rechtsgrundlage",
+      icon: FileText,
       content: (
-        <div className="space-y-2 text-sm">
-          <p><strong>Art. 6 Abs. 1 lit. f DSGVO:</strong> Berechtigtes Interesse am Bot-Betrieb und Systemsicherheit</p>
-          <p><strong>Art. 6 Abs. 1 lit. b DSGVO:</strong> Erfüllung der Vertragsbestimmungen bei der Nutzung des Bots</p>
-          <p><strong>Art. 6 Abs. 1 lit. c DSGVO:</strong> Einhaltung gesetzlicher Verpflichtungen</p>
+        <div className="space-y-3 text-sm leading-relaxed">
+          <p><strong>Art. 6 Abs. 1 lit. f DSGVO:</strong> Berechtigtes Interesse am Bot-Betrieb und Systemsicherheit.</p>
+          <p><strong>Art. 6 Abs. 1 lit. b DSGVO:</strong> Erfüllung der Vertragsbestimmungen bei der Nutzung des Bots.</p>
+          <p><strong>Art. 6 Abs. 1 lit. c DSGVO:</strong> Einhaltung gesetzlicher Verpflichtungen.</p>
         </div>
       ),
     },
     {
       title: "6. Speicherdauer",
+      icon: Activity,
       content: (
-        <div className="space-y-2 text-sm">
-          <p><strong>Moderationsdaten:</strong> Speicherung für 2 Jahre ab Eintrag (zur Nachverfolgung von Verstößen)</p>
-          <p><strong>Server-Konfigurationen:</strong> Solange der Bot aktiv ist oder bis zur Löschung</p>
-          <p><strong>XP/Level-Daten:</strong> Bis zur aktiven Löschung durch Server-Admin oder Bot-Entfernung</p>
-          <p><strong>Log-Daten:</strong> Maximale Speicherung von 90 Tagen für technische Fehlerdiagnose</p>
+        <div className="space-y-3 text-sm leading-relaxed">
+          <p><strong>Moderationsdaten:</strong> 2 Jahre ab Eintrag (zur Nachverfolgung).</p>
+          <p><strong>Server-Konfigurationen:</strong> Solange der Bot aktiv ist.</p>
+          <p><strong>XP/Level-Daten:</strong> Bis zur Löschung durch Admin oder Bot-Entfernung.</p>
+          <p><strong>Log-Daten:</strong> Maximal 90 Tage für technische Fehlerdiagnose.</p>
         </div>
       ),
     },
     {
-      title: "7. Hosting & Infrastruktur (Speicherort)",
+      title: "7. Hosting & Standort",
+      icon: Server,
       content: (
-        <div className="space-y-4 text-sm">
-          <p>Wir legen Wert auf Datensparsamkeit und lokale Speicherung:</p>
-          <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
-            <p className="font-bold flex items-center gap-2 mb-1">
-              <Server className="w-4 h-4 text-primary" /> 
-              Bot-Infrastruktur & Datenbank
-            </p>
-            <p>Gehostet bei <strong>DeinServerHost (DSH)</strong> in Deutschland.</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Der Standort der Server ist <strong>Frankfurt am Main, Deutschland</strong>. 
-              Dies stellt sicher, dass Nutzerdaten des Bots die EU nicht verlassen.
-            </p>
+        <div className="space-y-4">
+          <div className="p-6 rounded-2xl bg-primary/10 border border-primary/20 shadow-xl shadow-primary/5">
+            <div className="flex items-center gap-3 mb-3">
+              <Server className="w-5 h-5 text-primary" />
+              <span className="font-black text-white uppercase tracking-widest text-xs">Bot-Infrastruktur</span>
+            </div>
+            <p className="text-sm font-bold text-foreground">DeinServerHost (DSH)</p>
+            <p className="text-xs text-muted-foreground mt-1">Standort: Frankfurt am Main, Deutschland (EU)</p>
           </div>
-          <p className="text-xs">
-            Weitere Empfänger: <strong>Discord</strong> (als API-Partner für die Funktionalität).
-          </p>
+          <p className="text-xs italic text-muted-foreground">Dies stellt sicher, dass Nutzerdaten des Bots die EU nicht verlassen.</p>
         </div>
       ),
     },
     {
       title: "8. Datensicherheit",
+      icon: Lock,
       content: (
-        <div className="space-y-2 text-sm">
-          <p>Ihre Daten werden geschützt durch:</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
-            <li>SQLite-Datenbanken mit Zugriffskontrolle</li>
-            <li>Verschlüsselte Verbindungen (Discord API über HTTPS)</li>
-            <li>Regelmäßige Backups</li>
-            <li>Begrenzte Zugriffe (nur authorisierte Administratoren)</li>
+        <div className="space-y-3 text-sm leading-relaxed">
+          <ul className="space-y-1">
+            <li>• SQLite-Datenbanken mit Zugriffskontrolle</li>
+            <li>• Verschlüsselte Verbindungen (Discord API über HTTPS)</li>
+            <li>• Regelmäßige Backups</li>
+            <li>• Begrenzte Zugriffe (nur authorisierte Administratoren)</li>
           </ul>
         </div>
       ),
     },
     {
-      title: "9. Ihre Rechte (Art. 15-22 DSGVO)",
+      title: "9. Ihre Rechte",
+      icon: User,
       content: (
-        <div className="space-y-2 text-sm">
-          <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung (Vergessenwerden), Datenportabilität und Widerspruch.</p>
-          <p className="mt-2">Anfragen richten Sie bitte an: <a href="mailto:legal@oppro-network.de" className="text-primary hover:underline">legal@oppro-network.de</a></p>
+        <div className="space-y-4 text-sm leading-relaxed">
+          <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung (Vergessenwerden), Datenportabilität und Widerspruch gemäß Art. 15-22 DSGVO.</p>
+          <p className="font-bold text-white underline decoration-primary underline-offset-4">Anfragen an: legal@oppro-network.de</p>
         </div>
       ),
     },
     {
       title: "10. Beschwerderecht",
+      icon: Shield,
       content: (
-        <div className="space-y-2 text-sm">
-          <p>Sie haben das Recht, bei einer Datenschutzbehörde (Landesdatenschutzbehörde Ihres Bundeslandes) Beschwerde einzureichen.</p>
-        </div>
+        <p className="text-sm">Sie haben das Recht, bei einer Datenschutzbehörde (Landesdatenschutzbehörde Ihres Bundeslandes) Beschwerde einzureichen.</p>
       ),
     },
     {
-      title: "11. Automatisierte Entscheidungsfindung",
-      content: "ManagerX trifft keine vollautomatisierten Entscheidungen, die erhebliche rechtliche Auswirkungen haben.",
+      title: "11. Automatisierte Entscheidungen",
+      icon: Activity,
+      content: (
+        <p className="text-sm">ManagerX trifft keine vollautomatisierten Entscheidungen, die erhebliche rechtliche Auswirkungen haben.</p>
+      ),
     },
     {
       title: "12. Cookies & Tracking",
-      content: "Die Website nutzt keine Cookies oder Tracking-Technologien. Es werden nur technisch notwendige Session-Daten im Browser gespeichert.",
+      icon: Lock,
+      content: (
+        <p className="text-sm">Die Website nutzt keine Cookies oder Tracking-Technologien. Es werden nur technisch notwendige Session-Daten im Browser gespeichert.</p>
+      ),
     },
     {
-      title: "13. Webseiten-Hosting (GitHub Pages)",
+      title: "13. Web-Hosting (GitHub Pages)",
+      icon: Github,
       content: (
-        <div className="space-y-2 text-sm">
-          <p>Diese Webseite (Frontend) wird technisch auf <strong>GitHub Pages</strong> bereitgestellt.</p>
-          <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-2">
-            <li><strong>Anbieter:</strong> GitHub Inc., USA</li>
-            <li><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO (Berechtigtes Interesse am stabilen Webbetrieb)</li>
-            <li><strong>Sicherheit:</strong> Datenübertragung erfolgt unter Standardvertragsklauseln (SCC)</li>
-          </ul>
-          <p className="mt-2 italic text-xs">Hinweis: IP-Adressen werden von GitHub zur Abwehr von Angriffen kurzzeitig protokolliert.</p>
+        <div className="space-y-2 text-sm leading-relaxed">
+          <p><strong>Anbieter:</strong> GitHub Inc., USA</p>
+          <p><strong>Rechtsgrundlage:</strong> Art. 6 Abs. 1 lit. f DSGVO</p>
+          <p>IP-Adressen werden zur Abwehr von Angriffen kurzzeitig protokolliert (Standardvertragsklauseln).</p>
         </div>
       ),
     },
     {
-      title: "14. Änderungen dieser Erklärung",
-      content: "Änderungen werden auf dieser Seite veröffentlicht. Fortgesetzte Nutzung nach Änderungen bedeutet Zustimmung.",
+      title: "14. Änderungen",
+      icon: FileText,
+      content: (
+        <p className="text-sm text-muted-foreground italic">Änderungen dieser Erklärung werden auf dieser Seite veröffentlicht. Fortgesetzte Nutzung bedeutet Zustimmung.</p>
+      ),
     },
     {
       title: "15. Kontakt",
+      icon: Mail,
       content: (
         <div className="space-y-2 text-sm">
-          <p>
-            E-Mail: <a href="mailto:legal@oppro-network.de" className="text-primary hover:underline">legal@oppro-network.de</a>
-          </p>
-          <p className="text-xs text-muted-foreground/60">Letzte Aktualisierung: Januar 2026</p>
+          <p>E-Mail: <a href="mailto:legal@oppro-network.de" className="text-primary hover:underline font-bold">legal@oppro-network.de</a></p>
+          <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest mt-4">Letzte Aktualisierung: Januar 2026</p>
         </div>
       ),
     },
   ];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col font-sans">
       <Navbar />
-      
+
       <main className="flex-grow container relative z-10 px-4 pt-32 pb-24">
-        <div className="max-w-3xl mx-auto">
-          {/* Back Link - Korrigiert zu motion.div */}
+        <div className="max-w-4xl mx-auto">
+          {/* Back Link */}
           <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-            <Link 
-              to="/" 
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 group text-sm font-medium"
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 group text-sm font-black uppercase tracking-widest"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Zurück zur Startseite
+              Zurück zur Zentrale
             </Link>
           </motion.div>
 
           <header className="mb-16">
-            <div className="flex items-center gap-5 mb-6">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                <Lock className="w-6 h-6 text-primary" />
+            <div className="flex items-center gap-6 mb-8">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-xl shadow-primary/10">
+                <Lock className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <h1 className="text-4xl font-black tracking-tight text-foreground uppercase leading-none">
-                  Daten<span className="text-primary">schutz</span>
+                <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground uppercase italic leading-none mb-2">
+                  Daten<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">schutz</span>
                 </h1>
-                <div className="flex gap-3 mt-2 opacity-40">
-                  <span className="text-[10px] font-mono uppercase tracking-widest">DSGVO Konform</span>
-                  <span className="text-[10px] font-mono uppercase tracking-widest">•</span>
-                  <span className="text-[10px] font-mono uppercase tracking-widest">Frankfurt Hosted</span>
+                <div className="flex gap-4 opacity-40">
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">DSGVO Standard</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">•</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Frankfurt Hosted</span>
                 </div>
               </div>
             </div>
@@ -219,47 +227,55 @@ export const Datenschutz = memo(function Datenschutz() {
 
           <div className="grid gap-6">
             {sections.map((section, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                className="glass rounded-2xl p-8 border border-white/5 hover:border-primary/10 transition-colors"
+                transition={{ delay: index * 0.04, duration: 0.35 }}
+                className="group glass rounded-[2.5rem] p-8 md:p-10 border border-white/5 hover:border-primary/20 transition-all duration-500 hover:bg-card/90"
               >
-                <h2 className="text-lg font-bold mb-4 flex items-center gap-3">
-                  <Database className="w-4 h-4 text-primary/40" />
-                  {section.title}
-                </h2>
-                <div className="text-muted-foreground leading-relaxed text-sm md:text-base">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center border border-primary/10 group-hover:scale-110 transition-transform">
+                    <section.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-black tracking-tight text-white group-hover:text-primary transition-colors uppercase italic">
+                    {section.title}
+                  </h2>
+                </div>
+                <div className="text-muted-foreground leading-relaxed">
                   {section.content}
                 </div>
               </motion.div>
             ))}
 
-            {/* Kontakt Footer */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              className="mt-12 p-8 rounded-3xl border border-primary/10 bg-primary/[0.02] flex flex-col items-center text-center gap-4"
+            {/* Kontakt Section */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35 }}
+              className="mt-12 p-10 glass-strong rounded-[2.5rem] border border-primary/20 bg-primary/[0.02] flex flex-col items-center text-center gap-6"
             >
-              <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center border border-primary/20 mb-2">
-                <Shield className="w-6 h-6 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-background flex items-center justify-center border border-primary/20 shadow-2xl shadow-primary/20">
+                <Shield className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="font-bold text-xl text-foreground">Datenschutz-Anfrage</h3>
-              <p className="text-sm text-muted-foreground max-w-md">
-                Möchten Sie Auskunft über Ihre Daten oder deren Löschung beantragen?
+              <div className="space-y-2">
+                <h3 className="font-black text-3xl text-white tracking-tighter uppercase italic">Privacy Support</h3>
+                <p className="text-muted-foreground max-w-md mx-auto font-medium text-sm">
+                  Fragen zur Auskunft oder Löschung Ihrer Daten? Unser Legal-Team steht Ihnen direkt zur Verfügung.
+                </p>
+              </div>
+              <a
+                href="mailto:legal@oppro-network.de?subject=DSGVO-Anfrage"
+                className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-primary to-accent text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:shadow-[0_15px_40px_rgba(255,0,0,0.5)] transition-all overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <Mail className="w-5 h-5 relative z-10" />
+                <span className="relative z-10">Anfrage senden</span>
+              </a>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mt-2">
+                Aktueller Stand: Januar 2026 • © ManagerX
               </p>
-              <div className="flex flex-col gap-2 mt-2 w-full">
-                <a 
-                  href="mailto:legal@oppro-network.de?subject=DSGVO-Anfrage" 
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-xl font-bold text-sm hover:opacity-90 transition-opacity"
-                >
-                  <Mail className="w-4 h-4" />
-                  Anfrage per E-Mail
-                </a>
-                <p className="text-xs text-muted-foreground/60">Bearbeitungszeit: i.d.R. weniger als 30 Tage</p>
-              </div>
             </motion.div>
           </div>
         </div>

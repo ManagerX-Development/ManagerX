@@ -60,7 +60,7 @@ export const License = memo(function License() {
           </h3>
           <p className="text-xs text-muted-foreground mt-1">v{dep.version}</p>
           <p className="text-xs text-muted-foreground mt-1.5">
-            <span className="inline-block px-2 py-0.5 rounded bg-primary/10 text-primary font-mono text-[9px]">
+            <span className="inline-block px-2 py-0.5 rounded bg-primary/10 text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-mono text-[9px] border border-primary/20">
               {dep.license}
             </span>
           </p>
@@ -71,46 +71,60 @@ export const License = memo(function License() {
   );
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-background flex flex-col"
     >
       <Navbar />
-      
+
       <main className="flex-grow container relative z-10 px-4 pt-32 pb-24">
         <div className="max-w-5xl mx-auto">
           {/* Back Button */}
-          <motion.div 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <Link 
-              to="/" 
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 group text-sm font-medium"
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-all mb-12 group text-sm font-black uppercase tracking-widest"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Zurück zur Startseite
+              Zurück zur Zentrale
             </Link>
           </motion.div>
 
-          {/* Header */}
-          <header className="mb-12">
-            <div className="flex items-center gap-5 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                <Code2 className="w-6 h-6 text-primary" />
-              </div>
+          <header className="mb-16">
+            <div className="flex items-center gap-6 mb-8">
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                className="relative w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-xl shadow-primary/10"
+              >
+                <Code2 className="w-8 h-8 text-primary" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent rounded-2xl animate-pulse" />
+              </motion.div>
               <div>
-                <h1 className="text-4xl font-black tracking-tight text-foreground uppercase">
-                  Open <span className="text-primary">Source</span>
-                </h1>
-                <p className="text-muted-foreground font-mono text-[10px] uppercase tracking-widest mt-1 opacity-50">
-                  GPL-3.0 & Lizenz Information
-                </p>
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-5xl md:text-7xl font-black tracking-tighter text-foreground uppercase italic leading-none mb-2"
+                >
+                  Open <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary animate-gradient">Source</span>
+                </motion.h1>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.4 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex gap-4"
+                >
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">GPL-3.0 License</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">•</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Free Forever</span>
+                </motion.div>
               </div>
             </div>
           </header>
 
           {/* Main Content */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="glass rounded-3xl p-8 md:p-12 border border-white/5 space-y-12"
@@ -121,13 +135,13 @@ export const License = memo(function License() {
                 <Shield className="w-6 h-6 text-primary" />
                 <h2 className="text-2xl font-bold text-foreground">GNU General Public License v3.0</h2>
               </div>
-              
+
               <div className="bg-secondary/50 rounded-2xl p-6 border border-primary/10 space-y-4">
                 <p className="text-foreground">
                   <strong>ManagerX</strong> ist lizenziert unter der{" "}
-                  <a 
-                    href="https://www.gnu.org/licenses/gpl-3.0.de.html" 
-                    target="_blank" 
+                  <a
+                    href="https://www.gnu.org/licenses/gpl-3.0.de.html"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary hover:underline"
                   >
@@ -137,19 +151,19 @@ export const License = memo(function License() {
 
                 <div className="space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-start gap-3">
-                    <span className="text-primary font-bold mt-0.5">✓</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
                     <p><strong>Freiheit zu verwenden:</strong> Sie können das Programm für jeden Zweck verwenden.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-primary font-bold mt-0.5">✓</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
                     <p><strong>Freiheit zu studieren:</strong> Sie können den Quellcode einsehen und verstehen.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-primary font-bold mt-0.5">✓</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
                     <p><strong>Freiheit zu verteilen:</strong> Sie können Kopien weitergeben.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-primary font-bold mt-0.5">✓</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
                     <p><strong>Freiheit zu verbessern:</strong> Sie können das Programm modifizieren und verbesserungen veröffentlichen.</p>
                   </div>
                 </div>
@@ -230,9 +244,18 @@ export const License = memo(function License() {
               </div>
               <div className="bg-secondary/50 rounded-2xl p-6 border border-accent/10">
                 <div className="space-y-3 text-sm text-muted-foreground">
-                  <p>• Bug-Reports und Verbesserungsvorschläge</p>
-                  <p>• Code-Beiträge und Feature-Implementationen</p>
-                  <p>• Dokumentations-Verbesserungen</p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-accent font-bold">✓</span>
+                    <p>Bug-Reports und Verbesserungsvorschläge</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-accent font-bold">✓</span>
+                    <p>Code-Beiträge und Feature-Implementationen</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-accent font-bold">✓</span>
+                    <p>Dokumentations-Verbesserungen</p>
+                  </div>
                 </div>
                 <div className="mt-6">
                   <a
@@ -262,9 +285,9 @@ export const License = memo(function License() {
             <section className="space-y-4 pt-8 border-t border-white/10">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase">Links</h3>
               <div className="flex flex-wrap gap-4">
-                <Link to="/datenschutz" className="text-xs text-primary hover:underline">Datenschutz</Link>
-                <Link to="/nutzungsbedingungen" className="text-xs text-primary hover:underline">Nutzungsbedingungen</Link>
-                <Link to="/impressum" className="text-xs text-primary hover:underline">Impressum</Link>
+                <Link to="/legal/privacy" className="text-xs text-primary hover:underline">Datenschutz</Link>
+                <Link to="/legal/terms" className="text-xs text-primary hover:underline">AGB</Link>
+                <Link to="/legal/imprint" className="text-xs text-primary hover:underline">Impressum</Link>
                 <a href="https://github.com/ManagerX-Development/ManagerX" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">GitHub</a>
               </div>
             </section>

@@ -10,38 +10,39 @@ const socialLinks = [
 
 export const Footer = memo(function Footer() {
   return (
-    <footer className="relative py-32 bg-background overflow-hidden">
+    <footer className="relative py-32 bg-background overflow-hidden border-t border-white/5">
       {/* Premium Hintergrund-Effekte */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
       <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-primary/10 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/10 blur-[150px] rounded-full pointer-events-none" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
-      
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,0,0,0.05),transparent)]" />
+
       <div className="container relative z-10 px-4">
         <div className="flex flex-col items-center">
-          
+
           {/* --- HERO LOGO REPLICA --- */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="flex items-center justify-center gap-5 mb-12"
+            className="flex items-center justify-center gap-5 mb-14"
           >
-            <div className="relative">
-              <motion.div 
-                whileHover={{ scale: 1.05, rotate: 5 }}
+            <div className="relative group">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 10 }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="w-28 h-28 rounded-3xl bg-gradient-to-br from-primary via-primary/80 to-accent flex items-center justify-center shadow-2xl shadow-primary/40 border border-white/10 backdrop-blur-sm"
+                className="w-32 h-32 rounded-[2rem] bg-gradient-to-br from-primary via-primary/90 to-accent flex items-center justify-center shadow-2xl shadow-primary/40 border border-white/10 backdrop-blur-xl relative overflow-hidden"
               >
-                <Shield className="w-14 h-14 text-primary-foreground" />
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Shield className="w-16 h-16 text-white drop-shadow-glow" />
               </motion.div>
-              <motion.div 
+              <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-accent to-primary rounded-full flex items-center justify-center shadow-xl shadow-accent/50 border border-white/10"
+                transition={{ duration: 2.5, repeat: Infinity }}
+                className="absolute -bottom-3 -right-3 w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-2xl flex items-center justify-center shadow-xl shadow-accent/50 border border-white/10 z-10"
               >
-                <Sparkles className="w-5 h-5 text-accent-foreground" />
+                <Sparkles className="w-6 h-6 text-white" />
               </motion.div>
             </div>
           </motion.div>
@@ -52,10 +53,10 @@ export const Footer = memo(function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-6xl md:text-7xl font-black mb-6 tracking-tighter text-center bg-gradient-to-r from-foreground via-foreground to-primary bg-clip-text text-transparent"
+            className="text-6xl md:text-8xl font-black mb-8 tracking-tighter text-center"
           >
-            <span className="italic">Manager</span>
-            <span className="ml-2">X</span>
+            <span className="text-foreground">Manager</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary ml-2 filter drop-shadow-glow">X</span>
           </motion.h2>
 
           {/* --- SLOGAN --- */}
@@ -64,22 +65,25 @@ export const Footer = memo(function Footer() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl md:text-2xl text-muted-foreground mb-20 font-bold tracking-tight flex items-center gap-4 flex-wrap justify-center"
+            className="text-xl md:text-3xl text-muted-foreground/80 mb-24 font-black tracking-tight flex items-center gap-6 flex-wrap justify-center uppercase italic"
           >
-            <span className="flex items-center gap-2"><Zap className="w-5 h-5 text-primary" /> Sicher</span>
-            <span className="text-primary/40">•</span> 
-            <span className="flex items-center gap-2"><Rocket className="w-5 h-5 text-accent" /> Schnell</span>
-            <span className="text-primary/40">•</span> 
-            <span className="flex items-center gap-2"><Code2 className="w-5 h-5 text-primary" /> Open Source</span>
+            <span className="flex items-center gap-2 hover:text-primary transition-colors cursor-default"><Zap className="w-6 h-6 text-primary" /> Sicher</span>
+            <span className="text-primary/20">•</span>
+            <span className="flex items-center gap-2 hover:text-accent transition-colors cursor-default"><Rocket className="w-6 h-6 text-accent" /> Schnell</span>
+            <span className="text-primary/20">•</span>
+            <Link to="/legal/license" className="flex items-center gap-2 text-muted-foreground/80 hover:text-primary transition-colors cursor-pointer group">
+              <Code2 className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform" />
+              <span>Open Source</span>
+            </Link>
           </motion.p>
 
           {/* --- SOCIAL BUTTONS --- */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4 mb-24"
+            className="flex flex-wrap justify-center gap-6 mb-32"
           >
             {socialLinks.map((link, idx) => (
               <motion.a
@@ -87,168 +91,151 @@ export const Footer = memo(function Footer() {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ y: -6, boxShadow: "0 20px 40px rgba(var(--primary), 0.2)" }}
+                whileHover={{ y: -8, scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ delay: idx * 0.1 }}
-                className="group px-8 py-4 rounded-2xl border border-primary/20 bg-primary/5 backdrop-blur-sm flex items-center gap-3 text-sm font-bold hover:bg-primary/10 transition-all shadow-lg hover:shadow-primary/20 hover:border-primary/40"
+                className="group px-10 py-5 rounded-[1.5rem] border border-primary/20 bg-primary/5 backdrop-blur-md flex items-center gap-4 text-sm font-black uppercase tracking-widest hover:bg-primary/10 transition-all shadow-xl hover:shadow-primary/30 hover:border-primary/40 text-white"
               >
-                <link.icon className="w-5 h-5 text-primary group-hover:text-accent transition-colors" />
+                <link.icon className="w-6 h-6 text-primary group-hover:text-accent transition-colors" />
                 {link.label}
               </motion.a>
             ))}
           </motion.div>
 
           {/* --- NAVIGATION & TECH GRID --- */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 text-center md:text-left border-y border-white/10 py-20 w-full max-w-6xl mb-20 backdrop-blur-sm"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-16 text-center md:text-left border-y border-white/5 py-24 w-full max-w-7xl mb-24 backdrop-blur-sm"
           >
-            
-            <motion.div 
-              whileHover={{ y: -5 }}
-              className="flex flex-col gap-5 p-5 rounded-2xl hover:bg-white/5 transition-all"
-            >
-              <span className="text-[11px] font-black uppercase tracking-widest text-primary">Schnellzugriff</span>
-              <a href="#features" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <Star className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+            {/* column 1 */}
+            <div className="flex flex-col gap-6">
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Navigation</span>
+              <a href="#features" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Star className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
                 <span className="group-hover:translate-x-1 transition-transform">Features</span>
               </a>
-              <a href="#stats" className="text-sm text-muted-foreground hover:text-accent transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <BarChart3 className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-                <span className="group-hover:translate-x-1 transition-transform">Stats</span>
+              <a href="#stats" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <BarChart3 className="w-4 h-4 text-accent transition-transform group-hover:scale-110" />
+                <span className="group-hover:translate-x-1 transition-transform">Statistiken</span>
               </a>
-              <a href="#commands" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <Terminal className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                <span className="group-hover:translate-x-1 transition-transform">Commands</span>
-              </a>
-            </motion.div>
+              <Link to="/plugins" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Terminal className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
+                <span className="group-hover:translate-x-1 transition-transform">Plugin System</span>
+              </Link>
+            </div>
 
-            <motion.div 
-              whileHover={{ y: -5 }}
-              className="flex flex-col gap-5 p-5 rounded-2xl hover:bg-white/5 transition-all"
-            >
-              <span className="text-[11px] font-black uppercase tracking-widest text-primary">Links</span>
-              <a href="https://docs.oppro-network.de/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-accent flex items-center justify-center md:justify-start gap-2 font-medium group">
-                <ExternalLink className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-                <span className="group-hover:translate-x-1 transition-transform">Docs</span>
+            {/* column 2 */}
+            <div className="flex flex-col gap-6">
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Ressourcen</span>
+              <a href="https://docs.oppro-network.de/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <ExternalLink className="w-4 h-4 text-accent" />
+                <span className="group-hover:translate-x-1 transition-transform">Documentation</span>
               </a>
-              <a href="https://discord.com" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <Users className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                <span className="group-hover:translate-x-1 transition-transform">Invite Bot</span>
+              <a href="https://discord.gg/oppro" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Users className="w-4 h-4 text-primary" />
+                <span className="group-hover:translate-x-1 transition-transform">Support Server</span>
               </a>
-              <a href="https://status.oppro-network.de" className="text-sm text-muted-foreground hover:text-accent transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <Activity className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-                <span className="group-hover:translate-x-1 transition-transform">Status Page</span>
-              </a>
-            </motion.div>
+              <Link to="/status" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Activity className="w-4 h-4 text-accent" />
+                <span className="group-hover:translate-x-1 transition-transform">Network Status</span>
+              </Link>
+            </div>
 
-            <motion.div 
-              whileHover={{ y: -5 }}
-              className="flex flex-col gap-5 p-5 rounded-2xl hover:bg-white/5 transition-all"
-            >
-              <span className="text-[11px] font-black uppercase tracking-widest text-primary">Rechtliches</span>
-              <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <Lock className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+            {/* column 3 */}
+            <div className="flex flex-col gap-6">
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Legal</span>
+              <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Lock className="w-4 h-4 text-primary" />
                 <span className="group-hover:translate-x-1 transition-transform">Datenschutz</span>
               </Link>
-              <Link to="/legal/imprint" className="text-sm text-muted-foreground hover:text-accent transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <Info className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+              <Link to="/legal/imprint" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Info className="w-4 h-4 text-accent" />
                 <span className="group-hover:translate-x-1 transition-transform">Impressum</span>
               </Link>
-              <Link to="/legal/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <FileCheck className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                <span className="group-hover:translate-x-1 transition-transform">Nutzungsbedingungen</span>
+              <Link to="/legal/terms" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <FileCheck className="w-4 h-4 text-primary" />
+                <span className="group-hover:translate-x-1 transition-transform">AGB</span>
               </Link>
-              <Link to="/legal/license" className="text-sm text-muted-foreground hover:text-accent font-medium flex items-center justify-center md:justify-start gap-2 group">
-                <Code2 className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-                <span className="group-hover:translate-x-1 transition-transform">Open Source</span>
+              <Link to="/legal/license" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Code2 className="w-4 h-4 text-accent" />
+                <span className="group-hover:translate-x-1 transition-transform">Lizenz</span>
               </Link>
-            </motion.div>
+            </div>
 
-            <motion.div 
-              whileHover={{ y: -5 }}
-              className="flex flex-col gap-5 p-5 rounded-2xl hover:bg-white/5 transition-all"
-            >
-              <span className="text-[11px] font-black uppercase tracking-widest text-primary">System Architecture</span>
-              <div className="space-y-5">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-[10px] font-mono tracking-tighter">
-                    <span className="text-foreground font-bold">Python (Core)</span>
-                    <span className="text-primary font-bold">66.6%</span>
+            {/* column 4 */}
+            <div className="flex flex-col gap-8">
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Architecture</span>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-[11px] font-black uppercase tracking-widest">
+                    <span className="text-foreground">Python Core</span>
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">66.6%</span>
                   </div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                    <motion.div 
+                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
                       initial={{ width: 0 }}
                       whileInView={{ width: "66.6%" }}
                       viewport={{ once: true }}
                       transition={{ duration: 1.5, ease: "easeOut" }}
-                      className="h-full bg-gradient-to-r from-primary to-primary/50 shadow-[0_0_12px_rgba(var(--primary),0.5)] rounded-full" 
+                      className="h-full bg-gradient-to-r from-primary to-accent shadow-[0_0_15px_rgba(255,0,0,0.5)] rounded-full"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex justify-between text-[10px] font-mono tracking-tighter">
-                    <span className="text-foreground font-bold">TypeScript (Web)</span>
-                    <span className="text-accent font-bold">32.0%</span>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-[11px] font-black uppercase tracking-widest">
+                    <span className="text-foreground">React/TS Web</span>
+                    <span className="text-accent">32.0%</span>
                   </div>
-                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                    <motion.div 
+                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
                       initial={{ width: 0 }}
                       whileInView={{ width: "32.0%" }}
                       viewport={{ once: true }}
                       transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-                      className="h-full bg-gradient-to-r from-accent to-accent/50 shadow-[0_0_12px_rgba(var(--accent),0.5)] rounded-full" 
+                      className="h-full bg-gradient-to-r from-accent to-primary shadow-[0_0_15px_rgba(255,0,0,0.3)] rounded-full"
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 pt-2">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.6)]" />
-                    <span className="text-[9px] font-mono text-muted-foreground font-medium">CSS 1.1%</span>
+                <div className="flex items-center gap-4 pt-2">
+                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 border border-primary/20 shadow-lg">
+                    <Terminal className="w-4 h-4 text-primary" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">v2.0.0 Stable</span>
                   </div>
-                  <motion.div 
-                    whileHover={{ scale: 1.05 }}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 hover:border-accent/40 transition-all"
-                  >
-                    <Terminal className="w-3.5 h-3.5 text-accent" />
-                    <span className="text-[9px] font-mono text-accent font-bold">V2.0.0</span>
-                  </motion.div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
 
           {/* --- FOOTER BOTTOM --- */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col md:flex-row items-center justify-between w-full gap-8 pt-8"
+            className="flex flex-col md:flex-row items-center justify-between w-full gap-10 pt-10"
           >
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground transition-colors"
+              className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-white transition-all cursor-default"
             >
-              <span>Built with</span>
-              <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" />
-              <span>by ManagerX Dev Team</span>
+              <span>Made with</span>
+              <Heart className="w-5 h-5 text-primary fill-primary animate-pulse" />
+              <span>by ManagerX Team</span>
             </motion.div>
-            <motion.div 
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-3 opacity-50 text-[11px] font-mono uppercase font-bold hover:opacity-100 transition-opacity"
-            >
-              <Code2 className="w-3.5 h-3.5 text-primary" />
-              <span>Open Source Project</span>
-            </motion.div>
-            <p className="text-[11px] font-mono text-muted-foreground/60 hover:text-muted-foreground/100 transition-colors font-bold">
-              © {new Date().getFullYear()} / ALL RIGHTS RESERVED
-            </p>
+            <div className="flex items-center gap-10">
+              <Link to="/legal/license" className="flex items-center gap-3 opacity-40 text-xs font-black uppercase tracking-widest hover:opacity-100 hover:text-primary transition-all cursor-pointer">
+                <Code2 className="w-4 h-4 text-primary" />
+                <span>Open Source Community</span>
+              </Link>
+              <p className="text-xs font-black text-muted-foreground/50 hover:text-white transition-all tracking-[0.3em] uppercase">
+                © {new Date().getFullYear()} ALL RIGHTS RESERVED
+              </p>
+            </div>
           </motion.div>
         </div>
       </div>

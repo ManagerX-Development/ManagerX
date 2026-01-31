@@ -14,6 +14,14 @@ from discord import slash_command, option
 import timedelta
 from discord.ui import Container
 from discord import SlashCommandGroup
+
+# Importiere zentrale Konstanten
+from src.bot.core import (
+    SUCCESS_COLOR, ERROR_COLOR, WARN_COLOR, INFO_COLOR,
+    emoji_yes, emoji_no, emoji_warn, emoji_info, 
+    emoji_member, emoji_staff, emoji_summary, emoji_slowmode,
+    AUTHOR, FLOOTER
+)
 # ───────────────────────────────────────────────
 # >> Cogs
 # ───────────────────────────────────────────────
@@ -126,7 +134,7 @@ class moderationCog(ezcord.Cog):
         if additional_info:
             embed.add_field(name=f"{emoji_summary} × Zusätzlich", value=additional_info, inline=False)
         if target:
-            embed.set_footer(text=f"User ID: {target.id}")
+            embed.set_footer(text=f"User ID: {target.id} | {FLOOTER}")
         else:
             embed.set_footer(text=FLOOTER)
         return embed

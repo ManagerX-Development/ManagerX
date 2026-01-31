@@ -57,7 +57,7 @@ class DashboardTask:
                 json.dump(stats, f, indent=4, ensure_ascii=False)
                 
         except Exception as e:
-            logger.error(Category.BOT, f"Dashboard-Update fehlgeschlagen: {e}")
+            logger.error(Category.DISCORD_BOT, f"Dashboard-Update fehlgeschlagen: {e}")
     
     def _get_uptime(self) -> str:
         """Berechnet die Bot-Uptime"""
@@ -77,19 +77,19 @@ class DashboardTask:
         """Registriert den Task (startet ihn noch nicht)"""
         # Startzeit speichern
         self.bot.start_time = datetime.now()
-        logger.info(Category.DISCORD_BOT, "Dashboard-Task registriert")
+        
     
     def start(self):
         """Startet den Dashboard-Update-Task"""
         if self._task and not self._task.is_running():
             self._task.start()
-            logger.success(Category.DISCORD_BOT, "Dashboard-Task gestartet")
+            
     
     def stop(self):
         """Stoppt den Dashboard-Update-Task"""
         if self._task and self._task.is_running():
             self._task.cancel()
-            logger.info(Category.DISCORD_BOT, "Dashboard-Task gestoppt")
+            
     
     def is_running(self) -> bool:
         """
