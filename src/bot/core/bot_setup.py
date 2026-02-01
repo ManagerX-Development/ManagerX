@@ -26,12 +26,16 @@ class BotSetup:
         intents = discord.Intents.default()
         intents.members = True
         intents.message_content = True
+        intents.presences = True
         
         # Bot erstellen
         bot = ezcord.Bot(
             intents=intents,
             language="de"
         )
+        
+        # Ezcord Help Command aktivieren
+        bot.add_help_command()
         
         # Bot-Konfiguration anhängen
         bot.config = self._build_bot_config()

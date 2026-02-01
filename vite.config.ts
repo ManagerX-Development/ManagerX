@@ -1,12 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
   // WICHTIG: Erlaubt korrekte Pfade auf deiner Subdomain
-  base: "/", 
-  
+  base: "/",
+
   server: {
     host: "::",
     port: 8080,
@@ -15,9 +14,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    react(), 
-    mode === "development" && componentTagger()
-  ].filter(Boolean),
+    react()
+  ],
   resolve: {
     alias: {
       // Dein Alias zeigt auf ./src/web - das ist wichtig für deine Imports
