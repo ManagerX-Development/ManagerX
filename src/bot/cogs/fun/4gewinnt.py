@@ -19,6 +19,8 @@ import random
 ROWS = 6
 COLUMNS = 7
 DEFAULT_TIMEOUT = 300  # 5 Minuten
+ACTIVE_AI_GAMES = 0
+MAX_AI_GAMES = 5
 
 # Improved difficulty levels with better depth and strategy
 DIFFICULTY_CONFIG = {
@@ -489,7 +491,7 @@ class Connect4Button(Button):
             )
 
 class Connect4View(View):
-    def __init__(self, player1, player2, messages, is_ai_mode=False, difficulty="medium"):
+    def __init__(self, player1, player2, messages, is_ai_mode=False, difficulty="medium", on_cleanup=None):
         super().__init__(timeout=DEFAULT_TIMEOUT)
         self.player1 = player1
         self.player2 = player2
@@ -504,6 +506,8 @@ class Connect4View(View):
         self.move_count = 0
         self.move_history: List[tuple] = []
         self.game_ended = False
+        self.on_cleanup = on_cleanup
+        self.cleaned_up = False
 
         for col in range(COLUMNS):
             self.add_item(Connect4Button(col, self))
@@ -673,6 +677,10 @@ class Connect4View(View):
         else:
             await interaction.response.edit_message(embed=embed, view=self)
         
+        if self.on_cleanup and not self.cleaned_up:
+            self.on_cleanup()
+            self.cleaned_up = True
+            
         self.stop()
     
     async def on_timeout(self):
@@ -680,6 +688,10 @@ class Connect4View(View):
         self.game_ended = True
         for child in self.children:
             child.disabled = True
+            
+        if self.on_cleanup and not self.cleaned_up:
+            self.on_cleanup()
+            self.cleaned_up = True
 
 # ───────────────────────────────────────────────
 # >> Cog
@@ -712,8 +724,22 @@ class Connect4Cog(ezcord.Cog, group="fun"):
 
         # AI mode
         if opponent is None:
+            global ACTIVE_AI_GAMES
+            if ACTIVE_AI_GAMES >= MAX_AI_GAMES:
+                await ctx.respond(
+                    "Tut uns leid, unsere KI wird gerade stark beansprucht. Bitte warte einen Moment damit unsere CPU last nicht in das Unendliche geht",
+                    ephemeral=True
+                )
+                return
+
+            ACTIVE_AI_GAMES += 1
+            
+            def cleanup():
+                global ACTIVE_AI_GAMES
+                ACTIVE_AI_GAMES -= 1
+
             ai_user = ctx.guild.me
-            view = Connect4View(ctx.author, ai_user, messages, is_ai_mode=True, difficulty=difficulty)
+            view = Connect4View(ctx.author, ai_user, messages, is_ai_mode=True, difficulty=difficulty, on_cleanup=cleanup)
             
             difficulty_info = DIFFICULTY_CONFIG.get(difficulty, DIFFICULTY_CONFIG["medium"])
             difficulty_emoji = {"easy": "😊", "medium": "🤔", "hard": "😈"}
