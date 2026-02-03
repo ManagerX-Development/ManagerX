@@ -6,7 +6,7 @@ import time
 
 # Wir erstellen einen Router, den wir später in die Haupt-App einbinden
 router = APIRouter(
-    prefix="/api/v1/managerx",
+    prefix="/v1/managerx",
     tags=["dashboard"]
 )
 
