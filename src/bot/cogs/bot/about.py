@@ -1,20 +1,16 @@
-# Copyright (c) 2025 OPPRO.NET Network
+from datetime import datetime
+import platform
 import discord
 from discord.ext import commands
 import ezcord
-from datetime import datetime
-import platform
-import sys
-import time
-from discord.ui import Container
+from mx_handler import TranslationHandler
 
-
-class AboutCog(commands.Cog):
+class About(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # Fallback for uptime if bot.uptime is not set
-        if not hasattr(self.bot, 'uptime'):
-            self.bot.uptime = datetime.now()
+        # Fallback for uptime if bot.start_time is not set
+        if not hasattr(self.bot, 'start_time'):
+            self.bot.start_time = datetime.now()
 
     @discord.slash_command(name="about", description="Zeigt Informationen über den Bot an")
     async def about(self, ctx: discord.ApplicationContext):
@@ -27,7 +23,7 @@ class AboutCog(commands.Cog):
         ezcord_version = ezcord.__version__
         
         # Calculate uptime
-        uptime = discord.utils.format_dt(self.bot.uptime, style="R")
+        uptime = discord.utils.format_dt(self.bot.start_time, style="R")
         
         # Calculate ping
         ping = f"**{round(self.bot.latency * 1000)}ms**"
@@ -37,50 +33,59 @@ class AboutCog(commands.Cog):
         member_count = sum(g.member_count for g in self.bot.guilds)
         
         # Create Container
-        container = Container()
+        container = discord.ui.Container()
         
         # Header
-        container.add_text(f"# ℹ️ Über {self.bot.user.name}")
-        container.add_text(
-            "Ein fortschrittlicher Management-Bot entwickelt für professionelle Communities.\n"
-            "ManagerX bietet umfangreiche Tools für Moderation, Statistiken und Server-Verwaltung."
-        )
+        title = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.title")
+        description = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.description")
+        
+        container.add_text(title)
+        container.add_text(description)
         container.add_separator()
         
         # Development
-        container.add_text("## 👨💻 Entwicklung")
-        container.add_text(
-            "Entwickelt von **ManagerX Development**\n"
-            "❯ [🌐 Website](https://managerx-bot.de)\n"
-            "❯ [💬 Support Server](https://discord.gg/uDDWzsZNzD)"
-        )
+        dev_header = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.dev_header")
+        dev_info = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.dev_info")
+        
+        container.add_text(dev_header)
+        container.add_text(dev_info)
         container.add_separator()
         
         # Stats
-        container.add_text("## 📊 Statistiken")
-        container.add_text(
-            f"❯ **Server:** `{server_count}`\n"
-            f"❯ **User:** `{member_count:,}`\n"
-            f"❯ **Ping:** {ping}\n"
-            f"❯ **Uptime:** {uptime}"
+        stats_header = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.stats_header")
+        stats_info = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.stats_info",
+            server_count=server_count,
+            member_count=f"{member_count:,}",
+            ping=ping,
+            uptime=uptime
         )
+        
+        container.add_text(stats_header)
+        container.add_text(stats_info)
         container.add_separator()
         
         # Technical
-        container.add_text("## 🛠️ Technik & Versionen")
-        container.add_text(
-            f"❯ **Python:** `v{python_version}`\n"
-            f"❯ **PyCord:** `v{discord_version}`\n"
-            f"❯ **EzCord:** `v{ezcord_version}`"
+        tech_header = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.tech_header")
+        tech_info = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.tech_info",
+            python_version=python_version,
+            discord_version=discord_version,
+            ezcord_version=ezcord_version
         )
+        
+        container.add_text(tech_header)
+        container.add_text(tech_info)
         container.add_separator()
         
         # Footer
-        container.add_text(f"{datetime.now().year} ManagerX Development • ManagerX v2.0.0")
+        footer = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.footer",
+            year=datetime.now().year,
+            version="2.0.0"
+        )
+        container.add_text(footer)
         
         # Send View
         view = discord.ui.DesignerView(container, timeout=0)
         await ctx.respond(view=view)
 
 def setup(bot):
-    bot.add_cog(AboutCog(bot))
+    bot.add_cog(About(bot))

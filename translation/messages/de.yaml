@@ -120,3 +120,19 @@ cog_autorole:
     console_log: "✅ Autoroles [{role_names}] wurden {member_name} zugewiesen"
     error_forbidden: "❌ Keine Berechtigung, um Rollen zu vergeben"
     error_http: "❌ Fehler beim Zuweisen der Rollen: {error}"
+
+#######################################
+# About Cog
+#########################################################
+
+cog_about:
+  messages:
+    title: "# ℹ️ Über ManagerX"
+    description: "Ein fortschrittlicher Management-Bot entwickelt für professionelle Communities.\nManagerX bietet umfangreiche Tools für Moderation, Statistiken und Server-Verwaltung."
+    dev_header: "## 👨💻 Entwicklung"
+    dev_info: "Entwickelt von **ManagerX Development**\n❯ [🌐 Website](https://managerx-bot.de)\n❯ [💬 Support Server](https://discord.gg/uDDWzsZNzD)"
+    stats_header: "## 📊 Statistiken"
+    stats_info: "❯ **Server:** `{server_count}`\n❯ **User:** `{member_count}`\n❯ **Ping:** {ping}\n❯ **Uptime:** {uptime}"
+    tech_header: "## 🛠️ Technik & Versionen"
+    tech_info: "❯ **Python:** `v{python_version}`\n❯ **PyCord:** `v{discord_version}`\n❯ **EzCord:** `v{ezcord_version}`"
+    footer: "{year} ManagerX Development • ManagerX v2.0.0"

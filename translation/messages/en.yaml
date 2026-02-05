@@ -117,3 +117,19 @@ cog_autorole:
     console_log: "✅ Autoroles [{role_names}] were assigned to {member_name}"
     error_forbidden: "❌ Missing permissions to assign roles"
     error_http: "❌ Error while assigning roles: {error}"
+    
+#######################################
+# About Cog
+#########################################################
+
+cog_about:
+  messages:
+    title: "# ℹ️ About ManagerX"
+    description: "An advanced management bot developed for professional communities.\nManagerX offers comprehensive tools for moderation, statistics, and server management."
+    dev_header: "## 👨💻 Development"
+    dev_info: "Developed by **ManagerX Development**\n❯ [🌐 Website](https://managerx-bot.de)\n❯ [💬 Support Server](https://discord.gg/uDDWzsZNzD)"
+    stats_header: "## 📊 Statistics"
+    stats_info: "❯ **Servers:** `{server_count}`\n❯ **Users:** `{member_count}`\n❯ **Ping:** {ping}\n❯ **Uptime:** {uptime}"
+    tech_header: "## 🛠️ Technology & Versions"
+    tech_info: "❯ **Python:** `v{python_version}`\n❯ **PyCord:** `v{discord_version}`\n❯ **EzCord:** `v{ezcord_version}`"
+    footer: "{year} ManagerX Development • ManagerX v2.0.0"

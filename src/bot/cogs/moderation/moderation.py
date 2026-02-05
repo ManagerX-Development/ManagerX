@@ -25,7 +25,7 @@ from src.bot.core import (
 # ───────────────────────────────────────────────
 # >> Cogs
 # ───────────────────────────────────────────────
-class moderationCog(ezcord.Cog):
+class moderation(ezcord.Cog):
     """Erweiterte Moderations-Cog mit verbesserter Sicherheit und Fehlerbehandlung"""
 
     def __init__(self, bot):
@@ -555,4 +555,4 @@ class moderationCog(ezcord.Cog):
 
 
 def setup(bot):
-    bot.add_cog(moderationCog(bot))
+    bot.add_cog(moderation(bot))
