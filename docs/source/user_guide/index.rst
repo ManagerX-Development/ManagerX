@@ -31,52 +31,27 @@ That's it! ManagerX is ready to use.
 📚 Documentation Overview
 ==========================
 
-**Quick Start**
+.. toctree::
+    :maxdepth:
+    :caption: Setup/Settings:
 
-- :doc:`quick_start/index` — Add ManagerX to your server in minutes
-- Getting bot token
-- Permissions setup
-- Initial configuration
+    quick_start/index
+    setup_guide/index
+    configuration/index
 
-**Features & Capabilities**
+.. toctree::
+    :maxdepth:
+    :caption: Features:
 
-- :doc:`features/index` — Overview of all ManagerX features
-- Moderation tools
-- Entertainment commands
-- Statistics and profiles
-- Server management
+    features/index
+    commands/index
 
-**Commands & Usage**
+.. toctree::
+    :maxdepth:
+    :caption: Help:
 
-- :doc:`commands/index` — Complete command reference
-- Slash command syntax
-- Examples for each command
-- Permission requirements
-
-**Configuration**
-
-- :doc:`setup_guide/index` — Detailed server setup guide
-- Role configuration
-- Channel setup
-- Moderation settings
-- XP system configuration
-
-- :doc:`configuration/index` — All configuration options
-- Advanced settings
-- Best practices
-- Optimization tips
-
-**Help & Support**
-
-- :doc:`faq/index` — Frequently asked questions
-- Common scenarios
-- Quick answers
-
-- :doc:`troubleshooting/index` — Solving problems
-- Bot not responding
-- Permission issues
-- Command errors
-- Performance problems
+    faq/index
+    troubleshooting/index
 
 ---
 
