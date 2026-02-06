@@ -1,297 +1,237 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Code2, GitBranch, Heart, ExternalLink, Shield } from "lucide-react";
+import {
+  ArrowLeft, Code2, GitBranch, Heart, ExternalLink,
+  Shield, ChevronRight, Package, Terminal, Box, HelpCircle
+} from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { motion } from "framer-motion";
+
+const pythonDependencies = [
+  { name: "py-cord", version: "2.7.0", license: "MIT", url: "https://github.com/Pycord-Development/pycord" },
+  { name: "ezcord", version: "0.7.4", license: "MIT", url: "https://github.com/ezcord-org/ezcord" },
+  { name: "aiosqlite", version: "0.22.1", license: "MIT", url: "https://github.com/omnilib/aiosqlite" },
+  { name: "aiohttp", version: "3.13.3", license: "Apache 2.0", url: "https://github.com/aio-libs/aiohttp" },
+  { name: "aiocache", version: "0.12.3", license: "BSD", url: "https://github.com/aio-libs/aiocache" },
+  { name: "requests", version: "2.32.5", license: "Apache 2.0", url: "https://github.com/psf/requests" },
+  { name: "wikipedia", version: "1.4.0", license: "MIT", url: "https://github.com/goldsmith/Wikipedia" },
+  { name: "beautifulsoup4", version: "4.14.3", license: "MIT", url: "https://www.crummy.com/software/BeautifulSoup/" },
+];
+
+const nodeDependencies = [
+  { name: "react", version: "18+", license: "MIT", url: "https://github.com/facebook/react" },
+  { name: "typescript", version: "5+", license: "Apache 2.0", url: "https://github.com/microsoft/TypeScript" },
+  { name: "vite", version: "5+", license: "MIT", url: "https://github.com/vitejs/vite" },
+  { name: "framer-motion", version: "12+", license: "MIT", url: "https://github.com/framer/motion" },
+  { name: "lucide-react", version: "latest", license: "ISC", url: "https://github.com/lucide-icons/lucide" }
+];
+
+const SECTIONS = [
+  { id: "project-license", title: "Project License", icon: Shield },
+  { id: "python-deps", title: "Python Deps", icon: Box },
+  { id: "node-deps", title: "Node.js Deps", icon: Package },
+  { id: "other-deps", title: "Other Tools", icon: Terminal },
+  { id: "contributing", title: "Contributing", icon: Heart },
+  { id: "copyright", title: "Copyright", icon: HelpCircle },
+];
+
+const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+  <section id={id} className="scroll-mt-32 group">
+    <div className="flex items-center gap-4 mb-8">
+      <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+      <h2 className="text-2xl font-black text-white uppercase italic tracking-tight group-hover:text-primary transition-colors">
+        {title}
+      </h2>
+    </div>
+    <div className="text-lg leading-relaxed text-slate-400 font-medium whitespace-pre-wrap">
+      {children}
+    </div>
+  </section>
+);
+
+const DependencyCard = ({ dep }: { dep: any }) => (
+  <a
+    href={dep.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group flex flex-col p-6 rounded-2xl bg-[#111318] border border-white/5 hover:border-primary/20 transition-all"
+  >
+    <div className="flex items-center justify-between mb-2">
+      <h3 className="font-bold text-white group-hover:text-primary transition-colors">{dep.name}</h3>
+      <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-primary opacity-0 group-hover:opacity-100 transition-all" />
+    </div>
+    <div className="flex items-center gap-3">
+      <span className="text-[10px] text-slate-500 font-mono">v{dep.version}</span>
+      <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-black uppercase text-primary tracking-widest leading-none">
+        {dep.license}
+      </span>
+    </div>
+  </a>
+);
 
 export const License = memo(function License() {
-  // Python Dependencies
-  const pythonDependencies = [
-    { name: "py-cord", version: "2.7.0", license: "MIT", url: "https://github.com/Pycord-Development/pycord" },
-    { name: "ezcord", version: "0.7.4", license: "MIT", url: "https://github.com/ezcord-org/ezcord" },
-    { name: "aiosqlite", version: "0.22.1", license: "MIT", url: "https://github.com/omnilib/aiosqlite" },
-    { name: "aiohttp", version: "3.13.3", license: "Apache 2.0", url: "https://github.com/aio-libs/aiohttp" },
-    { name: "aiocache", version: "0.12.3", license: "BSD", url: "https://github.com/aio-libs/aiocache" },
-    { name: "propcache", version: "0.4.1", license: "Apache 2.0", url: "https://github.com/async-http-client/propcache" },
-    { name: "requests", version: "2.32.5", license: "Apache 2.0", url: "https://github.com/psf/requests" },
-    { name: "wikipedia", version: "1.4.0", license: "MIT", url: "https://github.com/goldsmith/Wikipedia" },
-    { name: "beautifulsoup4", version: "4.14.3", license: "MIT", url: "https://www.crummy.com/software/BeautifulSoup/" },
-    { name: "soupsieve", version: "2.8.1", license: "MIT", url: "https://github.com/facelessuser/soupsieve" },
-    { name: "yarl", version: "1.22.0", license: "Apache 2.0", url: "https://github.com/aio-libs/yarl" },
-    { name: "frozenlist", version: "1.8.0", license: "Apache 2.0", url: "https://github.com/aio-libs/frozenlist" },
-    { name: "multidict", version: "6.7.0", license: "Apache 2.0", url: "https://github.com/aio-libs/multidict" },
-    { name: "h11", version: "0.16.0", license: "MIT", url: "https://github.com/python-hyper/h11" }
-  ];
+  const [activeSection, setActiveSection] = useState("project-license");
 
-  // Node.js/JavaScript Dependencies
-  const nodeDependencies = [
-    { name: "react", version: "18+", license: "MIT", url: "https://github.com/facebook/react" },
-    { name: "typescript", version: "5+", license: "Apache 2.0", url: "https://github.com/microsoft/TypeScript" },
-    { name: "vite", version: "5+", license: "MIT", url: "https://github.com/vitejs/vite" },
-    { name: "tailwindcss", version: "3.4+", license: "MIT", url: "https://github.com/tailwindlabs/tailwindcss" },
-    { name: "@radix-ui/*", version: "latest", license: "MIT", url: "https://github.com/radix-ui/primitives" },
-    { name: "framer-motion", version: "12+", license: "MIT", url: "https://github.com/framer/motion" },
-    { name: "react-router-dom", version: "6+", license: "MIT", url: "https://github.com/remix-run/react-router" },
-    { name: "lucide-react", version: "latest", license: "ISC", url: "https://github.com/lucide-icons/lucide" }
-  ];
+  useEffect(() => {
+    const handleScroll = () => {
+      const sectionElements = SECTIONS.map(s => document.getElementById(s.id));
+      const scrollPosition = window.scrollY + 200;
 
-  // Other Dependencies (Tools & Databases)
-  const otherDependencies = [
-    { name: "sphinx", version: "latest", license: "BSD", url: "https://github.com/sphinx-doc/sphinx" },
-    { name: "SQLite", version: "3+", license: "Public Domain", url: "https://www.sqlite.org" }
-  ];
+      for (let i = sectionElements.length - 1; i >= 0; i--) {
+        const el = sectionElements[i];
+        if (el && scrollPosition >= el.offsetTop) {
+          setActiveSection(SECTIONS[i].id);
+          break;
+        }
+      }
+    };
 
-  // License Card Component
-  const LicenseCard = ({ dep, index }: { dep: any; index: number }) => (
-    <motion.a
-      href={dep.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03 }}
-      className="group bg-secondary/30 hover:bg-secondary/50 rounded-xl p-4 border border-white/5 hover:border-primary/30 transition-all"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1">
-          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-            {dep.name}
-          </h3>
-          <p className="text-xs text-muted-foreground mt-1">v{dep.version}</p>
-          <p className="text-xs text-muted-foreground mt-1.5">
-            <span className="inline-block px-2 py-0.5 rounded bg-primary/10 text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-mono text-[9px] border border-primary/20">
-              {dep.license}
-            </span>
-          </p>
-        </div>
-        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100 mt-1" />
-      </div>
-    </motion.a>
-  );
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      window.scrollTo({
+        top: el.offsetTop - 120,
+        behavior: "smooth"
+      });
+    }
+  };
 
   return (
-    <div
-      className="min-h-screen bg-background flex flex-col"
-    >
+    <div className="min-h-screen bg-[#0a0c10] text-slate-300 flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-grow container relative z-10 px-4 pt-32 pb-24">
-        <div className="max-w-5xl mx-auto">
-          {/* Back Button */}
-          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-all mb-12 group text-sm font-black uppercase tracking-widest"
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Zurück zur Zentrale
-            </Link>
-          </motion.div>
+      <main className="flex-grow container mx-auto px-4 pt-48 pb-24 flex flex-col lg:flex-row gap-12 relative">
 
-          <header className="mb-16">
-            <div className="flex items-center gap-6 mb-8">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-                className="relative w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-xl shadow-primary/10"
-              >
-                <Code2 className="w-8 h-8 text-primary" />
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent rounded-2xl animate-pulse" />
-              </motion.div>
-              <div>
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-5xl md:text-7xl font-black tracking-tighter text-foreground uppercase italic leading-none mb-2"
-                >
-                  Open <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary animate-gradient">Source</span>
-                </motion.h1>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.4 }}
-                  transition={{ delay: 0.3 }}
-                  className="flex gap-4"
-                >
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">GPL-3.0 License</span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">•</span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Free Forever</span>
-                </motion.div>
-              </div>
+        {/* Sidebar */}
+        <aside className="lg:w-80 shrink-0">
+          <div className="sticky top-32 space-y-8">
+            <div>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 px-4">Contents</h3>
+              <nav className="space-y-1">
+                {SECTIONS.map((section) => (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollToSection(section.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-sm font-semibold border ${activeSection === section.id
+                        ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
+                      }`}
+                  >
+                    <section.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeSection === section.id ? "text-primary" : "text-slate-500"
+                      }`} />
+                    {section.title}
+                    {activeSection === section.id && (
+                      <motion.div layoutId="active-indicator-license" className="ml-auto">
+                        <ChevronRight className="w-3 h-3" />
+                      </motion.div>
+                    )}
+                  </button>
+                ))}
+              </nav>
             </div>
+
+            <div className="p-8 rounded-[2rem] bg-accent/[0.02] border border-accent/20">
+              <Heart className="w-8 h-8 text-accent mb-4" />
+              <h4 className="text-white font-bold mb-2">Open Source</h4>
+              <p className="text-xs text-slate-500 leading-relaxed">ManagerX stolz lizenziert unter GPL-3.0.</p>
+            </div>
+          </div>
+        </aside>
+
+        {/* Content Area */}
+        <div className="flex-grow max-w-3xl">
+          <header className="mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-4 text-primary mb-6"
+            >
+              <Code2 className="w-6 h-6" />
+              <span className="text-xs font-black uppercase tracking-[0.4em]">Developer Credits</span>
+            </motion.div>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white uppercase italic leading-[0.9] mb-6">
+              Lizenz<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary animate-gradient">wesen</span>
+            </h1>
+            <p className="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
+              Transparenz bedeutet Vertrauen. Wir nutzen Open-Source-Technologien und geben unseren Code der Community zurück.
+            </p>
           </header>
 
-          {/* Main Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="glass rounded-3xl p-8 md:p-12 border border-white/5 space-y-12"
-          >
-            {/* GPL-3.0 License Section */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-3">
-                <Shield className="w-6 h-6 text-primary" />
-                <h2 className="text-2xl font-bold text-foreground">GNU General Public License v3.0</h2>
-              </div>
-
-              <div className="bg-secondary/50 rounded-2xl p-6 border border-primary/10 space-y-4">
-                <p className="text-foreground">
-                  <strong>ManagerX</strong> ist lizenziert unter der{" "}
-                  <a
-                    href="https://www.gnu.org/licenses/gpl-3.0.de.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    GNU General Public License v3.0 (GPL-3.0)
-                  </a>
+          <article className="space-y-24">
+            <Section id="project-license" title="Project License">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-4">
+                <Shield className="w-10 h-10 text-primary mb-2" />
+                <h3 className="text-2xl font-black text-white uppercase italic tracking-tight underline decoration-primary/30">GNU GPL v3.0</h3>
+                <p className="text-base text-slate-400 leading-relaxed">
+                  ManagerX ist unter der GNU General Public License v3.0 lizenziert. Das bedeutet:
                 </p>
-
-                <div className="space-y-3 text-sm text-muted-foreground">
-                  <div className="flex items-start gap-3">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
-                    <p><strong>Freiheit zu verwenden:</strong> Sie können das Programm für jeden Zweck verwenden.</p>
+                <div className="grid gap-3 text-sm italic">
+                  <div className="flex gap-4">
+                    <span className="text-primary font-bold">01</span>
+                    <span>Freie Nutzung und Modifikation des Codes.</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
-                    <p><strong>Freiheit zu studieren:</strong> Sie können den Quellcode einsehen und verstehen.</p>
+                  <div className="flex gap-4">
+                    <span className="text-primary font-bold">02</span>
+                    <span>Modifizierte Versionen müssen ebenfalls unter GPL-3.0 stehen.</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
-                    <p><strong>Freiheit zu verteilen:</strong> Sie können Kopien weitergeben.</p>
+                  <div className="flex gap-4">
+                    <span className="text-primary font-bold">03</span>
+                    <span>Der Source-Code muss öffentlich zugänglich bleiben.</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-bold mt-0.5">✓</span>
-                    <p><strong>Freiheit zu verbessern:</strong> Sie können das Programm modifizieren und verbesserungen veröffentlichen.</p>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-white/10">
-                  <p className="text-xs text-muted-foreground">
-                    <strong>Wichtig:</strong> Modifizierte Versionen müssen auch unter GPL-3.0 veröffentlicht werden. Der Quellcode muss verfügbar sein.
-                  </p>
                 </div>
               </div>
+            </Section>
 
-              <div className="flex flex-wrap gap-3">
+            <Section id="python-deps" title="Python Dependencies">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                {pythonDependencies.map((dep) => (
+                  <DependencyCard key={dep.name} dep={dep} />
+                ))}
+              </div>
+            </Section>
+
+            <Section id="node-deps" title="Node.js Dependencies">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                {nodeDependencies.map((dep) => (
+                  <DependencyCard key={dep.name} dep={dep} />
+                ))}
+              </div>
+            </Section>
+
+            <Section id="other-deps" title="Other Tools">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-4">
+                <p>Wir nutzen zudem SQLite 3+ (Public Domain) für die lokale Datenspeicherung und Sphinx für die Dokumentation.</p>
+              </div>
+            </Section>
+
+            <Section id="contributing" title="Contributing">
+              <div className="p-10 rounded-[2.5rem] bg-accent/[0.05] border border-accent/20 flex flex-col items-center text-center">
+                <GitBranch className="w-12 h-12 text-accent mb-6" />
+                <h4 className="text-3xl font-black text-white uppercase tracking-tighter mb-4 italic">Join the Devs</h4>
+                <p className="text-lg text-slate-400 font-medium mb-8">Helfen Sie uns, ManagerX noch besser zu machen. Jede PR ist willkommen.</p>
                 <a
-                  href="https://www.gnu.org/licenses/gpl-3.0.de.html"
+                  href="https://github.com/ManagerX-Development/ManagerX"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm font-medium border border-primary/20"
+                  className="px-8 py-3 rounded-full bg-accent text-white font-black uppercase tracking-widest hover:scale-105 transition-transform"
                 >
-                  <ExternalLink className="w-4 h-4" />
-                  GPL-3.0 Lizenz
-                </a>
-                <a
-                  href="https://github.com/ManagerX-Development/ManagerX/blob/main/LICENSE"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent/10 text-accent hover:bg-accent/20 transition-colors text-sm font-medium border border-accent/20"
-                >
-                  <GitBranch className="w-4 h-4" />
-                  GitHub LICENSE
+                  GitHub Repository
                 </a>
               </div>
-            </section>
+            </Section>
 
-            {/* Python Dependencies Section */}
-            <section className="space-y-6 pt-8 border-t border-white/10">
-              <div className="flex items-center gap-3">
-                <Code2 className="w-6 h-6 text-success" />
-                <h2 className="text-2xl font-bold text-foreground">Python Abhängigkeiten</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pythonDependencies.map((dep, i) => (
-                  <LicenseCard key={dep.name} dep={dep} index={i} />
-                ))}
-              </div>
-            </section>
-
-            {/* Node.js Dependencies Section */}
-            <section className="space-y-6 pt-8 border-t border-white/10">
-              <div className="flex items-center gap-3">
-                <Code2 className="w-6 h-6 text-info" />
-                <h2 className="text-2xl font-bold text-foreground">Node.js Abhängigkeiten</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {nodeDependencies.map((dep, i) => (
-                  <LicenseCard key={dep.name} dep={dep} index={i} />
-                ))}
-              </div>
-            </section>
-
-            {/* Other Dependencies Section */}
-            <section className="space-y-6 pt-8 border-t border-white/10">
-              <div className="flex items-center gap-3">
-                <Code2 className="w-6 h-6 text-warning" />
-                <h2 className="text-2xl font-bold text-foreground">Weitere Abhängigkeiten</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {otherDependencies.map((dep, i) => (
-                  <LicenseCard key={dep.name} dep={dep} index={i} />
-                ))}
-              </div>
-            </section>
-
-            {/* Contributing Section */}
-            <section className="space-y-6 pt-8 border-t border-white/10">
-              <div className="flex items-center gap-3">
-                <Heart className="w-6 h-6 text-accent" />
-                <h2 className="text-2xl font-bold text-foreground">Mitentwicklung</h2>
-              </div>
-              <div className="bg-secondary/50 rounded-2xl p-6 border border-accent/10">
-                <div className="space-y-3 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-3">
-                    <span className="text-accent font-bold">✓</span>
-                    <p>Bug-Reports und Verbesserungsvorschläge</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-accent font-bold">✓</span>
-                    <p>Code-Beiträge und Feature-Implementationen</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-accent font-bold">✓</span>
-                    <p>Dokumentations-Verbesserungen</p>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <a
-                    href="https://github.com/ManagerX-Development/ManagerX/blob/main/CONTRIBUTING.md"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent/10 text-accent hover:bg-accent/20 transition-colors text-sm font-medium border border-accent/20"
-                  >
-                    <GitBranch className="w-4 h-4" />
-                    Contribution Guidelines
-                  </a>
-                </div>
-              </div>
-            </section>
-
-            {/* Copyright Section */}
-            <section className="space-y-6 pt-8 border-t border-white/10">
-              <h2 className="text-xl font-bold text-foreground">Copyright & Attribution</h2>
-              <div className="bg-secondary/50 rounded-2xl p-6 border border-white/10 space-y-2 text-sm text-muted-foreground">
+            <Section id="copyright" title="Copyright">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-2 text-sm text-slate-500 font-bold uppercase tracking-widest">
                 <p>© 2026 ManagerX Development</p>
                 <p>© 2024-2026 OPPRO.NET Network</p>
-                <p>GPL-3.0 Open Source Project</p>
               </div>
-            </section>
-
-            {/* Links Section */}
-            <section className="space-y-4 pt-8 border-t border-white/10">
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase">Links</h3>
-              <div className="flex flex-wrap gap-4">
-                <Link to="/legal/privacy" className="text-xs text-primary hover:underline">Datenschutz</Link>
-                <Link to="/legal/terms" className="text-xs text-primary hover:underline">AGB</Link>
-                <Link to="/legal/imprint" className="text-xs text-primary hover:underline">Impressum</Link>
-                <a href="https://github.com/ManagerX-Development/ManagerX" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">GitHub</a>
-              </div>
-            </section>
-          </motion.div>
+            </Section>
+          </article>
         </div>
       </main>
 
