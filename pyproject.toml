@@ -65,7 +65,7 @@ dev = [
     "attrs==25.4.0",
     "annotated-types==0.7.0",
     "anyio==4.12.0",
-    "certifi==2025.11.12",
+    "certifi==2026.1.4",
     "charset-normalizer==3.4.4",
     "idna==3.11",
     "urllib3==2.6.3",
@@ -74,10 +74,10 @@ dev = [
 ]
 
 docs = [
-    "sphinx<8,>=6",
+    "sphinx<10,>=9",
     "pydata-sphinx-theme",
     "sphinx-autodoc-typehints",
-    "myst-parser<3,>=2",
+    "myst-parser<6,>=5",
     "sphinx-copybutton"
 ]
 
@@ -104,7 +104,7 @@ all = [
     "attrs==25.4.0",
     "annotated-types==0.7.0",
     "anyio==4.12.0",
-    "certifi==2025.11.12",
+    "certifi==2026.1.4",
     "charset-normalizer==3.4.4",
     "idna==3.11",
     "urllib3==2.6.3",
@@ -115,10 +115,10 @@ all = [
     "uvicorn==0.24.0",
     "SimpleColoredLogs==1.3.0",
     "timedelta==2020.12.3",
-    "sphinx<8,>=6",
+    "sphinx<10,>=9",
     "pydata-sphinx-theme",
     "sphinx-autodoc-typehints",
-    "myst-parser<3,>=2",
+    "myst-parser<6,>=5",
     "sphinx-copybutton",
     "build==1.3.0",
     "twine==4.2.0"
