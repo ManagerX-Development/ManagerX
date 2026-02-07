@@ -4,6 +4,8 @@ import path from "path";
 
 export default defineConfig(({ mode }) => ({
   // WICHTIG: Erlaubt korrekte Pfade auf deiner Subdomain
+  root: "src/web",
+  // WICHTIG: Erlaubt korrekte Pfade auf deiner Subdomain
   base: "/",
 
   server: {
@@ -16,15 +18,17 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react()
   ],
+  publicDir: "../../public",
   resolve: {
     alias: {
-      // Dein Alias zeigt auf ./src/web - das ist wichtig für deine Imports
-      "@": path.resolve(__dirname, "./src/web"),
+      // Dein Alias zeigt auf . (jetzt src/web)
+      "@": path.resolve(__dirname, "src/web"),
     },
   },
   build: {
     // Stellt sicher, dass der Output-Ordner 'dist' heißt (passend zur deploy.yml)
-    outDir: "dist",
+    outDir: "../../dist",
+    emptyOutDir: true,
     // Optimierung für sauberen Code
     minify: "esbuild",
     reportCompressedSize: false,
