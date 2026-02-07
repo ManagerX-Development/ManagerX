@@ -97,7 +97,7 @@ pip install ManagerX[all]
 <p align="center">
   <a href="#-installation"><b>📥 Detaillierte Installation</b></a> •
   <a href="#-features"><b>✨ Features</b></a> •
-  <a href="https://docs.oppro-network.de"><b>📖 Dokumentation</b></a> •
+  <a href="https://docs.managerx-bot.de"><b>📖 Dokumentation</b></a> •
   <a href="#-support--community"><b>💬 Support</b></a>
 </p>
 

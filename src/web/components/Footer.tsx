@@ -130,7 +130,7 @@ export const Footer = memo(function Footer() {
             {/* column 2 */}
             <div className="flex flex-col gap-6">
               <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Ressourcen</span>
-              <a href="https://docs.oppro-network.de/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+              <a href="https://docs.managerx-bot.de/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
                 <ExternalLink className="w-4 h-4 text-accent" />
                 <span className="group-hover:translate-x-1 transition-transform">Documentation</span>
               </a>

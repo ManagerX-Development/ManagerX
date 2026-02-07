@@ -90,8 +90,8 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
                     key={section.id}
                     onClick={() => scrollToSection(section.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-sm font-semibold border ${activeSection === section.id
-                        ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
+                      ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
                       }`}
                   >
                     <section.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeSection === section.id ? "text-primary" : "text-slate-500"
@@ -110,7 +110,7 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             <div className="p-6 rounded-3xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 shadow-2xl">
               <h4 className="text-white font-bold mb-2">Need help?</h4>
               <p className="text-xs text-slate-400 mb-4 leading-relaxed">Unser Team steht für rechtliche Fragen zur Verfügung.</p>
-              <a href="mailto:legal@oppro-network.de" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors">
+              <a href="mailto:legal@managerx-bot.de" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors">
                 Contact Legal <ArrowLeft className="w-3 h-3 rotate-180" />
               </a>
             </div>
@@ -133,7 +133,7 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             </h1>
             <p className="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
               Bitte lesen Sie diese Bedingungen sorgfältig durch, bevor Sie ManagerX nutzen.
-              Sie regeln die rechtliche Beziehung zwischen Ihnen und OPPRO.NET.
+              Sie regeln die rechtliche Beziehung zwischen Ihnen und ManagerX Development.
             </p>
             <div className="mt-8 flex items-center gap-6 opacity-40">
               <div className="flex flex-col">
@@ -221,7 +221,7 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             </Section>
 
             <Section id="content-ip" title="7. Geistiges Eigentum">
-              <p>Die Markenrechte an ManagerX, die Logos, das Design und die Web-UI liegen bei OPPRO.NET Network.</p>
+              <p>Die Markenrechte an ManagerX, die Logos, das Design und die Web-UI liegen bei ManagerX Development Network.</p>
               <p className="mt-4">Der Quellcode des Bots ist unter der <span className="text-white font-bold uppercase tracking-widest text-xs">GNU GPL v3.0</span> lizenziert.</p>
             </Section>
 
@@ -239,11 +239,11 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             </Section>
 
             <Section id="liability" title="11. Haftungsbeschränkung">
-              <p>Soweit gesetzlich zulässig, haftet OPPRO.NET oder dessen Entwickler nicht für indirekte Schäden, Datenverluste oder Server-Konflikte, die durch die Nutzung des Bots entstehen.</p>
+              <p>Soweit gesetzlich zulässig, haftet ManagerX Development oder dessen Entwickler nicht für indirekte Schäden, Datenverluste oder Server-Konflikte, die durch die Nutzung des Bots entstehen.</p>
             </Section>
 
             <Section id="indemnity" title="12. Freistellung">
-              <p>Sie erklären sich damit einverstanden, OPPRO.NET von allen Forderungen freizustellen, die sich aus Ihrer Nutzung des Dienstes oder Ihrer Verletzung dieser Bedingungen ergeben.</p>
+              <p>Sie erklären sich damit einverstanden, ManagerX Development von allen Forderungen freizustellen, die sich aus Ihrer Nutzung des Dienstes oder Ihrer Verletzung dieser Bedingungen ergeben.</p>
             </Section>
 
             <Section id="changes" title="13. Änderungen">
@@ -254,8 +254,8 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
               <p>Bei rechtlichen Anfragen erreichen Sie uns unter:</p>
               <div className="mt-8 p-10 rounded-[2.5rem] bg-[#111318] border border-primary/20 text-center">
                 <Mail className="w-12 h-12 text-primary mx-auto mb-4" />
-                <a href="mailto:legal@oppro-network.de" className="text-2xl font-black text-white hover:text-primary transition-colors underline decoration-primary/30">
-                  legal@oppro-network.de
+                <a href="mailto:legal@managerx-bot.de" className="text-2xl font-black text-white hover:text-primary transition-colors underline decoration-primary/30">
+                  legal@managerx-bot.de
                 </a>
                 <p className="mt-4 text-slate-500 font-bold tracking-widest uppercase text-[10px]">ManagerX Legal Department</p>
               </div>
