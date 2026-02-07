@@ -8,14 +8,14 @@ from datetime import datetime, timedelta
 from typing import Dict, Set, Optional, List
 import asyncio
 import logging
-
+import ezcord
 # Import our separate database class
 from DevTools import LoggingDatabase
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
-class LoggingCog(commands.Cog):
+class Logging(ezcord.Cog):
     """
     Comprehensive Discord logging system with improved performance and features
     """
@@ -1462,4 +1462,4 @@ class LoggingCog(commands.Cog):
             self._stats['errors'] += 1
 
 def setup(bot):
-    bot.add_cog(LoggingCog(bot))
+    bot.add_cog(Logging(bot))

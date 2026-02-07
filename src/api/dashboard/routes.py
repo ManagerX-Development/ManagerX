@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Security, status
+from fastapi.security import APIKeyHeader
+import os
 from typing import List, Optional
 from datetime import datetime
 import time
 # Falls du Schemas nutzt: from .schemas import ServerStatus, UserInfo
 
 # Wir erstellen einen Router, den wir später in die Haupt-App einbinden
-router = APIRouter(
+router_public = APIRouter(
     prefix="/v1/managerx",
-    tags=["dashboard"]
+    tags=["public"]
 )
 
 # Global Bot-Referenz (wird später in main.py gesetzt)
@@ -25,7 +27,7 @@ def set_bot_instance(bot):
     bot_instance = bot
 
 
-@router.get("/stats", response_model=dict)
+@router_public.get("/stats", response_model=dict)
 async def get_stats(request: Request):
     """
     Endpoint to get the current server status with real bot data.
@@ -60,3 +62,31 @@ async def get_stats(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
+API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+async def get_api_key(api_key_header: str = Security(API_KEY_HEADER)):
+    """Überprüft den API-Key aus dem Header."""
+    allowed_keys = os.getenv("DASHBOARD_API_KEYS")
+    
+    if not allowed_keys:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Keine API-Keys konfiguriert (DASHBOARD_API_KEYS fehlt)"
+        )
+    
+    key_list = [k.strip() for k in allowed_keys.split(",") if k.strip()]
+    
+    if not api_key_header or api_key_header not in key_list:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Zugriff verweigert: Ungültiger API-Key"
+        )
+    return api_key_header
+
+router = APIRouter(
+    prefix="/v1/managerx/dashboard",
+    tags=["dashboard"],
+    dependencies=[Security(get_api_key)]
+)
+router.include_router(router_public)

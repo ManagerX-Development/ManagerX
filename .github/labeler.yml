@@ -18,28 +18,12 @@ documentation:
 site:
 - any:
   - changed-files:
-    - any-glob-to-any-file: 'site/**'
+    - any-glob-to-any-file: 'src/web/**'
 
 example:
 - any:
   - changed-files:
-    - any-glob-to-any-file: 'example/**'
-
-backend:
-- any:
-  - changed-files:
-    - any-glob-to-any-file: 'src/DevTools/backend/**'
-    - any-glob-to-any-file: 'site/backend/**'
-
-ui:
-- any:
-  - changed-files:
-    - any-glob-to-any-file: 'src/DevTools/ui/**'
-
-static:
-- any:
-  - changed-files:
-    - any-glob-to-any-file: 'site/static/**'
+    - any-glob-to-any-file: 'examples/**'
 
 translation-message:
 - any:

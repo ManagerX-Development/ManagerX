@@ -12,7 +12,7 @@ class ContainerExample(ezcord.Cog):
     @discord.slash_command(name="container", description="Zeigt ein Container an")
     async def container(self, ctx: discord.ApplicationContext):
         container = Container() # Define the Container
-        container.add_text("Hello World") # Add a Text to the Container
+        container.add_text("## Hello World") # Add a Markdown Text to the Container
         container.add_separator() # Add a Separator to the Container
         container.add_text("Hello World") # Add a Text to the Container
         view = discord.ui.DesignerView(container, timeout=0) # Define the View

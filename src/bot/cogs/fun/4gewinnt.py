@@ -696,7 +696,7 @@ class Connect4View(View):
 # ───────────────────────────────────────────────
 # >> Cog
 # ───────────────────────────────────────────────
-class Connect4Cog(ezcord.Cog, group="fun"):
+class fun(ezcord.Cog):
     
     @commands.slash_command(name="connect4", description="Starte ein 4 Gewinnt Spiel!")
     async def connect4(
@@ -825,4 +825,4 @@ class Connect4Cog(ezcord.Cog, group="fun"):
         await ctx.respond(embed=embed)
 
 def setup(bot):
-    bot.add_cog(Connect4Cog(bot))
+    bot.add_cog(fun(bot))

@@ -500,7 +500,7 @@ class TicTacToeView(View):
 # ───────────────────────────────────────────────
 # >> Cog
 # ───────────────────────────────────────────────
-class fun(ezcord.Cog):
+class tictactoe(ezcord.Cog, group="fun"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -625,4 +625,4 @@ class fun(ezcord.Cog):
         await ctx.respond(embed=embed)
 
 def setup(bot):
-    bot.add_cog(fun(bot))
+    bot.add_cog(tictactoe(bot))

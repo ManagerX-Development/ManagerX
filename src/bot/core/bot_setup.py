@@ -35,7 +35,48 @@ class BotSetup:
         )
         
         # Ezcord Help Command aktivieren
-        bot.add_help_command()
+        embed = discord.Embed(
+            title="Hello, I'm ManagerX!", # Placeholder emoji, will fall back to text if not found
+            description=(
+                "**The ultimate all-in-one Discord solution.**\n\n"
+                "> ManagerX simplifies server management and brings your community "
+                "together with engaging games and reliable tools.\n\n"
+                "✨ **Getting Started**\n"
+                "Use the menu below to explore all commands!"
+            ),
+            color=discord.Color.from_rgb(46, 204, 113), # Fresh emerald green
+            timestamp=discord.utils.utcnow()
+        )
+
+        embed.add_field(
+            name="💎 **Core Modules**",
+            value=(
+                "🛡️ **Moderation** • Advanced security tools\n"
+                "🏆 **Leveling** • Activity & rewards system\n"
+                "🎮 **Games** • Connect4, TicTacToe & more\n"
+                "📊 **Logging** • Real-time server insights"
+            ),
+            inline=False
+        )
+
+        embed.add_field(
+            name="🔗 **Important Links**",
+            value=(
+                "🌐 [**Website**](https://managerx-bot.de) • "
+                "🚑 [**Support**](https://discord.gg/SrcE6zJZ) • "
+                "💻 [**GitHub**](https://github.com/ManagerX-Development/ManagerX)"
+            ),
+            inline=False
+        )
+        
+        # Check if we can set a thumbnail or image (safe fallback)
+        embed.set_footer(text="ManagerX • Empowering your Community", icon_url=None)
+
+        bot.add_help_command(
+            embed=embed,
+            show_categories=False,
+            show_description=True
+        )
         
         # Bot-Konfiguration anhängen
         bot.config = self._build_bot_config()

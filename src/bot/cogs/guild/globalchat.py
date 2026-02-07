@@ -736,7 +736,7 @@ class GlobalChatSender:
         return successful_sends, failed_sends
 
 
-class GlobalChatCog(ezcord.Cog):
+class GlobalChat(ezcord.Cog):
     """Haupt-Cog für das GlobalChat-System"""
 
     globalchat = SlashCommandGroup("globalchat", "GlobalChat Verwaltung")
@@ -1515,4 +1515,4 @@ def setup(bot):
     # Stelle sicher, dass die Datenbank initialisiert wird, falls nicht schon geschehen
     GlobalChatDatabase().create_tables()
     # Füge die Cog hinzu
-    bot.add_cog(GlobalChatCog(bot))
+    bot.add_cog(GlobalChat(bot))

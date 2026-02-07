@@ -10,7 +10,7 @@ import io
 import csv
 from typing import Optional
 from discord.ui import Container
-
+import ezcord
 
 class PrestigeConfirmView(discord.ui.View):
     def __init__(self, db, user, guild):
@@ -56,7 +56,7 @@ class PrestigeConfirmView(discord.ui.View):
         await interaction.response.edit_message(embed=embed, view=None)
 
 
-class LevelSystem(commands.Cog):
+class LevelSystem(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.db = LevelDatabase()

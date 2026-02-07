@@ -1,241 +1,270 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileText, Mail, Github, Shield, CheckCircle, Zap, AlertTriangle, Scale, Lock, RefreshCw, HelpCircle, Code2, LogOut, Database } from "lucide-react";
+import {
+  ArrowLeft, FileText, ChevronRight, Shield, Scale, Info,
+  CheckCircle, UserCheck, Lock, Zap, Users, MessageSquare,
+  Copyright, CreditCard, ExternalLink, Slash, ShieldAlert,
+  AlertCircle, RefreshCw, Mail, Gavel
+} from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { motion } from "framer-motion";
 
+const SECTIONS = [
+  { id: "overview", title: "Overview", icon: Info },
+  { id: "acceptance", title: "Acceptance", icon: CheckCircle },
+  { id: "eligibility", title: "Eligibility", icon: UserCheck },
+  { id: "security", title: "Accounts & Security", icon: Lock },
+  { id: "acceptable-use", title: "Acceptable Use", icon: Zap },
+  { id: "community", title: "Community Guidelines", icon: Users },
+  { id: "content-ip", title: "Content & IP", icon: Copyright },
+  { id: "third-party", title: "Third-Party Services", icon: ExternalLink },
+  { id: "termination", title: "Suspension & Termination", icon: Slash },
+  { id: "disclaimers", title: "Disclaimers", icon: ShieldAlert },
+  { id: "liability", title: "Limitation of Liability", icon: AlertCircle },
+  { id: "indemnity", title: "Indemnity", icon: Shield },
+  { id: "changes", title: "Changes to Terms", icon: RefreshCw },
+  { id: "contact", title: "Contact", icon: Mail },
+  { id: "law", title: "Governing Law", icon: Gavel },
+];
+
+const Section = ({ id, title, children }: { id: string; title: string; children: React.ReactNode }) => (
+  <section id={id} className="scroll-mt-32 group">
+    <div className="flex items-center gap-4 mb-8">
+      <div className="w-px h-8 bg-primary/30 group-hover:h-12 transition-all duration-500" />
+      <h2 className="text-3xl font-black text-white uppercase italic tracking-tight group-hover:text-primary transition-colors">
+        {title}
+      </h2>
+    </div>
+    <div className="text-lg leading-relaxed text-slate-400 font-medium whitespace-pre-wrap">
+      {children}
+    </div>
+  </section>
+);
+
 export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
-  const legalSections = [
-    {
-      title: "1. Geltungsbereich",
-      icon: Scale,
-      content: "Diese Nutzungsbedingungen regeln die Verwendung des Discord-Bots ManagerX sowie dieser Website. Mit der Nutzung des Bots, der Website oder des Quellcodes erklärst du dich mit diesen Bedingungen einverstanden.",
-    },
-    {
-      title: "2. Lizenz & Open Source",
-      icon: Code2,
-      content: (
-        <div className="space-y-4">
-          <p>ManagerX wird unter der <span className="text-primary font-black uppercase tracking-widest text-xs">GNU GPL v3.0</span> lizenziert.</p>
-          <ul className="grid grid-cols-1 gap-2 text-sm text-muted-foreground font-medium">
-            <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" /> Quellcode darf frei eingesehen, modifiziert und verbreitet werden.</li>
-            <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" /> Modifikationen müssen ebenfalls unter GPL-3.0 lizenziert werden.</li>
-            <li className="flex items-start gap-2"><div className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0" /> Kommerzielles Hosting ist gestattet, Quellcode muss verfügbar sein.</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
-      title: "3. Bot-Nutzung",
-      icon: Zap,
-      content: (
-        <div className="space-y-3 text-sm leading-relaxed">
-          <p>ManagerX darf auf Discord-Servern genutzt werden, sofern:</p>
-          <ul className="space-y-1 ml-4">
-            <li>• Sie Admin-Rechte auf dem Server haben</li>
-            <li>• Die Nutzung den Discord Terms of Service entspricht</li>
-            <li>• Sie keine illegalen oder schädlichen Aktivitäten durchführen</li>
-          </ul>
-        </div>
-      ),
-    },
-    {
-      title: "4. Verbotene Nutzung",
-      icon: AlertTriangle,
-      content: (
-        <div className="space-y-3 text-sm leading-relaxed">
-          <p>Folgende Aktivitäten sind streng untersagt:</p>
-          <ul className="space-y-1 ml-4 text-primary">
-            <li>• Reverse Engineering zu böswilligen Zwecken</li>
-            <li>• DDoS-Attacken oder Sicherheitsverstöße</li>
-            <li>• Automatisierte Spam-Kampagnen</li>
-            <li>• Verbreitung von Malware oder Exploits</li>
-          </ul>
-          <p className="mt-4 font-black uppercase tracking-tighter text-xs">Konsequenz: Sofortiger Ausschluss und Meldung an Behörden.</p>
-        </div>
-      ),
-    },
-    {
-      title: "5. Haftungsausschluss",
-      icon: Shield,
-      content: (
-        <div className="space-y-4 text-sm leading-relaxed">
-          <p>OPPRO.NET Network übernimmt <strong>keine Haftung</strong> für:</p>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 font-bold text-foreground">
-            <li className="flex items-center gap-2"><CheckCircle className="w-3 h-3 text-primary" /> Datenverluste</li>
-            <li className="flex items-center gap-2"><CheckCircle className="w-3 h-3 text-primary" /> Ausfallzeiten</li>
-            <li className="flex items-center gap-2"><CheckCircle className="w-3 h-3 text-primary" /> Indirekte Schäden</li>
-            <li className="flex items-center gap-2"><CheckCircle className="w-3 h-3 text-primary" /> User-Fehler</li>
-          </ul>
-          <p className="italic text-muted-foreground mt-4">Der Bot wird "AS IS" bereitgestellt.</p>
-        </div>
-      ),
-    },
-    {
-      title: "6. Funktionalität",
-      icon: RefreshCw,
-      content: (
-        <div className="space-y-3 text-sm leading-relaxed">
-          <p>Wir behalten uns das Recht vor, Funktionen jederzeit zu aktualisieren, zu optimieren oder zu entfernen, um die Stabilität des Netzwerks zu gewährleisten.</p>
-        </div>
-      ),
-    },
-    {
-      title: "7. Datenschutz",
-      icon: Lock,
-      content: (
-        <p className="text-sm">Siehe unsere <Link to="/legal/privacy" className="text-primary hover:underline font-bold">Datenschutzerklärung</Link> für Details über erhobene Daten und Ihre Rechte nach DSGVO.</p>
-      ),
-    },
-    {
-      title: "8. Geistiges Eigentum",
-      icon: FileText,
-      content: (
-        <p className="text-sm">ManagerX (Logos, Design, UI) sind Eigentum von OPPRO.NET. Der Quellcode ist unter GPL-3.0 frei verwendbar.</p>
-      ),
-    },
-    {
-      title: "9. Community & Support",
-      icon: HelpCircle,
-      content: (
-        <div className="space-y-2 text-sm leading-relaxed">
-          <p>Support erfolgt gemeinschaftlich über GitHub Issues oder E-Mail. Ein Anspruch auf sofortigen Support besteht nicht.</p>
-        </div>
-      ),
-    },
-    {
-      title: "10. Beendigung",
-      icon: LogOut,
-      content: (
-        <p className="text-sm">Wir können Ihren Zugriff beenden, wenn Sie gegen diese Bedingungen verstoßen oder unsere Ressourcen missbrauchen.</p>
-      ),
-    },
-    {
-      title: "11. Abhängigkeiten",
-      icon: Database,
-      content: (
-        <p className="text-sm">ManagerX nutzt externe Libraries (discord.py, FastAPI, SQLite). Siehe <code className="bg-white/5 px-2 py-0.5 rounded">requirements.txt</code> für vollständige Details.</p>
-      ),
-    },
-    {
-      title: "12. Änderungen",
-      icon: RefreshCw,
-      content: (
-        <p className="text-sm">Diese Bedingungen können jederzeit geändert werden. Bedeutende Änderungen werden 30 Tage im Voraus angekündigt.</p>
-      ),
-    },
-    {
-      title: "13. Geltendes Recht",
-      icon: Scale,
-      content: (
-        <p className="text-sm">Diese Bedingungen unterliegen <strong>deutschem Recht</strong>. Gerichtsstand ist Deutschland.</p>
-      ),
-    },
-    {
-      title: "14. Kontakt",
-      icon: Mail,
-      content: (
-        <div className="space-y-2 text-sm">
-          <p>E-Mail: <a href="mailto:legal@oppro-network.de" className="text-primary hover:underline font-bold">legal@oppro-network.de</a></p>
-          <p className="text-[10px] text-muted-foreground/60 uppercase tracking-widest mt-4">Letzte Aktualisierung: Januar 2026</p>
-        </div>
-      ),
-    },
-  ];
+  const [activeSection, setActiveSection] = useState("overview");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sectionElements = SECTIONS.map(s => document.getElementById(s.id));
+      const scrollPosition = window.scrollY + 200;
+
+      for (let i = sectionElements.length - 1; i >= 0; i--) {
+        const el = sectionElements[i];
+        if (el && scrollPosition >= el.offsetTop) {
+          setActiveSection(SECTIONS[i].id);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      window.scrollTo({
+        top: el.offsetTop - 120,
+        behavior: "smooth"
+      });
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0a0c10] text-slate-300 flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-grow container relative z-10 px-4 pt-32 pb-24">
-        <div className="max-w-4xl mx-auto">
-          {/* Back Button */}
-          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-12 group text-sm font-black uppercase tracking-widest"
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Zurück zur Zentrale
-            </Link>
-          </motion.div>
+      <main className="flex-grow container mx-auto px-4 pt-48 pb-24 flex flex-col lg:flex-row gap-12 relative">
 
-          <header className="mb-16">
-            <div className="flex items-center gap-6 mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-xl shadow-primary/10">
-                <FileText className="w-8 h-8 text-primary" />
+        {/* Sidebar Container */}
+        <aside className="lg:w-80 shrink-0">
+          <div className="sticky top-32 space-y-8">
+            <div>
+              <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6 px-4">Contents</h3>
+              <nav className="space-y-1">
+                {SECTIONS.map((section) => (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollToSection(section.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-sm font-semibold border ${activeSection === section.id
+                        ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
+                      }`}
+                  >
+                    <section.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeSection === section.id ? "text-primary" : "text-slate-500"
+                      }`} />
+                    {section.title}
+                    {activeSection === section.id && (
+                      <motion.div layoutId="active-indicator" className="ml-auto">
+                        <ChevronRight className="w-3 h-3" />
+                      </motion.div>
+                    )}
+                  </button>
+                ))}
+              </nav>
+            </div>
+
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 shadow-2xl">
+              <h4 className="text-white font-bold mb-2">Need help?</h4>
+              <p className="text-xs text-slate-400 mb-4 leading-relaxed">Unser Team steht für rechtliche Fragen zur Verfügung.</p>
+              <a href="mailto:legal@oppro-network.de" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors">
+                Contact Legal <ArrowLeft className="w-3 h-3 rotate-180" />
+              </a>
+            </div>
+          </div>
+        </aside>
+
+        {/* Content Area */}
+        <div className="flex-grow max-w-3xl">
+          <header className="mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-4 text-primary mb-6"
+            >
+              <FileText className="w-6 h-6" />
+              <span className="text-xs font-black uppercase tracking-[0.4em]">Legal Documentation</span>
+            </motion.div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase italic leading-[0.9] mb-6">
+              Nutzungs<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">bedingungen</span>
+            </h1>
+            <p className="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
+              Bitte lesen Sie diese Bedingungen sorgfältig durch, bevor Sie ManagerX nutzen.
+              Sie regeln die rechtliche Beziehung zwischen Ihnen und OPPRO.NET.
+            </p>
+            <div className="mt-8 flex items-center gap-6 opacity-40">
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Last Updated</span>
+                <span className="text-xs font-bold text-white">February 06, 2026</span>
               </div>
-              <div>
-                <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-foreground uppercase italic leading-none mb-2">
-                  Nutzer<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">regeln</span>
-                </h1>
-                <div className="flex gap-4 opacity-40">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">Version 2.0.0</span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">•</span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">GPL-3.0</span>
-                </div>
+              <div className="w-px h-8 bg-white/20" />
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Version</span>
+                <span className="text-xs font-bold text-white">2.2.0 (Stable)</span>
               </div>
             </div>
           </header>
 
-          <div className="grid gap-6">
-            {legalSections.map((section, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.04, duration: 0.35 }}
-                className="group glass rounded-[2.5rem] p-8 md:p-10 border border-white/5 hover:border-primary/20 transition-all duration-500 hover:bg-card/90"
-              >
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center border border-primary/10 group-hover:scale-110 transition-transform">
-                    {section.icon && <section.icon className="w-6 h-6 text-primary" />}
-                    {!section.icon && <span className="text-primary font-black font-mono text-xl italic">0{index + 1}</span>}
-                  </div>
-                  <h2 className="text-2xl font-black tracking-tight text-white group-hover:text-primary transition-colors uppercase italic">
-                    {section.title}
-                  </h2>
-                </div>
-                <div className="text-muted-foreground leading-relaxed">
-                  {section.content}
-                </div>
-              </motion.div>
-            ))}
+          <article className="space-y-24">
+            <Section id="overview" title="1. Übersicht">
+              <p>ManagerX ist ein Discord-Bot, der Server-Management, Moderation, Leveling und Unterhaltungsfunktionen bereitstellt. Diese Bedingungen regeln den Zugriff auf und die Nutzung der ManagerX-Dienste, einschließlich unserer Website und API.</p>
+              <p className="mt-4 text-slate-400 italic">Unsere Mission ist es, Discord-Communities sicherere und engagiertere Werkzeuge zur Verfügung zu stellen.</p>
+            </Section>
 
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.35 }}
-              className="mt-12 p-10 glass-strong rounded-[2.5rem] border border-primary/20 bg-primary/[0.02] flex flex-col md:flex-row items-center justify-between gap-8"
-            >
-              <div className="text-center md:text-left space-y-2">
-                <h3 className="font-black text-3xl text-white tracking-tighter uppercase italic">Noch Fragen?</h3>
-                <p className="text-muted-foreground font-medium text-sm">
-                  Bei Unklarheiten kontaktiere bitte unser Support-Team oder das Development.
-                </p>
+            <Section id="acceptance" title="2. Zustimmung">
+              <p>Durch das Hinzufügen des Bots zu einem Discord-Server, die Nutzung unserer Website oder den Zugriff auf unsere API erklären Sie sich mit diesen Bedingungen einverstanden.</p>
+              <div className="mt-6 p-6 rounded-2xl bg-[#111318] border border-white/5 border-l-primary border-l-4">
+                <p className="text-sm font-bold text-white mb-2 uppercase tracking-widest">Wichtiger Hinweis</p>
+                <p className="text-sm">Wenn Sie diesen Bedingungen nicht in vollem Umfang zustimmen, ist Ihnen die Nutzung unserer Dienste untersagt.</p>
               </div>
-              <div className="flex gap-4">
-                <a
-                  href="mailto:support@oppro-network.de"
-                  className="p-5 rounded-2xl glass-strong border border-white/10 hover:text-primary transition-all hover:scale-110"
-                  title="E-Mail Kontakt"
-                >
-                  <Mail className="w-6 h-6" />
-                </a>
-                <a
-                  href="https://github.com/ManagerX-Development"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-5 rounded-2xl glass-strong border border-white/10 hover:text-primary transition-all hover:scale-110"
-                  title="Source Code"
-                >
-                  <Github className="w-6 h-6" />
-                </a>
+            </Section>
+
+            <Section id="eligibility" title="3. Berechtigung">
+              <p>Sie müssen mindestens 13 Jahre alt sein (oder das in Ihrem Land geltende Mindestalter für die Nutzung von Discord erreicht haben), um ManagerX zu nutzen.</p>
+              <p className="mt-4">Durch die Nutzung bestätigen Sie, dass Sie über die rechtliche Befugnis verfügen, diese Vereinbarung einzugehen.</p>
+            </Section>
+
+            <Section id="security" title="4. Konten & Sicherheit">
+              <p>Die Sicherheit Ihres Discord-Kontos und Servers liegt ausschließlich in Ihrer Verantwortung. Dies beinhaltet:</p>
+              <ul className="mt-6 space-y-3">
+                <li className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-primary font-black">01</span>
+                  <span>Korrekte Konfiguration der Bot-Berechtigungen auf Ihrem Server.</span>
+                </li>
+                <li className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-primary font-black">02</span>
+                  <span>Schutz Ihres Discord-Accounts vor unbefugtem Zugriff.</span>
+                </li>
+                <li className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
+                  <span className="text-primary font-black">03</span>
+                  <span>Verantwortung für alle Aktionen, die durch falsch konfigurierte Moderations-Tools entstehen.</span>
+                </li>
+              </ul>
+            </Section>
+
+            <Section id="acceptable-use" title="5. Zulässige Nutzung">
+              <p>ManagerX darf nicht für folgende Zwecke verwendet werden:</p>
+              <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                {[
+                  "Illegale Aktivitäten",
+                  "Belästigung von Nutzern",
+                  "Verschicken von Spam",
+                  "Umgehung von Sicherheitsfunktionen",
+                  "DDoS-Angriffe",
+                  "Verbreitung von Malware",
+                  "Automatisierte API-Abfragen",
+                  "Reverse Engineering"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 p-3 rounded-lg bg-[#111318] border border-white/5">
+                    <AlertCircle className="w-3 h-3 text-red-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Section>
+
+            <Section id="community" title="6. Community-Richtlinien">
+              <p>Wir unterstützen eine sichere Umgebung für alle. Als Anbieter behalten wir uns das Recht vor, Server von unseren Diensten auszuschließen, die gegen Community-Standards verstoßen.</p>
+              <div className="mt-6 grid gap-4">
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all">
+                  <h5 className="text-white font-bold mb-2">Hassrede & Gewalt</h5>
+                  <p className="text-xs text-slate-500 leading-relaxed">Server, die Hassrede, Gewaltverherrlichung oder illegale Inhalte fördern, werden ohne Vorwarnung gesperrt.</p>
+                </div>
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/20 transition-all">
+                  <h5 className="text-white font-bold mb-2">Discord ToS</h5>
+                  <p className="text-xs text-slate-500 leading-relaxed">Alle Nutzer müssen zudem die offiziellen Nutzungsbedingungen von Discord einhalten.</p>
+                </div>
               </div>
-            </motion.div>
-          </div>
+            </Section>
+
+            <Section id="content-ip" title="7. Geistiges Eigentum">
+              <p>Die Markenrechte an ManagerX, die Logos, das Design und die Web-UI liegen bei OPPRO.NET Network.</p>
+              <p className="mt-4">Der Quellcode des Bots ist unter der <span className="text-white font-bold uppercase tracking-widest text-xs">GNU GPL v3.0</span> lizenziert.</p>
+            </Section>
+
+            <Section id="third-party" title="8. Drittanbieter-Dienste">
+              <p>Unser Dienst integriert oder interagiert mit Drittanbietern wie der Discord API. Wir sind nicht verantwortlich für die Leistung oder Verfügbarkeit dieser externen Dienste.</p>
+            </Section>
+
+            <Section id="termination" title="9. Suspendierung">
+              <p>Wir behalten uns das Recht vor, den Zugriff auf ManagerX für bestimmte Nutzer, IDs oder ganze Server permanent zu beenden, wenn gegen diese Bedingungen verstoßen wird.</p>
+            </Section>
+
+            <Section id="disclaimers" title="10. Haftungsausschluss">
+              <h4 className="text-white font-black text-2xl uppercase italic mb-6">Wird "WIE BESEHEN" bereitgestellt.</h4>
+              <p>Wir übernehmen keine Garantie für die ständige Verfügbarkeit (Uptime), die absolute Richtigkeit von Statistiken oder die vollständige Fehlerfreiheit des Codes.</p>
+            </Section>
+
+            <Section id="liability" title="11. Haftungsbeschränkung">
+              <p>Soweit gesetzlich zulässig, haftet OPPRO.NET oder dessen Entwickler nicht für indirekte Schäden, Datenverluste oder Server-Konflikte, die durch die Nutzung des Bots entstehen.</p>
+            </Section>
+
+            <Section id="indemnity" title="12. Freistellung">
+              <p>Sie erklären sich damit einverstanden, OPPRO.NET von allen Forderungen freizustellen, die sich aus Ihrer Nutzung des Dienstes oder Ihrer Verletzung dieser Bedingungen ergeben.</p>
+            </Section>
+
+            <Section id="changes" title="13. Änderungen">
+              <p>Wesentliche Änderungen werden auf unserem Support-Server oder dieser Website mit einer angemessenen Vorlaufzeit angekündigt.</p>
+            </Section>
+
+            <Section id="contact" title="14. Kontakt">
+              <p>Bei rechtlichen Anfragen erreichen Sie uns unter:</p>
+              <div className="mt-8 p-10 rounded-[2.5rem] bg-[#111318] border border-primary/20 text-center">
+                <Mail className="w-12 h-12 text-primary mx-auto mb-4" />
+                <a href="mailto:legal@oppro-network.de" className="text-2xl font-black text-white hover:text-primary transition-colors underline decoration-primary/30">
+                  legal@oppro-network.de
+                </a>
+                <p className="mt-4 text-slate-500 font-bold tracking-widest uppercase text-[10px]">ManagerX Legal Department</p>
+              </div>
+            </Section>
+
+            <Section id="law" title="15. Anwendbares Recht">
+              <p>Diese Bedingungen unterliegen dem Recht der <strong>Bundesrepublik Deutschland</strong>.</p>
+            </Section>
+          </article>
         </div>
       </main>
 
