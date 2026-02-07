@@ -35,7 +35,7 @@ typing-inspection==0.4.1
 requests==2.32.3
 requests-toolbelt==1.0.0
 httpx==0.24.1
-httpcore==0.17.3
+httpcore==0.18.0
 h11==0.14.0
 urllib3==2.4.0
 yarl==1.22.0
