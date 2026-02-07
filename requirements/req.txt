@@ -7,7 +7,7 @@ ezcord==0.7.4
 py-cord==2.7.0
 better-ipc==2.0.3
 fastapi==0.115.6
-uvicorn==0.34.0
+uvicorn==0.40.0
 starlette==0.46.2
 
 # --- Async & Performance ---
