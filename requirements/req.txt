@@ -29,7 +29,7 @@ pydantic==2.11.7
 pydantic_core==2.33.2
 PyYAML==6.0.1
 typing_extensions==4.15.0
-typing-inspection==0.4.1
+typing-inspection==0.4.2
 
 # --- HTTP & Web ---
 requests==2.32.3
