@@ -75,7 +75,7 @@ MarkupSafe==3.0.2
 
 # --- Helpers & Docs ---
 wikipedia==1.4.0
-packaging==25.0
+packaging==26.0
 pathlib==1.0.1
 more-itertools==10.8.0
 jaraco.classes==3.4.0
