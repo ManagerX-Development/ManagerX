@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord import SlashCommandGroup
 import ezcord
+from discord.ui import Container
 
 from mx_handler import TranslationHandler
 import os
@@ -108,6 +109,96 @@ class Settings(ezcord.Cog):
         )
         response_text = f"**Available Languages:**\n{languages_list}"
         await ctx.respond(response_text, ephemeral=True)
+
+    @data.command(
+        name="get",
+        description="Zeigt alle Daten an, die ManagerX über dich gespeichert hat."
+    )
+    async def get_all_data(self, ctx: discord.ApplicationContext):
+        """Sammelt alle User-Daten und zeigt sie in einem Container an."""
+        await ctx.defer(ephemeral=True)
+
+        user_id = ctx.author.id
+        guild_id = ctx.guild.id
+
+        # 1. Datenbanken initialisieren
+        try:
+            stats_db = StatsDB()
+            level_db = LevelDatabase()
+            
+            # WarnDatabase needs a base path that contains 'Datenbanken/warns.db'
+            # Based on moderation/warn.py, it takes os.path.dirname(__file__)
+            # which is src/bot/cogs/moderation
+            warn_base_path = os.path.join("src", "bot", "cogs", "moderation")
+            warn_db = WarnDatabase(warn_base_path)
+            
+            notes_db = NotesDatabase("data")
+        except Exception as e:
+            await ctx.respond(f"Fehler beim Initialisieren der Datenbanken: {e}", ephemeral=True)
+            return
+
+        # 2. Daten sammeln
+        # Language
+        lang = self.bot.settings_db.get_user_language(user_id) or "de"
+        lang_name = self.AVAILABLE_LANGUAGES.get(lang, lang)
+
+        # Global Stats
+        global_info = await stats_db.get_global_user_info(user_id)
+        
+        # Server Stats
+        user_stats = level_db.get_user_stats(user_id, guild_id)
+
+        # Moderation
+        warnings = warn_db.get_warnings(guild_id, user_id)
+        notes = notes_db.get_notes(guild_id, user_id)
+
+        # 3. Container erstellen
+        container = Container()
+        container.add_text(f"# 👤 Datenauskunft für {ctx.author.name}")
+        container.add_separator()
+
+        # Einstellungen
+        container.add_text(f"### ⚙️ Einstellungen")
+        container.add_text(f"**Bevorzugte Sprache:** {lang_name}")
+        container.add_separator()
+
+        # Globale Daten
+        container.add_text("### 🌍 Globale Statistiken (Serverübergreifend)")
+        if global_info:
+            container.add_text(f"**Global Level:** {global_info['level']}")
+            container.add_text(f"**Gesamt XP:** {int(global_info['xp']):,}")
+            container.add_text(f"**Nachrichten gesamt:** {global_info['total_messages']:,}")
+            container.add_text(f"**Voice Zeit gesamt:** {int(global_info['total_voice_minutes'] // 60)}h {int(global_info['total_voice_minutes'] % 60)}m")
+            container.add_text(f"**Aktivitäts-Streak:** {global_info['daily_streak']} Tage")
+        else:
+            container.add_text("*Keine globalen Daten gefunden.*")
+        container.add_separator()
+
+        # Lokale Server Daten
+        container.add_text(f"### 🏢 Server Statistiken ({ctx.guild.name})")
+        if user_stats:
+            xp, level, messages, xp_needed, prestige, total_earned = user_stats
+            container.add_text(f"**Lokales Level:** {level}")
+            container.add_text(f"**Aktuelle XP:** {xp:,} / {xp + xp_needed:,}")
+            if prestige > 0:
+                container.add_text(f"**Prestige Rang:** ⭐ {prestige}")
+        else:
+            container.add_text("*Keine lokalen Daten in diesem Server gefunden.*")
+        container.add_separator()
+
+        # Moderationsdaten
+        container.add_text("### 🛡️ Moderationsdaten")
+        warn_count = len(warnings) if warnings else 0
+        note_count = len(notes) if notes else 0
+        
+        container.add_text(f"**Aktive Verwarnungen:** {warn_count}")
+        container.add_text(f"**Gespeicherte Notizen:** {note_count}")
+        
+        container.add_separator()
+        container.add_text("*Hinweis: ManagerX speichert nur Daten, die für die Bot-Funktionalitäten (Leveling, Moderation, Einstellungen) zwingend erforderlich sind. Du kannst deine persönlichen Daten jederzeit mit `/user data delete` löschen.*")
+
+        view = discord.ui.DesignerView(container, timeout=0)
+        await ctx.respond(view=view, ephemeral=True)
 
     @data.command(
         name="delete",
