@@ -12,6 +12,9 @@
   "automerge": false,
   "rangeStrategy": "pin",
   "timezone": "Europe/Berlin",
+  "npm": {
+    "npmrc": "legacy-peer-deps=true"
+  },
   "pip_requirements": {
     "fileMatch": [
       "(^|/)requirements\\.txt$",
@@ -23,12 +26,8 @@
       "matchManagers": [
         "npm"
       ],
-      "fileMatch": [
-        "package.json",
-        "package-lock.json"
-      ],
       "groupName": "Node.js Updates",
-      "description": "Alles für Node.js in einen PR"
+      "description": "Fasst alle Node.js/NPM Updates inklusive Peer-Dep-Fix zusammen"
     },
     {
       "matchManagers": [
@@ -37,7 +36,7 @@
         "poetry"
       ],
       "groupName": "Python Updates",
-      "description": "Alles für Python (Root & Folder) in einen PR"
+      "description": "Fasst alle Python-Updates aus Root und Unterordnern zusammen"
     },
     {
       "matchManagers": [
