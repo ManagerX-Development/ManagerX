@@ -45,7 +45,7 @@ idna==3.11
 rfc3986==2.0.0
 
 # --- UI, Imaging & Logging ---
-beautifulsoup4==4.13.4
+beautifulsoup4==4.14.3
 soupsieve==2.7
 easy-pil==0.4.0
 pillow==10.4.0
