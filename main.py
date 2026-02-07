@@ -36,9 +36,9 @@ from src.bot.core.utils import print_logo
 # API Routes für Dashboard
 from src.api.dashboard.routes import set_bot_instance, router as dashboard_router
 
-# ============================================================================
+# =============================================================================
 # SETUP
-# ============================================================================
+# =============================================================================
 BASEDIR = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=BASEDIR / 'config' / '.env')
 colorama_init(autoreset=True)
