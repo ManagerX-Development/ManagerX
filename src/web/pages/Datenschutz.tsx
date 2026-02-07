@@ -89,8 +89,8 @@ export const Datenschutz = memo(function Datenschutz() {
                     key={section.id}
                     onClick={() => scrollToSection(section.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-sm font-semibold border ${activeSection === section.id
-                        ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
+                      ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
                       }`}
                   >
                     <section.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeSection === section.id ? "text-primary" : "text-slate-500"
@@ -149,7 +149,7 @@ export const Datenschutz = memo(function Datenschutz() {
 
             <Section id="controller" title="2. Verantwortliche Stelle">
               <div className="p-8 rounded-3xl bg-white/5 border border-white/5 space-y-4">
-                <p className="font-black text-white text-2xl tracking-tight uppercase italic underline decoration-primary/30">OPPRO.NET Network</p>
+                <p className="font-black text-white text-2xl tracking-tight uppercase italic underline decoration-primary/30">ManagerX Development Network</p>
                 <div className="space-y-1 text-base text-slate-400 font-medium">
                   <p className="text-white font-bold">Lenny Steiger</p>
                   <p>Eulauer Str. 24</p>
@@ -157,8 +157,8 @@ export const Datenschutz = memo(function Datenschutz() {
                   <div className="h-px w-12 bg-white/10 my-4" />
                   <p>
                     E-Mail:{" "}
-                    <a href="mailto:contact@oppro-network.de" className="text-primary hover:underline font-bold">
-                      contact@oppro-network.de
+                    <a href="mailto:contact@managerx-bot.de" className="text-primary hover:underline font-bold">
+                      contact@managerx-bot.de
                     </a>
                   </p>
                 </div>
@@ -253,7 +253,7 @@ export const Datenschutz = memo(function Datenschutz() {
 
             <Section id="rights" title="9. Ihre Rechte">
               <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Widerspruch.</p>
-              <p className="mt-8 text-sm italic">Senden Sie uns eine E-Mail an <span className="text-primary font-bold">legal@oppro-network.de</span>.</p>
+              <p className="mt-8 text-sm italic">Senden Sie uns eine E-Mail an <span className="text-primary font-bold">legal@managerx-bot.de</span>.</p>
             </Section>
 
             <Section id="complaints" title="10. Beschwerderecht">
@@ -286,8 +286,8 @@ export const Datenschutz = memo(function Datenschutz() {
                 <div className="relative z-10">
                   <Mail className="w-16 h-16 text-primary mx-auto mb-6" />
                   <h4 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4">Privacy Support</h4>
-                  <a href="mailto:legal@oppro-network.de" className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
-                    legal@oppro-network.de
+                  <a href="mailto:legal@managerx-bot.de" className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
+                    legal@managerx-bot.de
                   </a>
                   <p className="mt-12 text-[10px] uppercase font-black tracking-[0.5em] text-slate-600">© 2026 ManagerX Development</p>
                 </div>

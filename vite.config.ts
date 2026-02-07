@@ -30,10 +30,10 @@ export default defineConfig(({ mode }) => ({
     reportCompressedSize: false,
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, "index.html"),
-        datenschutz: path.resolve(__dirname, "datenschutz.html"),
-        impressum: path.resolve(__dirname, "impressum.html"),
-        agb: path.resolve(__dirname, "agb.html"),
+        main: path.resolve(__dirname, "src/web/index.html"),
+        datenschutz: path.resolve(__dirname, "src/web/datenschutz.html"),
+        impressum: path.resolve(__dirname, "src/web/impressum.html"),
+        agb: path.resolve(__dirname, "src/web/agb.html"),
       },
     },
   },

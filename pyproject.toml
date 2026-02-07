@@ -10,8 +10,8 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "GPL-3.0-or-later"}
 authors = [
-    {name = "OPPRO.NET Development", email = "development@oppro-network.de"},
-    {name = "OPPRO.NET Network", email = "contact@oppro-network.de"}
+    {name = "OPPRO.NET Development", email = "development@managerx-bot.de"},
+    {name = "OPPRO.NET Network", email = "contact@managerx-bot.de"}
 ]
 classifiers = [
     "Programming Language :: Python :: 3.8",
@@ -51,8 +51,8 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/Oppro-net-Development/ManagerX"
-Documentation = "https://docs.oppro-network.de/"
-Changelog = "https://docs.oppro-network.de/en/latest/releases/index.html"
+Documentation = "https://docs.managerx-bot.de/"
+Changelog = "https://docs.managerx-bot.de/en/latest/releases/index.html"
 BugTracker = "https://github.com/Oppro-net-Development/ManagerX/issues"
 
 [project.optional-dependencies]

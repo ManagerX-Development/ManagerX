@@ -122,7 +122,7 @@ export const Impressum = memo(function Impressum() {
               Impres<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">sum</span>
             </h1>
             <p className="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
-              Angaben gemäß § 5 DDG. ManagerX ist ein privates Open-Source-Projekt von OPPRO.NET.
+              Angaben gemäß § 5 DDG. ManagerX ist ein privates Open-Source-Projekt von ManagerX Development.
             </p>
           </header>
 
@@ -146,14 +146,14 @@ export const Impressum = memo(function Impressum() {
               <div className="grid gap-6">
                 <div className="p-8 rounded-3xl bg-[#111318] border border-white/5">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">E-Mail</p>
-                  <a href="mailto:contact@oppro-network.de" className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
-                    contact@oppro-network.de
+                  <a href="mailto:contact@managerx-bot.de" className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
+                    contact@managerx-bot.de
                   </a>
                 </div>
                 <div className="p-8 rounded-3xl bg-[#111318] border border-white/5">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Legal Support</p>
-                  <a href="mailto:legal@oppro-network.de" className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
-                    legal@oppro-network.de
+                  <a href="mailto:legal@managerx-bot.de" className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
+                    legal@managerx-bot.de
                   </a>
                 </div>
               </div>
@@ -195,8 +195,8 @@ export const Impressum = memo(function Impressum() {
               <div className="relative z-10">
                 <Mail className="w-16 h-16 text-primary mx-auto mb-6" />
                 <h4 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4">Support</h4>
-                <a href="mailto:contact@oppro-network.de" className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
-                  contact@oppro-network.de
+                <a href="mailto:contact@managerx-bot.de" className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
+                  contact@managerx-bot.de
                 </a>
                 <p className="mt-12 text-[10px] uppercase font-black tracking-[0.5em] text-slate-600">Stand: Februar 2026 • © ManagerX Development</p>
               </div>

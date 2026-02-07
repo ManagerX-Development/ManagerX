@@ -21,8 +21,7 @@
   <a href="https://github.com/Oppro-net-Development/ManagerX/commits/main">
     <img src="https://img.shields.io/github/last-commit/Oppro-net-Development/ManagerX?style=for-the-badge&logo=git&logoColor=white&color=F05032&label=Last%20Commit" alt="Last Commit">
   </a>
-
-  <a href="LICENSE">
+  <a href=".github/LICENSE">
     <img src="https://img.shields.io/badge/License-GPL--3.0-blue?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="License">
   </a>
 </p>
@@ -34,8 +33,6 @@
   <img src="https://img.shields.io/badge/SQLite-3-003B57?style=flat-square&logo=sqlite&logoColor=white" alt="SQLite">
   <img src="https://img.shields.io/github/issues/Oppro-net-Development/ManagerX?style=flat-square&logo=github&logoColor=white" alt="Issues">
   <img src="https://img.shields.io/github/stars/Oppro-net-Development/ManagerX?style=flat-square&logo=github&logoColor=white&color=FFD700" alt="Stars">
-  <img src="https://img.shields.io/github/forks/Oppro-net-Development/ManagerX?style=flat-square&logo=github&logoColor=white&color=00D26A" alt="Forks">
-  <a href="https://www.codefactor.io/repository/github/managerx-development/managerx"><img src="https://www.codefactor.io/repository/github/managerx-development/managerx/badge" alt="CodeFactor" /></a>
 </p>
 
 <br>
@@ -55,6 +52,23 @@
 **Entwickelt von** [**OPPRO.NET Development**](https://github.com/Oppro-net-Development) **|** ⚡ **Powered by OPPRO.NET Network™**
 
 <br>
+
+---
+
+## 📁 Projektstruktur
+
+```text
+ManagerX/
+├── 📂 .github/           # GitHub Config & Metadaten (License, Contributing)
+├── 📂 config/            # Bot-Konfiguration (.env, config.yaml)
+├── 📂 data/              # Dynamische Daten & Datenbanken
+├── 📂 src/
+│   ├── 📂 bot/           # Python Bot Core & Cogs
+│   ├── 📂 api/           # FastAPI Dashboard Backend
+│   └── 📂 web/           # React Dashboard Frontend
+├── 📜 main.py            # Haupteinstiegspunkt
+└── 📜 vite.config.ts     # Web Build Konfiguration
+```
 
 ---
 
@@ -100,7 +114,7 @@ pip install ManagerX[all]
 <p align="center">
   <a href="#-installation"><b>📥 Detaillierte Installation</b></a> •
   <a href="#-features"><b>✨ Features</b></a> •
-  <a href="https://docs.oppro-network.de"><b>📖 Dokumentation</b></a> •
+  <a href="https://docs.managerx-bot.de"><b>📖 Dokumentation</b></a> •
   <a href="#-support--community"><b>💬 Support</b></a>
 </p>
 

@@ -34,5 +34,5 @@ emoji_circleinfo = "ℹ️"
 
 # --- Texte ---
 AUTHOR = "ManagerX Network"
-FLOOTER = "Powered by OPPRO.NET Network" # Typo im Original ("FLOOTER"), behalte es für Kompatibilität oder korrigiere es
-FOOTER = "Powered by OPPRO.NET Network"
+FLOOTER = "Powered by ManagerX Development" # Typo im Original ("FLOOTER"), behalte es für Kompatibilität oder korrigiere es
+FOOTER = "Powered by ManagerX Development"

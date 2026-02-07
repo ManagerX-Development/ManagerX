@@ -18,7 +18,7 @@ class DashboardTask:
     def __init__(self, bot, basedir: Path):
         self.bot = bot
         self.basedir = basedir
-        self.stats_file = basedir / 'bot_stats.json'
+        self.stats_file = basedir / 'data' / 'bot_stats.json'
         self._task = None
         
         # Task definieren
