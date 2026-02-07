@@ -81,5 +81,5 @@ more-itertools==10.8.0
 jaraco.classes==3.4.0
 jaraco.context==6.0.1
 jaraco.functools==4.3.0
-docutils==0.22.3
+docutils==0.22.4
 nh3==0.3.2Ne
