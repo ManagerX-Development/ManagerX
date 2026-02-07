@@ -46,7 +46,7 @@ rfc3986==2.0.0
 
 # --- UI, Imaging & Logging ---
 beautifulsoup4==4.13.4
-soupsieve==2.7
+soupsieve==2.8.3
 easy-pil==0.4.0
 pillow==10.4.0
 SimpleColoredLogs==1.3.0
