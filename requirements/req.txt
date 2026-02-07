@@ -21,7 +21,7 @@ frozenlist==1.8.0
 multidict==6.7.0
 propcache==0.4.1
 sniffio==1.3.1
-websockets==14.1
+websockets==14.2
 
 # --- Data & Validation ---
 annotated-types==0.7.0
