@@ -118,23 +118,7 @@ Check out :doc:`dev_guide/deployment/index` for production deployment instructio
 📖 Feature Categories
 ======================
 
-🎯 **Frequently Used**
 
-- :doc:`user_guide/commands/index` — Complete command list
-- :doc:`user_guide/setup_guide/index` — Server setup
-- :doc:`user_guide/configuration/index` — Advanced configuration
-
-🔧 **Technical**
-
-- :doc:`dev_guide/architecture/index` — System design
-- :doc:`dev_guide/database/index` — Database schema
-- :doc:`dev_guide/api_development/index` — API endpoints
-
-❓ **Support**
-
-- :doc:`user_guide/faq/index` — Common questions
-- :doc:`user_guide/troubleshooting/index` — Solving problems
-- :doc:`dev_guide/troubleshooting/index` — Developer troubleshooting
 
 ---
 
@@ -192,16 +176,6 @@ Contributing
 ------------
 
 We welcome contributions from the community! Whether it's bug reports, feature requests, or code improvements, feel free to get involved via our `GitHub Repository <https://github.com/Oppro-net-Development/ManagerX>`_. For more details, check the **Contributing** section in the Developer Guide.
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Documentation:
-   :hidden:
-
-   User Guide <user_guide/index>
-   Developer Guide <dev_guide/index>
-   Changelog & Releases <releases/index>
-   Plugins <plugins/index>
 
 ---
 
