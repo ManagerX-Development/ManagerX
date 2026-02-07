@@ -24,7 +24,7 @@ const Status = memo(function Status() {
     const fetchStatus = async () => {
       try {
         // Abfrage an die neue FastAPI-Route für echte Bot-Daten
-        const response = await fetch("https://api.managerx-bot.de/api/v1/managerx/stats");
+        const response = await fetch("https://api.managerx-bot.de/v1/managerx/stats");
         if (!response.ok) throw new Error("Offline");
 
         const result = await response.json();
