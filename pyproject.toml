@@ -43,7 +43,7 @@ dependencies = [
     "uvicorn==0.24.0",
     "Jinja2==3.1.6",
     "MarkupSafe==3.0.3",
-    "starlette==0.50.0",
+    "starlette==0.52.1",
     "timedelta==2020.12.3",
     "ManagerX-Handler==1.2026.01.10",
     "ManagerX-DevTools==1.2026.01.11.1"
@@ -110,7 +110,7 @@ all = [
     "urllib3==2.6.2",
     "Jinja2==3.1.6",
     "MarkupSafe==3.0.3",
-    "starlette==0.50.0",
+    "starlette==0.52.1",
     "FastAPI==0.100.0",
     "uvicorn==0.24.0",
     "SimpleColoredLogs==1.3.0",
