@@ -2,7 +2,7 @@
 
 # First import the Modul
 import discord
-from discord.ui import Container # Import the Container Modul
+from discord.ui import Container # Import the Container Class
 import ezcord
 
 class ContainerExample(ezcord.Cog):
@@ -16,7 +16,7 @@ class ContainerExample(ezcord.Cog):
         container.add_separator() # Add a Separator to the Container
         container.add_text("Hello World") # Add a Text to the Container
         view = discord.ui.DesignerView(container, timeout=0) # Define the View
-        await ctx.respond(view=view)
+        await ctx.respond(view=view) # Send the View
 
 def setup(bot):
     bot.add_cog(ContainerExample(bot))  # Add the Cog to the Bot
