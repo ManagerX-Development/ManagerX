@@ -19,6 +19,9 @@ from datetime import datetime
 import ezcord
 from discord.ui import Container
 
+# Emoji Import
+from src.bot.ui.emojis import emoji_yes, emoji_no
+
 
 # Logger Setup
 logger = logging.getLogger(__name__)
@@ -513,7 +516,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 f"Welcome Messages werden nun in {channel.mention} gesendet."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         else:
             container = Container()
             container.add_text(
@@ -523,7 +526,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 "Der Welcome Channel konnte nicht gesetzt werden."
             ) 
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         await ctx.respond(view=view)
     
     @welcome.command(name="message", description="Setzt die Welcome Message über ein Modal")
@@ -615,13 +618,13 @@ class WelcomeSystem(ezcord.Cog):
                         f"{preview[:500] + ("..." if len(preview) > 500 else "")}\n\n"
                         "-# 💡 Tipp: Verwende `/welcome test` für eine vollständige Vorschau oder `/welcome placeholders` für alle verfügbaren Optionen."
                     )
-                    view = discord.ui.View(container, timeout=None)
+                    view = discord.ui.DesignerView(container, timeout=None)
                 else:
                     container = Container()
                     container.add_text(
                         "# ❌ Fehler\nDie Welcome Message konnte nicht gesetzt werden."
                     )
-                    view = discord.ui.View(container, timeout=None)
+                    view = discord.ui.DesignerView(container, timeout=None)
                 await interaction.response.send_message(view=view)
         
         modal = WelcomeMessageModal(self, current_message)
@@ -646,7 +649,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 "# ❌ Fehler\nEs sind noch keine Welcome Einstellungen vorhanden. Setze zuerst einen Channel."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         else:
             status = "aktiviert" if new_state else "deaktiviert"
             container = Container()
@@ -657,7 +660,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 f"Das Welcome System wurde **{status}**."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         await ctx.respond(view=view)
     
     @welcome.command(name="embed", description="Aktiviert/Deaktiviert Embed Modus")
@@ -685,13 +688,13 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 f"Welcome Messages werden nun {'als Embed' if enabled else 'als normale Nachricht'} gesendet."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         else:
             container = Container()
             container.add_text(
                 "# ❌ Fehler\nDer Embed Modus konnte nicht geändert werden."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         await ctx.respond(view=view)
     
     @welcome.command(name="autorole", description="Setzt eine Rolle die automatisch vergeben wird")
@@ -724,7 +727,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 "Neue Mitglieder erhalten keine automatische Rolle mehr."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
 
         else:
             # Rolle validieren
@@ -733,7 +736,7 @@ class WelcomeSystem(ezcord.Cog):
                 container.add_text(
                     "# ❌ Fehler\nDiese Rolle ist höher als meine höchste Rolle. Ich kann sie nicht vergeben."
                 )
-                view = discord.ui.View(container, timeout=None)
+                view = discord.ui.DesignerView(container, timeout=None)
                 await ctx.respond(view=view)
                 return
             
@@ -749,13 +752,13 @@ class WelcomeSystem(ezcord.Cog):
                 container.add_text(
                     f"Neue Mitglieder erhalten automatisch die Rolle {role.mention}."
                 )
-                view = discord.ui.View(container, timeout=None)
+                view = discord.ui.DesignerView(container, timeout=None)
             else:
                 container = Container()
                 container.add_text(
                     "# ❌ Fehler\nDie Auto-Role konnte nicht gesetzt werden."
                 )
-                view = discord.ui.View(container, timeout=None)
+                view = discord.ui.DesignerView(container, timeout=None)
         await ctx.respond(view=view)
     
     @welcome.command(name="dm", description="Aktiviert/Konfiguriert private Willkommensnachrichten")
@@ -797,13 +800,13 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 f"{description}"
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         else:
             container = Container()
             container.add_text(
                 "# ❌ Fehler\nDie DM Einstellungen konnten nicht aktualisiert werden."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
         await ctx.respond(view=view)
     
     @welcome.command(name="template", description="Lädt eine Vorlage")
@@ -919,7 +922,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 "# ❌ Keine Konfiguration gefunden\nEs sind noch keine Welcome Einstellungen vorhanden."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
             await ctx.respond(view=view)
             return
         
@@ -974,7 +977,7 @@ class WelcomeSystem(ezcord.Cog):
                 "## 🗑️ Auto-Delete\n"
                 f"{settings.get('delete_after')} Sekunden"
             )
-        view = discord.ui.View(container, timeout=None)
+        view = discord.ui.DesignerView(container, timeout=None)
         await ctx.respond(view=view)
     
     @welcome.command(name="test", description="Testet die Welcome Message")
@@ -1000,7 +1003,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 "# ❌ Fehler\nEs sind noch keine Welcome Einstellungen vorhanden."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
             await ctx.respond(view=view, ephemeral=True)
             return
         
@@ -1009,7 +1012,7 @@ class WelcomeSystem(ezcord.Cog):
             container.add_text(
                 "# ❌ Fehler\nEs ist kein Welcome Channel gesetzt."
             )
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
             await ctx.respond(view=view, ephemeral=True)
             return
         
