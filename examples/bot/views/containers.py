@@ -20,6 +20,3 @@ class ContainerExample(ezcord.Cog):
 
 def setup(bot):
     bot.add_cog(ContainerExample(bot))  # Add the Cog to the Bot
-
-
-        
