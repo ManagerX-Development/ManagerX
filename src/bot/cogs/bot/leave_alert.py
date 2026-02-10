@@ -11,7 +11,7 @@ class LeaveAlert(ezcord.Cog):
     @discord.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
         # Container für den Abschied bauen
-        container = Container()
+        container = Container(color=discord.Color.red())
         container.add_text("## 📤 Bot wurde entfernt")
         container.add_separator()
         

@@ -28,7 +28,7 @@
 
 <br>
 
-**Entwickelt von** [**OPPRO.NET Development**](https://github.com/Oppro-net-Development) **|** ⚡ **Powered by OPPRO.NET Network™**
+**Entwickelt von** [**ManagerX Development**](https://github.com/ManagerX-Development) **|** ⚡ **Powered by OPPRO.NET Network™**
 
 <br>
 
@@ -43,25 +43,6 @@
 </div>
 
 <br>
-
----
-
-## 📁 Projektstruktur
-
-Das Projekt ist modular aufgebaut, um maximale Performance und Wartbarkeit zu gewährleisten.
-
-```text
-ManagerX/
-├── 📂 .github/           # GitHub-Workflows & Projektdaten (License, Contributing)
-├── 📂 config/            # Globale Bot-Konfiguration & Umgebungsvariablen
-├── 📂 data/              # Lokale Persistenz (Datenbanken, JSON-Stats)
-├── 📂 src/
-│   ├── 📂 bot/           # 🐍 Core Bot Logic & Cog-System
-│   ├── 📂 api/           # ⚡ FastAPI Dashboard Backend
-│   └── 📂 web/           # ⚛️ React/Tailwind Dashboard Frontend
-├── 📜 main.py            # Haupteinstiegspunkt für den Bot
-└── 📜 vite.config.ts     # Build-Pipeline für das Web-Interface
-```
 
 ---
 

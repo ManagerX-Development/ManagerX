@@ -35,6 +35,7 @@ from src.bot.core.utils import print_logo
 
 # API Routes für Dashboard
 from src.api.dashboard.routes import set_bot_instance, router as dashboard_router
+from mx_handler import TranslationHandler
 
 # =============================================================================
 # SETUP
@@ -42,6 +43,15 @@ from src.api.dashboard.routes import set_bot_instance, router as dashboard_route
 BASEDIR = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=BASEDIR / 'config' / '.env')
 colorama_init(autoreset=True)
+
+TranslationHandler.settings(
+    path="translation/messages",
+    default_lang="de",
+    fallback_langs=("en", "de"),
+    logging=False,
+    colored=False,
+    log_level="DEBUG"
+)
 
 # Sys-Path
 if str(BASEDIR) not in sys.path:
@@ -111,17 +121,16 @@ if __name__ == '__main__':
     dashboard = DashboardTask(bot, BASEDIR)
     dashboard.register()
     
-    # Event Handler
     @bot.event
     async def on_ready():
         logger.success("BOT", f"Logged in as {bot.user.name}")
         
         # --- NEU: Status API & Webserver starten ---
         bot.loop.create_task(start_webserver())
-        
+            
         # Dashboard starten
         dashboard.start()
-        
+            
         # Bot-Status
         if config['features'].get('bot_status', True):
             await bot.change_presence(
@@ -130,10 +139,19 @@ if __name__ == '__main__':
                     name=f"ManagerX v{BotConfig.VERSION}"
                 )
             )
-        
+            
         # Commands sync
         await bot.sync_commands()
         logger.success("COMMANDS", "Application Commands synchronisiert")
+
+        # --- LIMIT CHECK START ---
+        all_cmds = bot.pending_application_commands
+        # Wir zählen nur die echten Top-Level Slash Commands (Slots)
+        root_slots = [c for c in all_cmds if isinstance(c, discord.SlashCommand)]
+            
+        logger.info("LIMITS", f"EzCord zählt (alle Funktionen): {len(bot.commands)}")
+        logger.info("LIMITS", f"Discord-API Slots belegt: {len(root_slots)} / 100")
+        # --- LIMIT CHECK ENDE ---
 
     # Minimaler KeepAlive Cog
     class KeepAlive(discord.ext.commands.Cog):

@@ -33,7 +33,7 @@ class About(ezcord.Cog):
         member_count = sum(g.member_count for g in self.bot.guilds)
         
         # Create Container
-        container = discord.ui.Container()
+        container = discord.ui.Container(color=discord.Color.red())
         
         # Header
         title = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.title")
