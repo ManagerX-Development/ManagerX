@@ -2,6 +2,7 @@ from datetime import datetime
 import platform
 import discord
 from discord.ext import commands
+import psutil
 import ezcord
 from mx_handler import TranslationHandler
 
@@ -74,6 +75,39 @@ class About(ezcord.Cog):
         
         container.add_text(tech_header)
         container.add_text(tech_info)
+        container.add_separator()
+        
+        # System
+        system_header = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.system_header")
+        
+        # Gather System Info
+        os_info = f"{platform.system()} {platform.release()}"
+        
+        memory = psutil.virtual_memory()
+        ram_info = f"{memory.used / (1024 ** 3):.2f} GB / {memory.total / (1024 ** 3):.2f} GB"
+        
+        # CPU can be 0 on first call without interval, but blocking is bad.
+        # We'll stick to non-blocking.
+        cpu_usage = f"{psutil.cpu_percent()}%"
+        
+        try:
+            if platform.system() == "Windows":
+                 storage_info = "N/A"
+            else:
+                disk = psutil.disk_usage("/")
+                storage_info = f"{disk.used / (1024 ** 3):.2f} GB / {disk.total / (1024 ** 3):.2f} GB"
+        except Exception:
+             storage_info = "N/A"
+        
+        system_info = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.system_info",
+            os=os_info,
+            ram=ram_info,
+            cpu=cpu_usage,
+            storage=storage_info
+        )
+        
+        container.add_text(system_header)
+        container.add_text(system_info)
         container.add_separator()
         
         # Footer

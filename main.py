@@ -174,7 +174,6 @@ if __name__ == '__main__':
         "src/bot/cogs",
         subdirectories=True,
         ignored_cogs=ignored,
-        log=CogLog.sum
     )
     logger.success("BOT", "Cogs geladen")
     

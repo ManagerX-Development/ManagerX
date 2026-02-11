@@ -132,4 +132,6 @@ cog_about:
     stats_info: "❯ **Servers:** `{server_count}`\n❯ **Users:** `{member_count}`\n❯ **Ping:** {ping}\n❯ **Uptime:** {uptime}"
     tech_header: "## 🛠️ Technology & Versions"
     tech_info: "❯ **Python:** `v{python_version}`\n❯ **PyCord:** `v{discord_version}`\n❯ **EzCord:** `v{ezcord_version}`"
+    system_header: "## 🖥️ System"
+    system_info: "❯ **OS:** `{os}`\n❯ **RAM:** {ram}\n❯ **CPU:** {cpu}\n❯ **Storage:** {storage}"
     footer: "{year} ManagerX Development • ManagerX v2.0.0"
