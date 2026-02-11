@@ -1,3 +1,6 @@
+#########################################################
+# General System Messages
+#########################################################
 general:
   error_types:
     no_permission: "You do not have permission to execute this command."
@@ -6,6 +9,9 @@ general:
     option_missing: "A required option is missing."
     bot_has_no_permission: "The bot does not have the necessary permissions to execute this command."
 
+#########################################################
+# Settings Cog
+#########################################################
 cog_settings:
   language:
     error_types:
@@ -18,11 +24,9 @@ cog_settings:
       language_set: "Language has been set to {language}."
       current_language: "Your current preferred language is {language}."
 
-###################################################################
-#
-# Cog Folder: cogs/fun 
-#
-####################################################################
+#########################################################
+# Fun Cogs (Games & Entertainment)
+#########################################################
 cog_4gewinnt:
   error_types:
     not_your_turn: "It's not your turn."
@@ -50,9 +54,11 @@ cog_tictactoe:
     draw: "It's a draw!"
 
   message: 
-    # NEU: Nur einfache Schlüssel verwenden
     start_game: "Tic Tac Toe: {author_mention} (X) vs {opponent_mention} (O)\n{author_mention} starts!"
 
+#########################################################
+# Utility Cogs (Weather, Tools)
+#########################################################
 cog_weather:
   error_types:
     city_not_found: "⚠️ City not found."
@@ -68,9 +74,8 @@ cog_weather:
     pressure: "**🧭 Pressure:** {pressure} hPa\n"
 
 #########################################################
-# Server Management
+# Server Management (Autorole, etc.)
 #########################################################
-
 cog_autorole:
   error_types:
     role_to_high:
@@ -118,10 +123,9 @@ cog_autorole:
     error_forbidden: "❌ Missing permissions to assign roles"
     error_http: "❌ Error while assigning roles: {error}"
     
-#######################################
-# About Cog
 #########################################################
-
+# About Cog (System Information)
+#########################################################
 cog_about:
   messages:
     title: "# ℹ️ About ManagerX"
@@ -132,4 +136,6 @@ cog_about:
     stats_info: "❯ **Servers:** `{server_count}`\n❯ **Users:** `{member_count}`\n❯ **Ping:** {ping}\n❯ **Uptime:** {uptime}"
     tech_header: "## 🛠️ Technology & Versions"
     tech_info: "❯ **Python:** `v{python_version}`\n❯ **PyCord:** `v{discord_version}`\n❯ **EzCord:** `v{ezcord_version}`"
+    system_header: "## 🖥️ System"
+    system_info: "❯ **OS:** `{os}`\n❯ **RAM:** {ram}\n❯ **CPU:** {cpu}\n❯ **Storage:** {storage}"
     footer: "{year} ManagerX Development • ManagerX v2.0.0"

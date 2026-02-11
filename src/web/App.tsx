@@ -56,8 +56,11 @@ const AppContent = () => {
           <Routes location={location}>
             <Route path="/" element={<Index />} />
             <Route path="/legal/imprint" element={<Impressum />} />
+            <Route path="/impressum.html" element={<Impressum />} />
             <Route path="/legal/privacy" element={<Datenschutz />} />
+            <Route path="/datenschutz.html" element={<Datenschutz />} />
             <Route path="/legal/terms" element={<Nutzungsbedingungen />} />
+            <Route path="/agb.html" element={<Nutzungsbedingungen />} />
             <Route path="/legal/license" element={<License />} />
             <Route path="/plugins" element={<PluginsPage />} />
             <Route path="/status" element={<Status />} />

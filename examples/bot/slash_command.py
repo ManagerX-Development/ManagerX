@@ -2,7 +2,7 @@ import discord
 import ezcord
 from discord import slash_command
 
-class SlashCommand(ezcord.Cog):
+class ExampleSlashCommand(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -11,4 +11,4 @@ class SlashCommand(ezcord.Cog):
         await ctx.respond("Pong!") # Send a message
 
 def setup(bot):
-    bot.add_cog(SlashCommand(bot)) 
+    bot.add_cog(ExampleSlashCommand(bot)) 

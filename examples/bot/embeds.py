@@ -4,7 +4,7 @@ import discord
 from discord import slash_command
 import ezcord
 
-class Embeds(ezcord.Cog):
+class ExampleEmbeds(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,4 +32,4 @@ class Embeds(ezcord.Cog):
         await ctx.respond(embed=embed)
 
 def setup(bot):
-    bot.add_cog(Embeds(bot))  # Add the Cog to the Bot
+    bot.add_cog(ExampleEmbeds(bot))  # Add the Cog to the Bot
