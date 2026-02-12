@@ -8,7 +8,7 @@ DM-Nachrichten und Statistiken.
 
 import discord
 from discord.ext import commands
-from DevTools import WelcomeDatabase
+from mx_devtools import WelcomeDatabase
 import asyncio
 import json
 import io

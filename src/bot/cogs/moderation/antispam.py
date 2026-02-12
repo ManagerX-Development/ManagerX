@@ -8,7 +8,7 @@ import datetime
 from datetime import timedelta
 
 
-from DevTools import AntiSpamDatabase as SpamDB
+from mx_devtools import AntiSpamDatabase as SpamDB
 
 antispam = SlashCommandGroup("antispam")
 class AntiSpam(ezcord.Cog):

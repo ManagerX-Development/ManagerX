@@ -4,7 +4,7 @@ from discord.ext import commands, tasks
 from discord import SlashCommandGroup
 import logging
 from typing import Optional
-from DevTools import StatsDB
+from mx_devtools import StatsDB
 import asyncio
 from datetime import datetime, timedelta
 import math

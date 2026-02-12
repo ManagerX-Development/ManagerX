@@ -7,7 +7,7 @@ from discord.ui import Container
 from mx_handler import TranslationHandler
 import os
 from src.bot.core.constants import ERROR_COLOR, SUCCESS_COLOR, emoji_warn, emoji_delete, AUTHOR, FOOTER
-from DevTools import StatsDB, WarnDatabase, NotesDatabase, LevelDatabase
+from mx_devtools import StatsDB, WarnDatabase, NotesDatabase, LevelDatabase
 import sqlite3
 
 

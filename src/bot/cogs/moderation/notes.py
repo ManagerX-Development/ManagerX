@@ -6,7 +6,7 @@ import discord
 from discord import SlashCommandGroup
 import datetime
 import ezcord
-from DevTools import NotesDatabase
+from mx_devtools import NotesDatabase
 
 notes = SlashCommandGroup("notes")
 # ───────────────────────────────────────────────

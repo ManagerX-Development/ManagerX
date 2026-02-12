@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from discord import option
-from DevTools import AutoRoleDatabase
+from mx_devtools import AutoRoleDatabase
 from mx_handler import TranslationHandler as TH
 
 class AutoRole(commands.Cog):

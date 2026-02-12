@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands, tasks
 from discord import slash_command, Option, SlashCommandGroup
-from DevTools.backend.database.globalchat_db import GlobalChatDatabase, db
+from mx_devtools.backend.database.globalchat_db import GlobalChatDatabase, db
 import asyncio
 import logging
 import re
