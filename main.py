@@ -113,7 +113,7 @@ if __name__ == '__main__':
     # Datenbank initialisieren
     db_manager = DatabaseManager()
     if not db_manager.initialize(bot):
-        logger.warning("DATABASE", "Bot läuft ohne Datenbank weiter...")
+        logger.warn("DATABASE", "Bot läuft ohne Datenbank weiter...")
     else:
         logger.success("DATABASE", "Datenbank erfolgreich initialisiert")
     

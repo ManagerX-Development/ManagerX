@@ -1,16 +1,10 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Shield, Users, MessageCircle, Sparkles, Zap, Rocket, Code2, ArrowRight } from "lucide-react";
+import { useStats } from "@/hooks/useStats";
 
-const stats = [
-  { label: "Server", value: "10+", icon: Users },
-  { label: "Befehle", value: "90+", icon: MessageCircle },
-  { label: "Uptime", value: "99.9%", icon: Sparkles },
-];
-
-const StatCard = memo(({ stat, index }: { stat: typeof stats[0]; index: number }) => (
+const StatCard = memo(({ stat, index }: { stat: { label: string; value: string; icon: any }; index: number }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -28,6 +22,14 @@ const StatCard = memo(({ stat, index }: { stat: typeof stats[0]; index: number }
 StatCard.displayName = "StatCard";
 
 export const Hero = memo(function Hero() {
+  const { data, isLoading } = useStats();
+
+  const stats = [
+    { label: "Server", value: isLoading ? "..." : `${data.guilds}`, icon: Users },
+    { label: "Nutzer", value: isLoading ? "..." : `${data.users}`, icon: MessageCircle },
+    { label: "Uptime", value: isLoading ? "..." : data.uptime, icon: Sparkles },
+  ];
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Premium Animated Background */}

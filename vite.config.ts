@@ -21,8 +21,7 @@ export default defineConfig(({ mode }) => ({
   publicDir: "../../public",
   resolve: {
     alias: {
-      // Dein Alias zeigt auf . (jetzt src/web)
-      "@": path.resolve(__dirname, "src/web"),
+      "@": path.resolve(__dirname, "./src/web"),
     },
   },
   build: {

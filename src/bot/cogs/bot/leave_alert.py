@@ -5,33 +5,44 @@ import ezcord
 class LeaveAlert(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
-        # ID deines Kanals, in den die Info fließen soll
+        # Dein Log-Kanal für Abgänge
         self.log_channel_id = 1429164270435700849 
 
     @discord.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
-        # Container für den Abschied bauen
-        container = Container(color=discord.Color.red())
-        container.add_text("## 📤 Bot wurde entfernt")
+        # Wir berechnen den neuen Serverstand direkt
+        total_servers = len(self.bot.guilds)
+        
+        # Container in Rot für den Abschied
+        container = Container(color=discord.Color.from_rgb(255, 0, 0)) # Sattes Rot
+        container.add_text("## 📤 Bot hat einen Server verlassen")
         container.add_separator()
         
-        # Falls der Name nicht mehr greifbar ist (selten), nutzen wir die ID
         guild_name = guild.name if guild.name else "Unbekannter Server"
         
-        container.add_text(f"**Server:** {guild_name}")
-        container.add_text(f"**ID:** {guild.id}")
+        # Schickere Formatierung mit Emojis und Backticks
+        info_text = (
+            f"**🏠 Server:** `{guild_name}`\n"
+            f"**🆔 ID:** `{guild.id}`\n"
+        )
         
-        # Da wir weg sind, wissen wir nicht genau, wie viele Member es zuletzt waren,
-        # aber wir können versuchen, den letzten Stand auszugeben
         if guild.member_count:
-            container.add_text(f"**Letzter Stand:** {guild.member_count} Mitglieder")
+            info_text += f"**👥 Letzte Mitgliederzahl:** `{guild.member_count}`\n"
+            
+        info_text += f"**📊 Neue Gesamtanzahl:** `{total_servers}`"
+        
+        container.add_text(info_text)
+
+        # Versuchen, das Icon noch zu kriegen (manchmal klappt's noch kurz nach dem Leave)
+        if guild.icon:
+            container.set_thumbnail(guild.icon.url)
 
         log_channel = self.bot.get_channel(self.log_channel_id)
         if log_channel:
             view = DesignerView(container, timeout=None)
             await log_channel.send(view=view)
         
-        print(f"[-] Bot hat den Server verlassen: {guild_name} ({guild.id})")
+        print(f"[-] Bot verlassen: {guild_name} | Server verbleibend: {total_servers}")
 
 def setup(bot):
     bot.add_cog(LeaveAlert(bot))

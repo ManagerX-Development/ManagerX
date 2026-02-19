@@ -161,7 +161,6 @@ Verbinde deine Community mit Servern weltweit über unser integriertes Globalcha
 - **Temporary Voice**: User-gesteuerte Sprachkanäle mit voller Permission-Control.
 - **Auto-Cleanup**: Intelligente Löschung inaktiver Kanäle spart Ressourcen.
 - **Live-Stats**: Echtzeit-Analysen über Voice-Aktivität und User-Engagement.
-- **Toolbox**: Integrationen wie Google-Search, Wetterdaten und Wikipedia.
 
 <br>
 
