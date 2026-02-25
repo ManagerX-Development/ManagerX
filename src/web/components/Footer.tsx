@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, Heart, Github, MessageCircle, ExternalLink, Terminal, Sparkles, Code2, Zap, Users, Rocket, Star, BarChart3, Lock, Info, FileCheck, Activity } from "lucide-react";
+import { Shield, Heart, Github, MessageCircle, ExternalLink, Terminal, Sparkles, Code2, Zap, Users, Rocket, Star, BarChart3, Lock, Info, FileCheck, Activity, LayoutGrid } from "lucide-react";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/ManagerX-Development/ManagerX", label: "GitHub" },
@@ -124,6 +124,10 @@ export const Footer = memo(function Footer() {
               <Link to="/plugins" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
                 <Terminal className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
                 <span className="group-hover:translate-x-1 transition-transform">Plugin System</span>
+              </Link>
+              <Link to="/commands" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <LayoutGrid className="w-4 h-4 text-accent transition-transform group-hover:scale-110" />
+                <span className="group-hover:translate-x-1 transition-transform">Befehle</span>
               </Link>
             </div>
 

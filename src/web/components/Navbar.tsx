@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import {
-  Shield, Menu, X, Sparkles, Puzzle, Activity,
+  Shield, Menu, X, Sparkles, Puzzle, Activity, Terminal,
   Newspaper // Icon für den Blog hinzugefügt
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 
 const navLinks = [
   { label: "Features", href: "/#features", icon: Sparkles },
+  { label: "Commands", href: "/commands", icon: Terminal },
   { label: "Plugins", href: "/plugins", icon: Puzzle },
   { label: "Status", href: "/status", icon: Activity },
 ];

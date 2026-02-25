@@ -85,8 +85,14 @@ async def get_api_key(api_key_header: str = Security(API_KEY_HEADER)):
     return api_key_header
 
 router = APIRouter(
-    prefix="/v1/managerx/dashboard",
+    prefix="dashboard",
     tags=["dashboard"],
     dependencies=[Security(get_api_key)]
 )
 router.include_router(router_public)
+
+list_router = APIRouter(
+    preifx="/v1/managerx/lists"
+    tags=["lists"]
+)
+
