@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { Button } from "../components/ui/button";
 import {
   Shield, Menu, X, Sparkles, Puzzle, Activity, Terminal,
   Newspaper // Icon für den Blog hinzugefügt
