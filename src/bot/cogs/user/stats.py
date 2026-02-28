@@ -23,6 +23,7 @@ class EnhancedStatsCog(commands.Cog):
         self.bot = bot
         self.db = StatsDB()
         self.cleanup_task.start()
+        self.monthly_reset_task.start()
         logger.info("Enhanced StatsCog initialized")
 
     stats = SlashCommandGroup("stats", "Statistiken")
@@ -31,16 +32,26 @@ class EnhancedStatsCog(commands.Cog):
     def cog_unload(self):
         """Called when the cog is unloaded."""
         self.cleanup_task.cancel()
+        self.monthly_reset_task.cancel()
         self.db.close()
         logger.info("Enhanced StatsCog unloaded")
 
     @tasks.loop(hours=24)
     async def cleanup_task(self):
-        """Daily cleanup of old data."""
-        await self.db.cleanup_old_data(days=90)
+        """Daily rolling cleanup – removes raw event data older than 30 days."""
+        await self.db.cleanup_old_data(days=30)
 
     @cleanup_task.before_loop
     async def before_cleanup(self):
+        await self.bot.wait_until_ready()
+
+    @tasks.loop(hours=24)
+    async def monthly_reset_task(self):
+        """Season reset – wipes messages & voice_sessions on the 1st of each month."""
+        await self.db.monthly_season_reset()
+
+    @monthly_reset_task.before_loop
+    async def before_monthly_reset(self):
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
@@ -336,13 +347,13 @@ class EnhancedStatsCog(commands.Cog):
 
         try:
             if typ == "global":
-                leaderboard_data = await self.db.get_leaderboard(limit)
+                leaderboard_data = await self.db.get_leaderboard(limit, bot=self.bot)
                 title = "🌍 Globale Rangliste"
                 description = "Top User nach globalem Level & XP"
             else:
-                leaderboard_data = await self.db.get_leaderboard(limit, ctx.guild.id)
+                leaderboard_data = await self.db.get_leaderboard(limit, ctx.guild.id, bot=self.bot)
                 title = f"🏢 {ctx.guild.name} Rangliste"
-                description = "Top User der letzten 30 Tage"
+                description = "Top User dieser Saison (letzten 30 Tage)"
 
             if not leaderboard_data:
                 embed = discord.Embed(
@@ -543,9 +554,11 @@ class EnhancedStatsCog(commands.Cog):
         )
 
         embed.add_field(
-            name="🔒 Datenschutz",
+            name="🔒 Datenschutz (Privacy-First)",
             value="• Nur Metadaten werden gespeichert (keine Inhalte)\n"
-                  "• Automatische Bereinigung alter Daten nach 90 Tagen\n"
+                  "• **Monatlicher Reset:** Leaderboard startet jeden Monat neu\n"
+                  "• **30-Tage-Cleanup:** Rohdaten werden nach 30 Tagen gelöscht\n"
+                  "• **Anonyme Tagesstatistiken:** Keine Verknüpfung zu einzelnen Usern\n"
                   "• [Vollständige Datenschutzerklärung](https://medicopter117.github.io/ManagerX-Web/privacy.html)",
             inline=False
         )

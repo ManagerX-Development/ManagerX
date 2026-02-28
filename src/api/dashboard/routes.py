@@ -61,6 +61,13 @@ async def get_stats(request: Request):
         return server_status
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router_public.get("/version")
+async def get_version(request: Request):
+    return {
+        "pypi_version": "1.2026.2.26",
+        "bot_version": "v2.0.0-open-beta"
+    }
     
 
 API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=False)
@@ -85,14 +92,9 @@ async def get_api_key(api_key_header: str = Security(API_KEY_HEADER)):
     return api_key_header
 
 router = APIRouter(
-    prefix="dashboard",
+    prefix="/dashboard",
     tags=["dashboard"],
     dependencies=[Security(get_api_key)]
 )
 router.include_router(router_public)
-
-list_router = APIRouter(
-    preifx="/v1/managerx/lists"
-    tags=["lists"]
-)
 
