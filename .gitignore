@@ -6,6 +6,7 @@
 .idea/
 .vscode/
 data/
+!src/web/data/
 
 # Python
 __pycache__/
