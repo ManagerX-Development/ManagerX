@@ -2,7 +2,7 @@
 import discord
 from discord.ext import commands, tasks
 from discord import slash_command, Option, SlashCommandGroup
-from DevTools.backend.database.globalchat_db import GlobalChatDatabase, db
+from mx_devtools.backend.database.globalchat_db import GlobalChatDatabase, db
 import asyncio
 import logging
 import re
@@ -256,13 +256,13 @@ class EmbedBuilder:
         # Embed-Farbe
         embed_color = self._parse_color(settings.get('embed_color', self.config.DEFAULT_EMBED_COLOR))
         
-        # Beschreibung
+        # Beschreibung mit stilisiertem Layout
         if content:
-            description = content
+            description = f"{content}"
         elif message.attachments or message.stickers or attachment_data:
-            description = "*Medien-Nachricht*"
+            description = "📎 *Medien-Nachricht*"
         else:
-            description = "*Keine Beschreibung*"
+            description = ""
         
         # Embed erstellen
         embed = discord.Embed(
@@ -271,15 +271,18 @@ class EmbedBuilder:
             timestamp=message.created_at
         )
         
-        # Author mit Badges
+        # Author mit Badges und Username-Tag
         author_text, badges = self._build_author_info(message.author)
         embed.set_author(
             name=author_text,
             icon_url=message.author.display_avatar.url
         )
         
-        # Footer mit Server-Info UND Original-Message-ID (für Reply-Tracking)
-        footer_text = f"📍 {message.guild.name} • #{message.channel.name} • ID:{message.id}"
+        # Thumbnail mit User-Avatar für bessere Optik
+        embed.set_thumbnail(url=message.author.display_avatar.url)
+        
+        # Footer mit Server-Info und schönerem Layout
+        footer_text = f"🌐 {message.guild.name}  •  #{message.channel.name}  •  ID:{message.id}"
         embed.set_footer(
             text=footer_text,
             icon_url=message.guild.icon.url if message.guild.icon else None
@@ -599,7 +602,7 @@ class EmbedBuilder:
             return discord.Color.blurple()
             
     def _build_author_info(self, author: discord.Member) -> Tuple[str, List[str]]:
-        """Baut Author-Text mit Badges"""
+        """Baut Author-Text mit Badges – schöneres Format"""
         badges = []
         roles = []
         # Bot Owner
@@ -613,13 +616,24 @@ class EmbedBuilder:
         elif author.guild_permissions.manage_guild:
             badges.append("🔧")
             roles.append("Mod")
+        
+        # Nitro/Booster Badge
+        if hasattr(author, 'premium_since') and author.premium_since:
+            badges.append("💎")
+            roles.append("Booster")
             
         badge_text = " ".join(badges)
-        author_text = f"{badge_text} {author.display_name}".strip()
+        display = author.display_name
+        
+        # Format: "👑 ⚡ DisplayName (@username)"
+        if badge_text:
+            author_text = f"{badge_text}  {display}  (@{author.name})"
+        else:
+            author_text = f"{display}  (@{author.name})"
         
         # Hinzufügen von Discord System Badges (z.B. Bot, Verified Bot)
         if author.bot:
-            author_text += " [BOT]"
+            author_text += " ✦ BOT"
 
         return author_text, roles
 
@@ -714,13 +728,9 @@ class GlobalChatSender:
         successful_sends = 0
         failed_sends = 0
 
-        # Berechne, wie viele Tasks gleichzeitig laufen sollen (z.B. 10)
+        # Sende an ALLE aktiven Channels (inkl. Ursprungskanal – Original wird gelöscht)
         tasks = []
         for channel_id in active_channels:
-            # Sende nicht an den Ursprungskanal zurück
-            if channel_id == message.channel.id:
-                continue
-
             tasks.append(self._send_to_channel(channel_id, embed, files_to_upload))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -831,17 +841,16 @@ class GlobalChat(ezcord.Cog):
                 # Wenn Download fehlschlägt, Nachricht trotzdem ohne Medien senden
                 attachment_data = []
 
-        # Nachricht senden
-        successful, failed = await self.sender.send_global_message(message, attachment_data)
+        # Ursprüngliche Nachricht IMMER löschen (wird als Embed neu gepostet)
+        try:
+            await message.delete()
+        except discord.Forbidden:
+            logger.warning(f"⚠️ Keine Permissions zum Löschen der Original-Nachricht in {message.channel.id}")
+        except discord.NotFound:
+            pass
 
-        # Ursprüngliche Nachricht löschen, wenn Relaying erfolgreich war
-        if settings.get('delete_original', False):
-             try:
-                await message.delete()
-             except discord.Forbidden:
-                logger.warning(f"⚠️ Keine Permissions zum Löschen der Original-Nachricht in {message.channel.id}")
-             except discord.NotFound:
-                pass
+        # Nachricht als Embed an alle Channels senden (inkl. eigenen)
+        successful, failed = await self.sender.send_global_message(message, attachment_data)
         
         logger.info(f"🌍 GlobalChat: Nachricht von {message.guild.name} | User: {message.author.name} | ✅ {successful} | ❌ {failed}")
 

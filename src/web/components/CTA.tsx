@@ -1,15 +1,17 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-
-const stats = [
-  { label: "Aktive Server", value: "10+" },
-  { label: "Befehle ausgeführt", value: "1000+" },
-  { label: "Zufriedene User", value: "300+" },
-];
+import { useStats } from "@/hooks/useStats";
 
 export const CTA = memo(function CTA() {
+  const { data, isLoading } = useStats();
+
+  const stats = [
+    { label: "Aktive Server", value: isLoading ? "..." : `${data.guilds}` },
+    { label: "Befehle", value: "90+" },
+    { label: "Zufriedene User", value: isLoading ? "..." : `${data.users}` },
+  ];
+
   return (
     <section id="support" className="py-32 relative overflow-hidden">
       {/* Premium Background */}

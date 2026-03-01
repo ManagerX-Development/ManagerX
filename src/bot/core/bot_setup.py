@@ -29,9 +29,11 @@ class BotSetup:
         intents.presences = True
         
         # Bot erstellen
-        bot = ezcord.Bot(
+        bot = ezcord.PrefixBot(
             intents=intents,
-            language="de"
+            language="de",
+            command_prefix="!mx ",
+            help_command=None
         )
         
         # Ezcord Help Command aktivieren

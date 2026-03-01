@@ -2,7 +2,7 @@
 # ───────────────────────────────────────────────
 # >> Imports
 # ───────────────────────────────────────────────
-from DevTools import WarnDatabase
+from mx_devtools import WarnDatabase
 import discord
 from discord import slash_command, Option
 import os

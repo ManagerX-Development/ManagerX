@@ -9,7 +9,7 @@ Pfad: src/bot/core/database.py
 from logger import logger, Category
 
 try:
-    from DevTools import SettingsDB
+    from mx_devtools import SettingsDB
 except ImportError as e:
     logger.critical(Category.DATABASE, f"SettingsDB Import fehlgeschlagen: {e}")
     SettingsDB = None

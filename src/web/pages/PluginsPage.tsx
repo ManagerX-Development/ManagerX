@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { SEO } from "../components/SEO";
 import { motion } from "framer-motion";
 
 const SECTIONS = [
@@ -98,8 +99,8 @@ export const PluginsPage = memo(function PluginsPage() {
                     key={section.id}
                     onClick={() => scrollToSection(section.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group text-sm font-semibold border ${activeSection === section.id
-                        ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
+                      ? "bg-primary/10 text-primary border-primary/20 shadow-lg shadow-primary/5"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/5 border-transparent"
                       }`}
                   >
                     <section.icon className={`w-4 h-4 transition-transform group-hover:scale-110 ${activeSection === section.id ? "text-primary" : "text-slate-500"
