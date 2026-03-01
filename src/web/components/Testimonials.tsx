@@ -85,43 +85,35 @@ export const Testimonials = memo(function Testimonials() {
       <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-accent/10 blur-[150px] rounded-full" />
 
       <div className="container relative z-10 px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: "easeInOut" }}
-          className="text-center mb-20"
-        >
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-20">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="inline-flex items-center gap-2 glass rounded-full px-6 py-3 mb-8 border border-accent/20"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 mb-8"
           >
-            <TrendingUp className="w-4 h-4 text-accent" />
-            <span className="text-xs text-foreground/80 font-bold tracking-widest uppercase">Early Access Feedback</span>
+            <Users className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/70">Community Feedback</span>
           </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1, duration: 0.7, ease: "easeInOut" }}
-            className="text-5xl md:text-6xl font-black mb-6 tracking-tighter"
+            className="text-5xl md:text-6xl font-bold mb-8 tracking-tighter"
           >
             Stimmen der <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Ersten Stunde</span>
           </motion.h2>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium"
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl font-medium leading-relaxed"
           >
-            Admins, die ManagerX von Anfang an begleiten, teilen ihre Erfahrungen.
+            Server-Owner und Admins, die ManagerX von Anfang an begleiten.
           </motion.p>
-        </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {testimonials.map((testimonial, index) => (

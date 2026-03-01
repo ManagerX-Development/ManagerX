@@ -74,44 +74,36 @@ export const Features = memo(function Features() {
 
       <div className="container relative z-10 px-4">
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, ease: "easeInOut" }}
-          className="text-center max-w-3xl mx-auto mb-24"
-        >
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-20">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.35, ease: "easeInOut" }}
-            className="inline-flex items-center gap-2 glass rounded-full px-6 py-3 mb-10 border border-accent/20"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 mb-8"
           >
-            <Sparkles className="w-4 h-4 text-accent animate-spin" style={{ animationDuration: "3s" }} />
-            <span className="text-sm text-foreground/80 font-bold">Über 90 innovative Befehle</span>
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/70">Leistungsstarke Features</span>
           </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.05, duration: 0.4, ease: "easeInOut" }}
-            className="text-5xl md:text-7xl font-black mb-8 tracking-tighter leading-tight"
+            className="text-5xl md:text-7xl font-bold mb-8 tracking-tighter leading-tight"
           >
-            <span className="text-foreground">Alles, was du </span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent font-black">wirklich brauchst</span>
+            Alles für dein <br className="md:hidden" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Discord Universum</span>
           </motion.h2>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium"
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl font-medium leading-relaxed"
           >
-            Ein Bot für alle deine Server-Bedürfnisse. Moderation, Engagement, Social Features und interaktive Tools.
+            Von moderner Server-Sicherheit bis hin zu interaktiven Community-Tools – wir haben alles an Bord.
           </motion.p>
-        </motion.div>
+        </div>
 
         {/* Feature Cards Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">

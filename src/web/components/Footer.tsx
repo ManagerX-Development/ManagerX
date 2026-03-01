@@ -52,215 +52,116 @@ export const Footer = memo(function Footer() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-6xl md:text-8xl font-black mb-8 tracking-tighter text-center"
+            className="text-5xl md:text-7xl font-bold mb-8 tracking-tighter text-center"
           >
-            <span className="text-foreground">Manager</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary ml-2 filter drop-shadow-glow">X</span>
+            Manager<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent drop-shadow-glow ml-1">X</span>
           </motion.h2>
 
           {/* --- SLOGAN --- */}
-          <motion.p
+          <motion.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl md:text-3xl text-muted-foreground/80 mb-24 font-black tracking-tight flex items-center gap-6 flex-wrap justify-center uppercase italic"
+            className="flex flex-wrap justify-center gap-8 mb-20 text-sm font-semibold uppercase tracking-[0.2em] text-muted-foreground/60 italic"
           >
-            <span className="flex items-center gap-2 hover:text-primary transition-colors cursor-default"><Zap className="w-6 h-6 text-primary" /> Sicher</span>
-            <span className="text-primary/20">•</span>
-            <span className="flex items-center gap-2 hover:text-accent transition-colors cursor-default"><Rocket className="w-6 h-6 text-accent" /> Schnell</span>
-            <span className="text-primary/20">•</span>
-            <Link to="/legal/license" className="flex items-center gap-2 text-muted-foreground/80 hover:text-primary transition-colors cursor-pointer group">
-              <Code2 className="w-6 h-6 text-primary group-hover:rotate-12 transition-transform" />
-              <span>Open Source</span>
+            <span className="flex items-center gap-2 hover:text-primary transition-colors cursor-default">
+              <Zap className="w-4 h-4" /> Sicher
+            </span>
+            <span className="flex items-center gap-2 hover:text-accent transition-colors cursor-default">
+              <Rocket className="w-4 h-4" /> Schnell
+            </span>
+            <Link to="/legal/license" className="flex items-center gap-2 hover:text-primary transition-colors">
+              <Code2 className="w-4 h-4" /> Open Source
             </Link>
-          </motion.p>
+          </motion.div>
 
           {/* --- SOCIAL BUTTONS --- */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-6 mb-32"
+            className="flex flex-wrap justify-center gap-4 mb-24"
           >
-            {socialLinks.map((link, idx) => (
+            {socialLinks.map((link) => (
               <motion.a
                 key={link.label}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ y: -8, scale: 1.05 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
-                transition={{ delay: idx * 0.1 }}
-                className="group px-10 py-5 rounded-[1.5rem] border border-primary/20 bg-primary/5 backdrop-blur-md flex items-center gap-4 text-sm font-black uppercase tracking-widest hover:bg-primary/10 transition-all shadow-xl hover:shadow-primary/30 hover:border-primary/40 text-white"
+                className="px-8 py-4 rounded-2xl glass border border-white/5 flex items-center gap-3 text-xs font-bold uppercase tracking-widest hover:border-primary/30 transition-all shadow-lg"
               >
-                <link.icon className="w-6 h-6 text-primary group-hover:text-accent transition-colors" />
+                <link.icon className="w-5 h-5 text-primary" />
                 {link.label}
               </motion.a>
             ))}
           </motion.div>
 
           {/* --- NAVIGATION & TECH GRID --- */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-16 text-center md:text-left border-y border-white/5 py-24 w-full max-w-7xl mb-24 backdrop-blur-sm"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 text-center md:text-left border-y border-white/5 py-20 w-full max-w-6xl mb-20">
             {/* column 1 */}
-            <div className="flex flex-col gap-6">
-              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Navigation</span>
-              <a href="#features" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Star className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
-                <span className="group-hover:translate-x-1 transition-transform">Features</span>
-              </a>
-              <a href="#stats" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <BarChart3 className="w-4 h-4 text-accent transition-transform group-hover:scale-110" />
-                <span className="group-hover:translate-x-1 transition-transform">Statistiken</span>
-              </a>
-              <Link to="/plugins" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Terminal className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
-                <span className="group-hover:translate-x-1 transition-transform">Plugin System</span>
-              </Link>
-              <Link to="/commands" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <LayoutGrid className="w-4 h-4 text-accent transition-transform group-hover:scale-110" />
-                <span className="group-hover:translate-x-1 transition-transform">Befehle</span>
-              </Link>
-              <Link to="/roadmap" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Milestone className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
-                <span className="group-hover:translate-x-1 transition-transform">Roadmap</span>
-              </Link>
-              <Link to="/team" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Users className="w-4 h-4 text-accent transition-transform group-hover:scale-110" />
-                <span className="group-hover:translate-x-1 transition-transform">Team</span>
-              </Link>
+            <div className="flex flex-col gap-5">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mb-2">Navigation</span>
+              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Features</a>
+              <a href="#testimonials" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Feedback</a>
+              <Link to="/commands" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Befehle</Link>
+              <Link to="/team" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Unser Team</Link>
             </div>
 
             {/* column 2 */}
-            <div className="flex flex-col gap-6">
-              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Ressourcen</span>
-              <a href="https://docs.managerx-bot.de/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <ExternalLink className="w-4 h-4 text-accent" />
-                <span className="group-hover:translate-x-1 transition-transform">Documentation</span>
-              </a>
-              <a href="https://discord.gg/nWWBWy6EbX" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Users className="w-4 h-4 text-primary" />
-                <span className="group-hover:translate-x-1 transition-transform">Support Server</span>
-              </a>
-              <Link to="/status" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Activity className="w-4 h-4 text-accent" />
-                <span className="group-hover:translate-x-1 transition-transform">Network Status</span>
-              </Link>
-              <a href="https://github.com/ManagerX-Development/ManagerX" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Terminal className="w-4 h-4 text-primary" />
-                <span className="group-hover:translate-x-1 transition-transform">GitHub</span>
-              </a>
-              <a href="https://github.com/ManagerX-Development/ManagerX/issues" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Terminal className="w-4 h-4 text-primary" />
-                <span className="group-hover:translate-x-1 transition-transform">Issues</span>
-              </a>
-              <a href="https://github.com/ManagerX-Development/ManagerX/tree/main/examples/bot" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Terminal className="w-4 h-4 text-primary" />
-                <span className="group-hover:translate-x-1 transition-transform">Examples</span>
-              </a>
+            <div className="flex flex-col gap-5">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mb-2">Ressourcen</span>
+              <a href="https://docs.managerx-bot.de/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Dokumentation</a>
+              <a href="https://discord.gg/oppro" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Support Server</a>
+              <a href="https://github.com/ManagerX-Development/ManagerX" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">GitHub Repository</a>
             </div>
 
             {/* column 3 */}
-            <div className="flex flex-col gap-6">
-              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Legal</span>
-              <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Lock className="w-4 h-4 text-primary" />
-                <span className="group-hover:translate-x-1 transition-transform">Datenschutz</span>
-              </Link>
-              <Link to="/legal/imprint" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Info className="w-4 h-4 text-accent" />
-                <span className="group-hover:translate-x-1 transition-transform">Impressum</span>
-              </Link>
-              <Link to="/legal/terms" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <FileCheck className="w-4 h-4 text-primary" />
-                <span className="group-hover:translate-x-1 transition-transform">AGB</span>
-              </Link>
-              <Link to="/legal/license" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
-                <Code2 className="w-4 h-4 text-accent" />
-                <span className="group-hover:translate-x-1 transition-transform">Lizenz</span>
-              </Link>
+            <div className="flex flex-col gap-5">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mb-2">Rechtliches</span>
+              <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Datenschutz</Link>
+              <Link to="/legal/imprint" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Impressum</Link>
+              <Link to="/legal/license" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Lizenz (GPL-3.0)</Link>
             </div>
 
             {/* column 4 */}
-            <div className="flex flex-col gap-8">
-              <span className="text-xs font-black uppercase tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mb-2">Architecture</span>
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <div className="flex justify-between text-[11px] font-black uppercase tracking-widest">
-                    <span className="text-foreground">Python Core</span>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">66.6%</span>
+            <div className="flex flex-col gap-6">
+              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mb-2">Core Tech</span>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
+                    <span>Python Core</span>
+                    <span>66%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: "66.6%" }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.5, ease: "easeOut" }}
-                      className="h-full bg-gradient-to-r from-primary to-accent shadow-[0_0_15px_rgba(255,0,0,0.5)] rounded-full"
-                    />
+                  <div className="h-1 w-full bg-white/5 rounded-full">
+                    <div className="h-full w-[66%] bg-primary rounded-full" />
                   </div>
                 </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between text-[11px] font-black uppercase tracking-widest">
-                    <span className="text-foreground">React/TS Web</span>
-                    <span className="text-accent">32.0%</span>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground/70">
+                    <span>Web Stack</span>
+                    <span>34%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: "32.0%" }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-                      className="h-full bg-gradient-to-r from-accent to-primary shadow-[0_0_15px_rgba(255,0,0,0.3)] rounded-full"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 pt-2">
-                  <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/5 border border-primary/20 shadow-lg">
-                    <Terminal className="w-4 h-4 text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">v2.0.0 Stable</span>
+                  <div className="h-1 w-full bg-white/5 rounded-full">
+                    <div className="h-full w-[34%] bg-accent rounded-full" />
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* --- FOOTER BOTTOM --- */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-col md:flex-row items-center justify-between w-full gap-10 pt-10"
-          >
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.3em] text-muted-foreground hover:text-white transition-all cursor-default"
-            >
+          <div className="flex flex-col md:flex-row items-center justify-between w-full gap-8 pt-8 opacity-40 hover:opacity-100 transition-opacity duration-500">
+            <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest">
               <span>Made with</span>
-              <Heart className="w-5 h-5 text-primary fill-primary animate-pulse" />
+              <Heart className="w-4 h-4 text-primary fill-primary" />
               <span>by ManagerX Team</span>
-            </motion.div>
-            <div className="flex items-center gap-10">
-              <Link to="/legal/license" className="flex items-center gap-3 opacity-40 text-xs font-black uppercase tracking-widest hover:opacity-100 hover:text-primary transition-all cursor-pointer">
-                <Code2 className="w-4 h-4 text-primary" />
-                <span>Open Source Community</span>
-              </Link>
-              <p className="text-xs font-black text-muted-foreground/50 hover:text-white transition-all tracking-[0.3em] uppercase">
-                © {new Date().getFullYear()} ALL RIGHTS RESERVED
-              </p>
             </div>
-          </motion.div>
+            <div className="flex items-center gap-8 text-[10px] font-bold uppercase tracking-widest">
+              <p>© {new Date().getFullYear()} ALL RIGHTS RESERVED</p>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
