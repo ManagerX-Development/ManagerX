@@ -197,7 +197,7 @@ export const Datenschutz = memo(function Datenschutz() {
                 </li>
                 <li className="flex gap-4">
                   <ChevronRight className="w-5 h-5 text-primary shrink-0" />
-                  <span>Berechnung von Level-Fortschritten.</span>
+                  <span>Berechnung von Level-Fortschritten (XP) und damit verbundene automatisierte Zuweisungen (z.B. Level-Rollen).</span>
                 </li>
                 <li className="flex gap-4">
                   <ChevronRight className="w-5 h-5 text-primary shrink-0" />
@@ -261,7 +261,8 @@ export const Datenschutz = memo(function Datenschutz() {
             </Section>
 
             <Section id="decisions" title="11. Automatische Entscheidungen">
-              <p>ManagerX trifft keine vollautomatisierten Entscheidungen nach Art. 22 DSGVO.</p>
+              <p>ManagerX trifft keine vollautomatisierten Entscheidungen im Sinne des Art. 22 DSGVO, die Ihnen gegenüber rechtliche Wirkung entfalten oder Sie in ähnlicher Weise erheblich beeinträchtigen.</p>
+              <p className="mt-4">Der Bot führt jedoch funktionale Automatisierungen durch, wie etwa die automatische Zuweisung von Community-Rollen basierend auf Ihrer Aktivität (Level-System) oder das automatische Löschen von Nachrichten gemäß den Server-Einstellungen.</p>
             </Section>
 
             <Section id="tracking" title="12. Cookies & Tracking">

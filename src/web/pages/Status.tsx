@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
+import { SEO } from "../components/SEO";
 import { motion } from "framer-motion";
 const Status = memo(function Status() {
   // State für die Live-Daten vom Bot

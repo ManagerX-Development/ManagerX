@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Star, MessageSquare, Users, TrendingUp } from "lucide-react";
+import { Star, Users, TrendingUp } from "lucide-react";
+import { useStats } from "../hooks/useStats";
 
 const testimonials = [
   {
@@ -52,7 +53,7 @@ const TestimonialCard = memo(({ testimonial, index }: { testimonial: typeof test
     </p>
 
     <div className="flex items-center gap-3 mb-4">
-      <motion.div 
+      <motion.div
         whileHover={{ scale: 1.1 }}
         className="w-12 h-12 rounded-full bg-gradient-to-br from-primary/80 to-accent/80 flex items-center justify-center text-primary-foreground font-bold text-base shadow-lg shadow-primary/30"
       >
@@ -75,6 +76,8 @@ const TestimonialCard = memo(({ testimonial, index }: { testimonial: typeof test
 ));
 
 export const Testimonials = memo(function Testimonials() {
+  const { data: stats } = useStats();
+
   return (
     <section id="testimonials" className="relative py-32 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/8 to-background" />
@@ -89,7 +92,7 @@ export const Testimonials = memo(function Testimonials() {
           transition={{ duration: 0.7, ease: "easeInOut" }}
           className="text-center mb-20"
         >
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -100,7 +103,7 @@ export const Testimonials = memo(function Testimonials() {
             <span className="text-xs text-foreground/80 font-bold tracking-widest uppercase">Early Access Feedback</span>
           </motion.div>
 
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -109,7 +112,7 @@ export const Testimonials = memo(function Testimonials() {
           >
             Stimmen der <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Ersten Stunde</span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -135,11 +138,15 @@ export const Testimonials = memo(function Testimonials() {
         >
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center border-r border-border/50">
-              <div className="text-2xl font-bold text-foreground">16</div>
+              <div className="text-2xl font-bold text-foreground">
+                {stats.guilds > 0 ? stats.guilds : "16"}
+              </div>
               <div className="text-[10px] uppercase tracking-tighter text-muted-foreground">Aktive Server</div>
             </div>
             <div className="text-center border-r border-border/50">
-              <div className="text-2xl font-bold text-foreground">~300</div>
+              <div className="text-2xl font-bold text-foreground">
+                {stats.users > 0 ? `~${stats.users}` : "~300"}
+              </div>
               <div className="text-[10px] uppercase tracking-tighter text-muted-foreground">Nutzer</div>
             </div>
             <div className="text-center">

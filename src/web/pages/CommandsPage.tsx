@@ -9,45 +9,58 @@ import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
 import { cn } from "../lib/utils";
 import { CATEGORIES, COMMANDS, Command } from "../data/commands";
+import { SEO } from "../components/SEO";
 
-const CommandCard = ({ command }: { command: Command }) => (
-    <motion.div
-        layout
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ duration: 0.2 }}
-        className="group p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-primary/20 hover:bg-white/[0.08] transition-all duration-300 relative overflow-hidden flex flex-col"
-    >
-        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Terminal className="w-12 h-12 text-primary" />
+import { useRef } from "react";
+import { useInView } from "framer-motion";
+
+const CommandCard = memo(({ command }: { command: Command }) => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "200px" });
+
+    return (
+        <div ref={ref} className="min-h-[220px]">
+            {isInView && (
+                <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                    className="group p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-primary/20 hover:bg-white/[0.08] transition-all duration-300 relative overflow-hidden flex flex-col h-full"
+                >
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Terminal className="w-12 h-12 text-primary" />
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        {command.badges.map((badge, i) => (
+                            <Badge key={i} variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg">
+                                {badge}
+                            </Badge>
+                        ))}
+                    </div>
+
+                    <h3 className="text-xl font-black text-white italic tracking-tight mb-2 flex items-center gap-2">
+                        <span className="text-primary group-hover:scale-110 transition-transform">/</span>
+                        {command.name}
+                    </h3>
+
+                    <p className="text-sm text-slate-400 font-medium leading-relaxed mb-6 group-hover:text-slate-300 transition-colors">
+                        {command.description}
+                    </p>
+
+                    <div className="mt-auto pt-6 border-t border-white/5">
+                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Usage</div>
+                        <code className="text-xs font-mono bg-black/40 px-3 py-2 rounded-xl border border-white/5 text-primary block truncate">
+                            {command.usage}
+                        </code>
+                    </div>
+                </motion.div>
+            )}
         </div>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-            {command.badges.map((badge, i) => (
-                <Badge key={i} variant="secondary" className="bg-primary/10 text-primary border-primary/20 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg">
-                    {badge}
-                </Badge>
-            ))}
-        </div>
-
-        <h3 className="text-xl font-black text-white italic tracking-tight mb-2 flex items-center gap-2">
-            <span className="text-primary group-hover:scale-110 transition-transform">/</span>
-            {command.name}
-        </h3>
-
-        <p className="text-sm text-slate-400 font-medium leading-relaxed mb-6 group-hover:text-slate-300 transition-colors">
-            {command.description}
-        </p>
-
-        <div className="mt-auto pt-6 border-t border-white/5">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Usage</div>
-            <code className="text-xs font-mono bg-black/40 px-3 py-2 rounded-xl border border-white/5 text-primary block truncate">
-                {command.usage}
-            </code>
-        </div>
-    </motion.div>
-);
+    );
+});
 
 export const CommandsPage = memo(function CommandsPage() {
     const [search, setSearch] = useState("");
@@ -71,12 +84,21 @@ export const CommandsPage = memo(function CommandsPage() {
         return groups;
     }, [filteredCommands]);
 
+    const availableCategories = useMemo(() => {
+        const usedIds = new Set(COMMANDS.map(cmd => cmd.category));
+        return CATEGORIES.filter(cat => cat.id === "all" || usedIds.has(cat.id));
+    }, []);
+
     const visibleCategories = useMemo(() => {
-        return CATEGORIES.filter(cat => cat.id !== "all" && groupedCommands[cat.id]);
-    }, [groupedCommands]);
+        return availableCategories.filter(cat => cat.id !== "all" && groupedCommands[cat.id]);
+    }, [availableCategories, groupedCommands]);
 
     return (
         <div className="min-h-screen bg-[#0a0c10] text-slate-300 flex flex-col font-sans selection:bg-primary/30">
+            <SEO
+                title="Befehle"
+                description="Alle ManagerX Slash-Commands auf einen Blick. Moderation, XP, Spiele und vieles mehr."
+            />
             <Navbar />
 
             <main className="flex-grow container mx-auto px-4 pt-48 pb-24">
@@ -117,7 +139,7 @@ export const CommandsPage = memo(function CommandsPage() {
 
                 {/* Category Filters */}
                 <div className="flex flex-wrap justify-center gap-3 mb-24 max-w-5xl mx-auto">
-                    {CATEGORIES.map((cat) => {
+                    {availableCategories.map((cat) => {
                         const Icon = cat.icon;
                         return (
                             <button

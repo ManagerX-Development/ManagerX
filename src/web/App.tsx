@@ -12,6 +12,8 @@ const Nutzungsbedingungen = lazy(() => import("./pages/Nutzungsbedingungen"));
 const PluginsPage = lazy(() => import("./pages/PluginsPage"));
 const Status = lazy(() => import("./pages/Status"));
 const CommandsPage = lazy(() => import("./pages/CommandsPage"));
+const TeamPage = lazy(() => import("./pages/TeamPage"));
+const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
 const License = lazy(() => import("./pages/License").then(module => ({ default: module.License })));
 
 const queryClient = new QueryClient();
@@ -66,6 +68,8 @@ const AppContent = () => {
             <Route path="/plugins" element={<PluginsPage />} />
             <Route path="/commands" element={<CommandsPage />} />
             <Route path="/status" element={<Status />} />
+            <Route path="/team" element={<TeamPage />} />
+            <Route path="/roadmap" element={<RoadmapPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

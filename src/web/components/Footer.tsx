@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, Heart, Github, MessageCircle, ExternalLink, Terminal, Sparkles, Code2, Zap, Users, Rocket, Star, BarChart3, Lock, Info, FileCheck, Activity, LayoutGrid } from "lucide-react";
+import { Shield, Heart, Github, MessageCircle, ExternalLink, Terminal, Sparkles, Code2, Zap, Users, Rocket, Star, BarChart3, Lock, Info, FileCheck, Activity, LayoutGrid, Milestone } from "lucide-react";
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/ManagerX-Development/ManagerX", label: "GitHub" },
@@ -129,6 +129,14 @@ export const Footer = memo(function Footer() {
                 <LayoutGrid className="w-4 h-4 text-accent transition-transform group-hover:scale-110" />
                 <span className="group-hover:translate-x-1 transition-transform">Befehle</span>
               </Link>
+              <Link to="/roadmap" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Milestone className="w-4 h-4 text-primary transition-transform group-hover:rotate-12" />
+                <span className="group-hover:translate-x-1 transition-transform">Roadmap</span>
+              </Link>
+              <Link to="/team" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Users className="w-4 h-4 text-accent transition-transform group-hover:scale-110" />
+                <span className="group-hover:translate-x-1 transition-transform">Team</span>
+              </Link>
             </div>
 
             {/* column 2 */}
@@ -138,7 +146,7 @@ export const Footer = memo(function Footer() {
                 <ExternalLink className="w-4 h-4 text-accent" />
                 <span className="group-hover:translate-x-1 transition-transform">Documentation</span>
               </a>
-              <a href="https://discord.gg/oppro" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+              <a href="https://discord.gg/nWWBWy6EbX" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
                 <Users className="w-4 h-4 text-primary" />
                 <span className="group-hover:translate-x-1 transition-transform">Support Server</span>
               </a>
@@ -146,6 +154,18 @@ export const Footer = memo(function Footer() {
                 <Activity className="w-4 h-4 text-accent" />
                 <span className="group-hover:translate-x-1 transition-transform">Network Status</span>
               </Link>
+              <a href="https://github.com/ManagerX-Development/ManagerX" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Terminal className="w-4 h-4 text-primary" />
+                <span className="group-hover:translate-x-1 transition-transform">GitHub</span>
+              </a>
+              <a href="https://github.com/ManagerX-Development/ManagerX/issues" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Terminal className="w-4 h-4 text-primary" />
+                <span className="group-hover:translate-x-1 transition-transform">Issues</span>
+              </a>
+              <a href="https://github.com/ManagerX-Development/ManagerX/tree/main/examples/bot" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-white transition-all font-bold group flex items-center justify-center md:justify-start gap-3">
+                <Terminal className="w-4 h-4 text-primary" />
+                <span className="group-hover:translate-x-1 transition-transform">Examples</span>
+              </a>
             </div>
 
             {/* column 3 */}

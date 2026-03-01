@@ -1,11 +1,11 @@
-# Copyright (c) 2025 OPPRO.NET Network
 import discord
 from discord.ext import commands, tasks
 from discord import SlashCommandGroup
 import logging
 from typing import Optional
-from mx_devtools import StatsDB
+from mx_devtools import StatsDB, LevelDatabase
 import asyncio
+import ezcord
 from datetime import datetime, timedelta
 import math
 
@@ -13,7 +13,7 @@ import math
 logger = logging.getLogger(__name__)
 
 
-class EnhancedStatsCog(commands.Cog):
+class EnhancedStatsCog(ezcord.Cog):
     """
     Enhanced Discord Cog for tracking user statistics with global level system.
     Provides comprehensive tracking of messages, voice activity, and user progression.
@@ -22,6 +22,7 @@ class EnhancedStatsCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.db = StatsDB()
+        self.level_db = LevelDatabase()
         self.cleanup_task.start()
         self.monthly_reset_task.start()
         logger.info("Enhanced StatsCog initialized")
@@ -124,7 +125,7 @@ class EnhancedStatsCog(commands.Cog):
             logger.error(f"Error logging enhanced message from {message.author.display_name}: {e}")
 
     @stats.command(
-        name="statsistics",
+        name="server",
         description="Zeige deine Aktivitätsstatistiken an"
     )
     async def stats_command(
@@ -163,6 +164,9 @@ class EnhancedStatsCog(commands.Cog):
 
             # Get global user info
             global_info = await self.db.get_global_user_info(target_user.id)
+            
+            # Get local server level
+            server_level_data = self.level_db.get_user_stats(target_user.id, ctx.guild.id)
 
             # Format voice time
             voice_hours = int(voice_minutes // 60)
@@ -177,9 +181,17 @@ class EnhancedStatsCog(commands.Cog):
             )
 
             # Local server stats
+            server_activity = f"💬 **{message_count}** Nachrichten\n🎤 **{voice_time_str}** Voice-Zeit"
+            if server_level_data:
+                # server_level_data: xp, level, messages, xp_needed, prestige, total_earned
+                slvl = server_level_data[1]
+                sxp = server_level_data[0]
+                sxp_needed = sxp + server_level_data[3]
+                server_activity += f"\n🏆 **Level {slvl}** ({sxp:,}/{sxp_needed:,} XP)"
+
             embed.add_field(
                 name="📅 Server Aktivität",
-                value=f"💬 **{message_count}** Nachrichten\n🎤 **{voice_time_str}** Voice-Zeit",
+                value=server_activity,
                 inline=True
             )
 
@@ -559,7 +571,7 @@ class EnhancedStatsCog(commands.Cog):
                   "• **Monatlicher Reset:** Leaderboard startet jeden Monat neu\n"
                   "• **30-Tage-Cleanup:** Rohdaten werden nach 30 Tagen gelöscht\n"
                   "• **Anonyme Tagesstatistiken:** Keine Verknüpfung zu einzelnen Usern\n"
-                  "• [Vollständige Datenschutzerklärung](https://medicopter117.github.io/ManagerX-Web/privacy.html)",
+                  "• [Vollständige Datenschutzerklärung](https://managerx-bot.de/datenschutz.html)",
             inline=False
         )
 
