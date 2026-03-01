@@ -123,7 +123,7 @@
     --popover-foreground: 0 0% 98%;
 
     --primary: 0 84% 55%;
-    --primary-foreground: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 240 6% 10%;
     --secondary-foreground: 0 0% 98%;
@@ -552,7 +552,7 @@
 @utility btn-primary {
   @apply px-8 py-4 rounded-2xl font-bold transition-all duration-300;
   background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-  color: white;
+  color: white !important;
   box-shadow: 0 10px 20px -10px hsl(var(--primary) / 0.5);
 
   &:hover {

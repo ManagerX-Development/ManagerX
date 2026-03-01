@@ -93,16 +93,16 @@ export const Hero = memo(function Hero() {
               href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-4.5 rounded-2xl bg-primary text-white font-bold text-lg shadow-xl shadow-primary/30 hover:shadow-primary/50 transition-all border border-white/10"
+              className="btn-primary inline-flex items-center gap-3"
             >
               <span>Bot einladen</span>
               <ArrowRight className="w-5 h-5" />
             </motion.a>
             <motion.a
-              whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.05)" }}
+              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               href="#features"
-              className="inline-flex items-center gap-2 px-10 py-4.5 rounded-2xl glass border border-white/10 font-bold text-lg text-white transition-all shadow-lg"
+              className="inline-flex items-center gap-2 px-10 py-4.5 rounded-2xl glass border border-white/10 font-bold text-lg text-white shadow-lg"
             >
               Features entdecken
             </motion.a>

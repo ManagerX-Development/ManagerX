@@ -69,7 +69,7 @@ export const CTA = memo(function CTA() {
               href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-4.5 rounded-2xl bg-primary text-white font-black text-lg shadow-2xl shadow-primary/40 border border-white/10"
+              className="btn-primary inline-flex items-center gap-3"
             >
               <span>Bot einladen</span>
               <ArrowRight className="w-5 h-5" />

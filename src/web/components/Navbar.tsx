@@ -163,7 +163,7 @@ export function Navbar() {
                 href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-sm tracking-tight relative overflow-hidden shadow-lg shadow-primary/20"
+                className="btn-primary inline-flex items-center gap-2.5 !px-6 !py-2.5 !text-sm"
               >
                 <Sparkles className="w-4 h-4" />
                 <span>Bot einladen</span>
