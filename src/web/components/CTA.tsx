@@ -69,7 +69,7 @@ export const CTA = memo(function CTA() {
               href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-4.5 rounded-2xl bg-primary text-white font-bold text-lg shadow-xl shadow-primary/20"
+              className="inline-flex items-center gap-3 px-10 py-4.5 rounded-2xl bg-primary text-white font-black text-lg shadow-2xl shadow-primary/40 border border-white/10"
             >
               <span>Bot einladen</span>
               <ArrowRight className="w-5 h-5" />
@@ -80,7 +80,7 @@ export const CTA = memo(function CTA() {
               href="https://discord.gg/oppro"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-4.5 rounded-2xl glass border border-white/10 font-bold text-lg"
+              className="inline-flex items-center gap-3 px-10 py-4.5 rounded-2xl glass border border-white/10 font-bold text-lg text-white shadow-xl"
             >
               Support Server
             </motion.a>
