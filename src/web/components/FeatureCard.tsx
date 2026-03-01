@@ -41,65 +41,42 @@ export const FeatureCard = memo(function FeatureCard({
 }: FeatureCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.35, delay, type: "spring", stiffness: 200, damping: 20 }}
-      whileHover={{ y: -15, scale: 1.05 }}
-      whileTap={{ scale: 0.98 }}
-      className="group relative glass rounded-[2.5rem] p-8 hover:bg-card/95 transition-all duration-300 ease-out border border-white/5 backdrop-blur-3xl overflow-hidden shadow-2xl"
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -10 }}
+      className="group relative glass rounded-[2rem] p-8 border border-white/5 hover:border-primary/20 transition-all duration-500 overflow-hidden shadow-xl"
     >
-      {/* Dynamic Glow Orb */}
       <div className={cn(
-        "absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[80px] opacity-0 group-hover:opacity-50 transition-all duration-500",
-        categoryBgColors[category].replace("bg-", "bg-")
+        "absolute -top-12 -right-12 w-32 h-32 rounded-full blur-[60px] opacity-0 group-hover:opacity-30 transition-opacity duration-700",
+        categoryBgColors[category]
       )} />
 
-      {/* Header */}
-      <div className="flex items-start justify-between mb-10">
-        <motion.div
-          whileHover={{ scale: 1.2, rotate: 12 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          className={cn(
-            "w-20 h-20 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-xl border border-white/5 relative overflow-hidden",
-            categoryBgColors[category],
-            categoryGlows[category]
-          )}
-        >
-          <div className="absolute inset-0 bg-white/5 group-hover:bg-transparent transition-colors" />
-          <Icon className={cn("w-10 h-10", categoryColors[category])} />
-        </motion.div>
+      <div className="flex items-start justify-between mb-8">
+        <div className={cn(
+          "w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-500 border border-white/5 shadow-inner",
+          categoryBgColors[category]
+        )}>
+          <Icon className={cn("w-6 h-6", categoryColors[category])} />
+        </div>
       </div>
 
-      <motion.h3
-        className="text-3xl font-black mb-8 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent transition-all duration-300 tracking-tighter"
-      >
+      <h3 className="text-2xl font-bold mb-6 text-foreground tracking-tight group-hover:text-primary transition-colors">
         {title}
-      </motion.h3>
+      </h3>
 
-      <div className="space-y-5">
+      <div className="space-y-4">
         {features.map((feature, index) => (
-          <motion.div
+          <div
             key={index}
-            initial={{ opacity: 0, x: -15 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: delay + 0.05 + index * 0.02 }}
-            className="flex items-start gap-4 text-[15px] font-medium text-muted-foreground group-hover:text-foreground/90 transition-colors"
+            className="flex items-start gap-3 text-[14px] font-medium text-muted-foreground group-hover:text-foreground/80 transition-colors"
           >
-            <div className={cn(
-              "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 shadow-lg border border-white/5 group-hover:scale-110 transition-transform",
-              categoryBgColors[category]
-            )}>
-              <Check className={cn("w-3.5 h-3.5", categoryColors[category])} />
-            </div>
-            <span className="leading-snug">{feature}</span>
-          </motion.div>
+            <Check className={cn("w-4 h-4 mt-0.5 shrink-0 opacity-50", categoryColors[category])} />
+            <span className="leading-relaxed">{feature}</span>
+          </div>
         ))}
       </div>
-
-      {/* Playful hover line */}
-      <div className="absolute bottom-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300" />
     </motion.div>
   );
 });

@@ -44,42 +44,38 @@ function NavDropdown({ label, links, location }: { label: string, links: any[], 
     >
       <button
         className={cn(
-          "relative text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300 group flex items-center gap-2 px-5 py-3 rounded-xl overflow-hidden",
+          "relative text-sm font-medium transition-all duration-300 group flex items-center gap-1.5 px-4 py-2 rounded-xl",
           isActive
-            ? "text-white bg-primary/30 shadow-inner"
-            : "text-muted-foreground hover:text-white hover:bg-white/5"
+            ? "text-primary"
+            : "text-muted-foreground hover:text-foreground"
         )}
       >
         <span>{label}</span>
-        <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isOpen && "rotate-180")} />
-        <div className={cn(
-          "absolute bottom-0 left-0 h-1 bg-primary transition-all duration-500",
-          isActive ? "w-full" : "w-0 group-hover:w-full"
-        )} />
+        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform duration-300 opacity-60", isOpen && "rotate-180")} />
       </button>
 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute top-full left-0 mt-2 w-56 glass-strong rounded-2xl border border-white/10 shadow-2xl p-2 overflow-hidden z-50"
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+            className="absolute top-full left-0 mt-3 w-52 glass-strong rounded-[1.25rem] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-2 z-50"
           >
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-0.5">
               {links.map((link) => (
                 <Link
                   key={link.label}
                   to={link.href}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-[11px] font-black uppercase tracking-widest",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm font-medium",
                     location.pathname === link.href
                       ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-white hover:bg-white/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                   )}
                 >
-                  <link.icon className="w-4 h-4" />
+                  <link.icon className="w-4 h-4 opacity-70" />
                   {link.label}
                 </Link>
               ))}
@@ -110,46 +106,45 @@ export function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-        isScrolled ? "glass-strong py-3 shadow-2xl border-b border-primary/20" : "py-6 bg-transparent"
+        isScrolled ? "py-3" : "py-6"
       )}
     >
-      <div className="container px-4">
-        <nav className="flex items-center justify-between">
+      <div className="container px-4 flex justify-center">
+        <nav className={cn(
+          "flex items-center justify-between gap-8 md:gap-12 px-6 py-3 rounded-[2rem] transition-all duration-500 border border-transparent w-full max-w-7xl",
+          isScrolled ? "glass-strong shadow-2xl border-white/10" : "bg-transparent"
+        )}>
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-4 group">
+          <Link to="/" className="flex items-center gap-3 group shrink-0">
             <motion.div
-              className="w-12 h-12 rounded-[1.2rem] bg-gradient-to-br from-primary to-accent flex items-center justify-center glow-subtle shadow-xl shadow-primary/30 text-white relative overflow-hidden"
-              whileHover={{ rotate: 15, scale: 1.15 }}
+              className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 text-white relative overflow-hidden"
+              whileHover={{ scale: 1.1, rotate: -5 }}
             >
-              <Shield className="w-6 h-6 drop-shadow-glow" />
+              <Shield className="w-5 h-5 drop-shadow-glow" />
             </motion.div>
             <div className="flex flex-col">
-              <span className="text-2xl font-black tracking-tighter text-white leading-none group-hover:text-primary transition-colors">
-                Manager<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">X</span>
+              <span className="text-xl font-bold tracking-tight text-white leading-none">
+                Manager<span className="text-primary">X</span>
               </span>
-              <span className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] mt-1 opacity-60">High Performance</span>
+              <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-[0.2em] mt-1 opacity-50">Stable 2.0.0</span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-3 glass p-1.5 rounded-2xl border border-white/5 backdrop-blur-3xl">
+          <div className="hidden md:flex items-center gap-2">
             {mainLinks.map((link) => (
               <Link
                 key={link.label}
                 to={link.href}
                 className={cn(
-                  "relative text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300 group flex items-center gap-2 px-5 py-3 rounded-xl overflow-hidden",
+                  "relative text-sm font-medium transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl",
                   location.pathname === link.href
-                    ? "text-white bg-primary/30 shadow-inner"
-                    : "text-muted-foreground hover:text-white hover:bg-white/5"
+                    ? "text-primary bg-primary/5"
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                 )}
               >
-                <link.icon className={cn("w-4 h-4 transition-transform group-hover:rotate-12", location.pathname === link.href ? "text-primary" : "text-muted-foreground")} />
+                <link.icon className={cn("w-4 h-4 opacity-70", location.pathname === link.href && "opacity-100")} />
                 {link.label}
-                <div className={cn(
-                  "absolute bottom-0 left-0 h-1 bg-primary transition-all duration-500",
-                  location.pathname === link.href ? "w-full" : "w-0 group-hover:w-full"
-                )} />
               </Link>
             ))}
 
@@ -157,16 +152,16 @@ export function Navbar() {
           </div>
 
           {/* CTA Button */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-4 shrink-0">
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-3 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-accent text-white font-black uppercase text-xs tracking-widest relative overflow-hidden shadow-xl shadow-primary/20"
+              className="group inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-sm tracking-tight relative overflow-hidden shadow-lg shadow-primary/20"
             >
-              <Sparkles className="w-4 h-4 group-hover:animate-spin-slow transition-transform" />
+              <Sparkles className="w-4 h-4" />
               <span>Bot einladen</span>
             </motion.a>
           </div>
@@ -174,7 +169,7 @@ export function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-white hover:bg-white/5 rounded-lg"
+            className="md:hidden p-2 text-white hover:bg-white/5 rounded-xl transition-colors"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -185,36 +180,34 @@ export function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-b border-white/10 backdrop-blur-lg overflow-hidden"
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="md:hidden px-4 mt-4"
           >
-            <div className="container py-10 flex flex-col gap-8">
-              <div className="grid grid-cols-1 gap-4">
-                {[...mainLinks, ...dropdownLinks].map((link) => (
-                  <Link
-                    key={link.label}
-                    to={link.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={cn(
-                      "text-sm font-black uppercase tracking-widest flex items-center gap-4 p-4 rounded-2xl transition-all",
-                      location.pathname === link.href
-                        ? "text-primary bg-primary/10 border border-primary/20"
-                        : "text-foreground/80 hover:text-white hover:bg-white/5 border border-transparent"
-                    )}
-                  >
-                    <link.icon className="w-5 h-5 text-primary" />
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-
+            <div className="glass shadow-2xl rounded-[2.5rem] border border-white/10 p-4 flex flex-col gap-2">
+              {[...mainLinks, ...dropdownLinks].map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    "text-base font-medium flex items-center gap-4 px-6 py-4 rounded-2xl transition-all",
+                    location.pathname === link.href
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                  )}
+                >
+                  <link.icon className="w-5 h-5 opacity-70" />
+                  {link.label}
+                </Link>
+              ))}
+              <hr className="border-white/5 my-2" />
               <a
                 href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-primary to-accent text-white p-5 rounded-2xl text-center font-black uppercase tracking-widest shadow-xl shadow-primary/20"
+                className="inline-flex items-center justify-center gap-3 bg-primary text-white p-5 rounded-2xl text-center font-bold tracking-tight shadow-xl shadow-primary/20"
               >
                 <Sparkles className="w-5 h-5" />
                 Bot einladen
