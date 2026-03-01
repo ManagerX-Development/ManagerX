@@ -72,7 +72,7 @@ export const Features = memo(function Features() {
       <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-primary/10 blur-[150px] rounded-full" />
       <div className="absolute bottom-1/4 right-0 w-[700px] h-[700px] bg-accent/10 blur-[150px] rounded-full" />
 
-      <div className="container relative z-10 px-4">
+      <div className="container mx-auto relative z-10 px-4">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-20">
           <motion.div

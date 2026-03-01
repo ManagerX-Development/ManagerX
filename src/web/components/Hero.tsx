@@ -27,8 +27,8 @@ export const Hero = memo(function Hero() {
       {/* Subtle Grid */}
       <div className="absolute inset-0 opacity-[0.05] grid-pattern" />
 
-      <div className="container relative z-10 px-4">
-        <div className="flex flex-col items-center text-center max-w-5xl mx-auto">
+      <div className="container mx-auto relative z-10 px-4">
+        <div className="flex flex-col items-center text-center max-w-5xl mx-auto w-full">
           {/* Version Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

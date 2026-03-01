@@ -17,7 +17,7 @@ export const Footer = memo(function Footer() {
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/10 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,0,0,0.05),transparent)]" />
 
-      <div className="container relative z-10 px-4">
+      <div className="container mx-auto relative z-10 px-4">
         <div className="flex flex-col items-center">
 
           {/* --- HERO LOGO REPLICA --- */}

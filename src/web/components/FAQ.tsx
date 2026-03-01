@@ -47,7 +47,7 @@ export const FAQ = memo(function FAQ() {
       <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-primary/10 blur-[150px] rounded-full" />
       <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-accent/10 blur-[150px] rounded-full" />
 
-      <div className="container relative z-10 px-4">
+      <div className="container mx-auto relative z-10 px-4">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-20">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
