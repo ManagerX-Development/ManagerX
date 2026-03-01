@@ -109,70 +109,75 @@ export function Navbar() {
         isScrolled ? "py-3" : "py-6"
       )}
     >
-      <div className="container px-4 flex justify-center">
+      <div className="container mx-auto px-4 flex justify-center">
         <nav className={cn(
           "flex items-center justify-between gap-8 md:gap-12 px-6 py-3 rounded-[2rem] transition-all duration-500 border border-transparent w-full max-w-7xl",
           isScrolled ? "glass-strong shadow-2xl border-white/10" : "bg-transparent"
         )}>
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group shrink-0">
-            <motion.div
-              className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 text-white relative overflow-hidden"
-              whileHover={{ scale: 1.1, rotate: -5 }}
-            >
-              <Shield className="w-5 h-5 drop-shadow-glow" />
-            </motion.div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tight text-white leading-none">
-                Manager<span className="text-primary">X</span>
-              </span>
-              <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-[0.2em] mt-1 opacity-50">Stable 2.0.0</span>
-            </div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-2">
-            {mainLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                className={cn(
-                  "relative text-sm font-medium transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl",
-                  location.pathname === link.href
-                    ? "text-primary bg-primary/5"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                )}
+          {/* Left: Logo */}
+          <div className="flex-1 flex justify-start">
+            <Link to="/" className="flex items-center gap-3 group shrink-0">
+              <motion.div
+                className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 text-white relative overflow-hidden"
+                whileHover={{ scale: 1.1, rotate: -5 }}
               >
-                <link.icon className={cn("w-4 h-4 opacity-70", location.pathname === link.href && "opacity-100")} />
-                {link.label}
-              </Link>
-            ))}
-
-            <NavDropdown label="Netzwerk" links={dropdownLinks} location={location} />
+                <Shield className="w-5 h-5 drop-shadow-glow" />
+              </motion.div>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold tracking-tight text-white leading-none">
+                  Manager<span className="text-primary">X</span>
+                </span>
+                <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-[0.2em] mt-1 opacity-50">Stable 2.0.0</span>
+              </div>
+            </Link>
           </div>
 
-          {/* CTA Button */}
-          <div className="hidden md:flex items-center gap-4 shrink-0">
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-sm tracking-tight relative overflow-hidden shadow-lg shadow-primary/20"
+          {/* Center: Desktop Navigation */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <div className="flex items-center gap-1">
+              {mainLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={cn(
+                    "relative text-sm font-medium transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl",
+                    location.pathname === link.href
+                      ? "text-primary bg-primary/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                  )}
+                >
+                  <link.icon className={cn("w-4 h-4 opacity-70", location.pathname === link.href && "opacity-100")} />
+                  {link.label}
+                </Link>
+              ))}
+              <NavDropdown label="Netzwerk" links={dropdownLinks} location={location} />
+            </div>
+          </div>
+
+          {/* Right: CTA & Mobile Menu */}
+          <div className="flex-1 flex justify-end items-center gap-4">
+            <div className="hidden md:flex items-center">
+              <motion.a
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2.5 px-6 py-2.5 rounded-xl bg-primary text-white font-bold text-sm tracking-tight relative overflow-hidden shadow-lg shadow-primary/20"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Bot einladen</span>
+              </motion.a>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-white hover:bg-white/5 rounded-xl transition-colors"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Bot einladen</span>
-            </motion.a>
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 text-white hover:bg-white/5 rounded-xl transition-colors"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </nav>
       </div>
 

@@ -18,7 +18,7 @@ export const CTA = memo(function CTA() {
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-accent/5" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-7xl h-[600px] bg-primary/5 blur-[120px] rounded-full opacity-50" />
 
-      <div className="container relative z-10 px-4">
+      <div className="container mx-auto relative z-10 px-4">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
