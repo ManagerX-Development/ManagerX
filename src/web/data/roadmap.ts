@@ -24,7 +24,14 @@ export const ROADMAP_ITEMS: RoadmapItem[] = [
         status: "in-progress",
         description: "Synchronere Einstellungen zwischen Discord und dieser Website.",
         icon: Cpu,
-        date: "In Entwicklung"
+        date: "Q1 2026"
+    },
+    {
+        title: "internationalisierung",
+        status: "in-progress",
+        description: "Internationalisierung des Discords Bot.",
+        icon: Globe,
+        date: "Q1 2026"
     },
     {
         title: "Plugin Marktplatz",

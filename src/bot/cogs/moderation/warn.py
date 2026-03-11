@@ -13,12 +13,31 @@ import asyncio
 from typing import Optional
 
 # Importiere zentrale Konstanten
-from src.bot.core import (
-    SUCCESS_COLOR, ERROR_COLOR, WARN_COLOR, INFO_COLOR,
-    emoji_yes, emoji_no, emoji_warn, emoji_info, 
-    emoji_member, emoji_staff, emoji_summary, emoji_slowmode,
-    emoji_circleinfo, AUTHOR, FLOOTER
-)
+# Branding & Colors (Local Fallbacks)
+SUCCESS_COLOR = 0x2ecc71
+ERROR_COLOR = 0xe74c3c
+WARN_COLOR = 0xf39c12
+INFO_COLOR = 0x3498db
+AUTHOR = "ManagerX"
+FLOOTER = "ManagerX Bot"
+
+# Emojis directly from UI module
+try:
+    from src.bot.ui.emojis import (
+        emoji_yes, emoji_no, emoji_warn, emoji_info,
+        emoji_member, emoji_staff, emoji_summary, emoji_slowmode,
+        emoji_circleinfo
+    )
+except ImportError:
+    emoji_yes = "✅"
+    emoji_no = "❌"
+    emoji_warn = "⚠️"
+    emoji_info = "ℹ️"
+    emoji_member = "👤"
+    emoji_staff = "🛡️"
+    emoji_summary = "📋"
+    emoji_slowmode = "⏳"
+    emoji_circleinfo = "ℹ️"
 
 
 # ───────────────────────────────────────────────

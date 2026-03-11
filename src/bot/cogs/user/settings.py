@@ -7,7 +7,17 @@ import io
 import json
 from datetime import datetime
 
-from src.bot.core.constants import ERROR_COLOR, SUCCESS_COLOR, emoji_warn, AUTHOR, FOOTER
+# Branding & Colors (Local Fallbacks)
+SUCCESS_COLOR = 0x2ecc71
+ERROR_COLOR = 0xe74c3c
+AUTHOR = "ManagerX"
+FOOTER = "ManagerX Bot"
+
+# Emojis directly from UI module
+try:
+    from src.bot.ui.emojis import emoji_warn
+except ImportError:
+    emoji_warn = "⚠️"
 from mx_devtools import (
     StatsDB, WarnDatabase, NotesDatabase, LevelDatabase,
     ProfileDB, SettingsDB, AutoDeleteDB,
