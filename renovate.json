@@ -6,15 +6,12 @@
     "dependencies"
   ],
   "prHourlyLimit": 0,
-  "prConcurrentLimit": 10,
+  "prConcurrentLimit": 15,
   "dependencyDashboard": true,
   "dependencyDashboardTitle": "ManagerX – Dependency Updates",
   "automerge": false,
   "rangeStrategy": "pin",
   "timezone": "Europe/Berlin",
-  "schedule": [
-    "at any time on the weekend"
-  ],
   "npm": {
     "npmrc": "legacy-peer-deps=true"
   },
@@ -58,7 +55,7 @@
         "patch"
       ],
       "groupName": "All Non-Major Updates",
-      "description": "Fasst alles außer große Versionssprünge zusammen"
+      "description": "Fasst alle kleinen Updates zusammen, um PR-Spam zu vermeiden"
     }
   ]
 }
