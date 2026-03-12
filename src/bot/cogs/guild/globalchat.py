@@ -640,16 +640,15 @@ class EmbedBuilder:
 
 class GlobalChatSender:
     """Verantwortlich für das Senden der Nachricht an alle verbundenen Kanäle"""
-    def __init__(self, bot, config: GlobalChatConfig, embed_builder: EmbedBuilder, cache_ref: List[int]):
+    def __init__(self, bot, config: GlobalChatConfig, embed_builder: EmbedBuilder):
         self.bot = bot
         self.config = config
         self.embed_builder = embed_builder
-        self._cached_channels = cache_ref # Referenz zum Cache in der Cog
+        self._cached_channels: Optional[List[int]] = None
 
     async def _get_all_active_channels(self) -> List[int]:
         """Ruft alle aktiven Channel-IDs ab, nutzt den Cache"""
         if self._cached_channels is None:
-            # Cache initial füllen
             self._cached_channels = await self._fetch_all_channels()
         return self._cached_channels
 
@@ -670,14 +669,18 @@ class GlobalChatSender:
         try:
             channel = self.bot.get_channel(channel_id)
             if not channel:
-                logger.warning(f"⚠️ Channel {channel_id} nicht gefunden")
-                return False
+                try:
+                    channel = await self.bot.fetch_channel(channel_id)
+                except Exception:
+                    logger.warning(f"⚠️ Channel {channel_id} konnte nicht abgerufen werden.")
+                    return False
             
             # Permissions prüfen
-            perms = channel.permissions_for(channel.guild.me)
-            if not perms.send_messages or not perms.embed_links:
-                logger.warning(f"⚠️ Keine Permissions in {channel_id}")
-                return False
+            if hasattr(channel, 'guild') and channel.guild:
+                perms = channel.permissions_for(channel.guild.me)
+                if not perms.send_messages or not perms.embed_links:
+                    logger.warning(f"⚠️ Keine Permissions in {channel_id} ({channel.guild.name})")
+                    return False
             
             # Erstelle NEUE discord.File Objekte für diesen Channel (wichtig!)
             # Jeder Channel bekommt seine eigenen frischen Files!
@@ -745,6 +748,26 @@ class GlobalChatSender:
         
         return successful_sends, failed_sends
 
+    async def send_global_broadcast_message(self, embed: discord.Embed) -> Tuple[int, int]:
+        """Sendet einen Broadcast an alle Kanäle"""
+        active_channels = await self._get_all_active_channels()
+        successful_sends = 0
+        failed_sends = 0
+
+        tasks = []
+        for channel_id in active_channels:
+            tasks.append(self._send_to_channel(channel_id, embed, []))
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for result in results:
+            if result is True:
+                successful_sends += 1
+            else:
+                failed_sends += 1
+        
+        return successful_sends, failed_sends
+
 
 class GlobalChat(ezcord.Cog):
     """Haupt-Cog für das GlobalChat-System"""
@@ -762,8 +785,8 @@ class GlobalChat(ezcord.Cog):
             self.config.RATE_LIMIT_SECONDS, 
             commands.BucketType.user
         )
-        self._cached_channels: Optional[List[int]] = None
-        self.sender = GlobalChatSender(self.bot, self.config, self.embed_builder, self._cached_channels)
+        self._cached_channels = None  # Wird bei der ersten Nachricht geladen
+        self.sender = GlobalChatSender(self.bot, self.config, self.embed_builder)
         self.cleanup_task.start()
 
     @tasks.loop(hours=12)
@@ -772,8 +795,8 @@ class GlobalChat(ezcord.Cog):
             # db.delete_expired_blacklist_entries() <--- DIESE ZEILE AUSKOMMENTIEREN
             # logger.info("🗑️ GlobalChat: Abgelaufene Blacklist-Einträge bereinigt.")
             
-            # Cache neu laden, um Änderungen in der DB zu sehen
-            self._cached_channels = await self.sender._fetch_all_channels()
+            # Cache neu laden
+            await self.sender._get_all_active_channels()
             logger.info("🧠 GlobalChat: Channel-Cache neu geladen.")
 
     @ezcord.Cog.listener()
@@ -892,14 +915,14 @@ class GlobalChat(ezcord.Cog):
             db.set_globalchat_channel(ctx.guild.id, channel.id)
             
             # Cache aktualisieren
-            self._cached_channels = await self.sender._fetch_all_channels()
+            self.sender._cached_channels = await self.sender._fetch_all_channels()
 
             # UI Container für eine schönere Antwort (falls vorhanden)
             container = Container()
 
             status_text = f"✅ **GlobalChat eingerichtet!**\n\n"
             status_text += f"Der GlobalChat ist nun in {channel.mention} aktiv.\n"
-            status_text += f"Aktuell verbunden: **{len(self._cached_channels)}** Server."
+            status_text += f"Aktuell verbunden: **{len(self.sender._cached_channels)}** Server."
 
             container.add_text(status_text)
             container.add_separator()
@@ -946,12 +969,12 @@ class GlobalChat(ezcord.Cog):
             db.set_globalchat_channel(ctx.guild.id, None)
             
             # Cache aktualisieren
-            self._cached_channels = await self.sender._fetch_all_channels()
+            self.sender._cached_channels = await self.sender._fetch_all_channels()
 
             await ctx.respond(
                 f"✅ **GlobalChat entfernt!**\n\n"
                 f"Der GlobalChat wurde von diesem Server entfernt.\n"
-                f"Es sind nun noch **{len(self._cached_channels)}** Server verbunden.",
+                f"Es sind nun noch **{len(self.sender._cached_channels)}** Server verbunden.",
                 ephemeral=True
             )
         except Exception as e:
@@ -1414,7 +1437,7 @@ class GlobalChat(ezcord.Cog):
             )
             
             # An alle Channels senden
-            successful, failed = await self.sender.send_global_broadcast_message(embed) # Annahme: Eine separate Broadcast-Methode in Sender
+            successful, failed = await self.sender.send_global_broadcast_message(embed)
 
             # Response
             result_embed = discord.Embed(
@@ -1457,9 +1480,9 @@ class GlobalChat(ezcord.Cog):
 
         await ctx.defer(ephemeral=True)
         try:
-            old_count = len(self._cached_channels or [])
-            self._cached_channels = await self.sender._fetch_all_channels()
-            new_count = len(self._cached_channels)
+            old_count = len(self.sender._cached_channels or [])
+            self.sender._cached_channels = await self.sender._fetch_all_channels()
+            new_count = len(self.sender._cached_channels)
 
             await ctx.respond(
                 f"✅ **Cache neu geladen!**\n\n"
@@ -1486,7 +1509,7 @@ class GlobalChat(ezcord.Cog):
 
         await ctx.defer(ephemeral=True)
         try:
-            cached_channels = len(self._cached_channels or [])
+            cached_channels = len(self.sender._cached_channels or [])
             all_settings = db.get_all_guild_settings()
             
             debug_info = (
