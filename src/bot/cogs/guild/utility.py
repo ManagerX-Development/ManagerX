@@ -8,7 +8,6 @@ from datetime import datetime
 
 from discord.ui import Container, DesignerView, Thumbnail, Section, TextDisplay
 from discord.ui.separator import SeparatorSpacingSize
-from src.bot.core.constants import FOOTER
 
 class Utility(ezcord.Cog):
     """Premium Utility commands for server and user information."""
