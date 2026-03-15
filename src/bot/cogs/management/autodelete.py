@@ -21,7 +21,7 @@ class AutoDelete(ezcord.Cog):
     @autodelete.command(name="setup", description="Richtet AutoDelete für einen Kanal ein.")
     async def setup(self, ctx,
                     channel: Option(discord.TextChannel, "Kanal", required=True),
-                    duration: Option(int, "Zeit in Sekunden (min: 60, max: 604800)", required=True),
+                    duration: Option(int, "Zeit in Sekunden (min: 60s max: 7d (604800s))", required=True),
                     exclude_pinned: Option(bool, "Angepinnte Nachrichten ausschließen", default=True),
                     exclude_bots: Option(bool, "Bot-Nachrichten ausschließen", default=False)):
 

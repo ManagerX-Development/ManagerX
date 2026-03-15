@@ -64,6 +64,7 @@ class WelcomeSystem(ezcord.Cog):
         """
         self.bot = bot
         self.db = WelcomeDatabase()
+        self.bot.welcome_db = self.db
         # Cache für bessere Performance
         self._settings_cache = {}
         self._cache_timeout = 300  # 5 Minuten Cache

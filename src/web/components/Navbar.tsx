@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import {
   Shield, Menu, X, Sparkles, Puzzle, Activity, Terminal,
-  Newspaper, Users, Milestone, ChevronDown // Icons for Team and Roadmap
+  Newspaper, Users, Milestone, ChevronDown, LayoutDashboard // Added LayoutDashboard
 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { useAuth } from "./AuthProvider";
 
 const mainLinks = [
   { label: "Features", href: "/#features", icon: Sparkles },
@@ -91,6 +92,7 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -156,7 +158,28 @@ export function Navbar() {
 
           {/* Right: CTA & Mobile Menu */}
           <div className="flex-1 flex justify-end items-center gap-4">
-            <div className="hidden md:flex items-center">
+            <div className="hidden md:flex items-center gap-3">
+              {isAuthenticated ? (
+                <Link
+                  to="/dash/settings"
+                  className="btn-primary inline-flex items-center gap-2.5 !px-6 !py-2.5 !text-sm group"
+                >
+                  <LayoutDashboard className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                  <span>Dashboard</span>
+                </Link>
+              ) : (
+                <Link
+                  to="/dash/login"
+                  className="relative group px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 transition-all overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative flex items-center gap-2 text-sm font-semibold text-white">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    Login
+                  </div>
+                </Link>
+              )}
+
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -208,6 +231,25 @@ export function Navbar() {
                 </Link>
               ))}
               <hr className="border-white/5 my-2" />
+              {isAuthenticated ? (
+                <Link
+                  to="/dash/settings"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white p-5 rounded-2xl text-center font-bold tracking-tight"
+                >
+                  <LayoutDashboard className="w-5 h-5" />
+                  Dashboard
+                </Link>
+              ) : (
+                <Link
+                  to="/dash/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white p-5 rounded-2xl text-center font-bold tracking-tight"
+                >
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Login
+                </Link>
+              )}
               <a
                 href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
                 target="_blank"

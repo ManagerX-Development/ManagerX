@@ -25,6 +25,12 @@ from uvicorn import Server, Config
 # Logger (muss existieren!)
 from logger import logger
 
+# =============================================================================
+# SETUP
+# =============================================================================
+BASEDIR = Path(__file__).resolve().parent
+load_dotenv(dotenv_path=BASEDIR / 'config' / '.env')
+
 # Lokale Module aus src/bot/core
 from src.bot.core.config import ConfigLoader, BotConfig
 from src.bot.core.bot_setup import BotSetup
@@ -37,11 +43,6 @@ from src.bot.core.utils import print_logo
 from src.api.dashboard.routes import set_bot_instance, router as dashboard_router
 from mx_handler import TranslationHandler
 
-# =============================================================================
-# SETUP
-# =============================================================================
-BASEDIR = Path(__file__).resolve().parent
-load_dotenv(dotenv_path=BASEDIR / 'config' / '.env')
 colorama_init(autoreset=True)
 
 TranslationHandler.settings(

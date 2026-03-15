@@ -14,11 +14,14 @@ const Status = lazy(() => import("./pages/Status"));
 const CommandsPage = lazy(() => import("./pages/CommandsPage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
+const RoadmaPage = lazy(() => import("./pages/RoadmapPage"));
 const License = lazy(() => import("./pages/License").then(module => ({ default: module.License })));
+const LoginPage = lazy(() => import("./dashboard/LoginPage"));
+const SettingsPage = lazy(() => import("./dashboard/SettingsPage"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 const queryClient = new QueryClient();
 
-// Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
     <div className="flex flex-col items-center gap-4">
@@ -40,7 +43,38 @@ const PageLoader = () => (
   </div>
 );
 
-const AppContent = () => {
+const DashboardRoutes = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{
+          duration: 0.25,
+          ease: "easeInOut",
+        }}
+      >
+        <Suspense fallback={<PageLoader />}>
+          <Routes location={location}>
+            <Route path="/dash/login" element={<LoginPage />} />
+            <Route path="/dash/auth/callback" element={<AuthCallback />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/dash/settings" element={<SettingsPage />} />
+            <Route path="/dash" element={<LoginPage />} />
+            <Route path="/" element={<LoginPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+const MainRoutes = () => {
   const location = useLocation();
 
   return (
@@ -70,6 +104,10 @@ const AppContent = () => {
             <Route path="/status" element={<Status />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/dash/auth/callback" element={<AuthCallback />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/dash/settings" element={<SettingsPage />} />
+            <Route path="/dash/login" element={<LoginPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
@@ -78,11 +116,28 @@ const AppContent = () => {
   );
 };
 
+const AppContent = () => {
+  const hostname = window.location.hostname;
+  const isDashboard = hostname.startsWith("dashboard.");
+
+  // Wenn wir auf der Dashboard Subdomain sind
+  if (isDashboard) {
+    return <DashboardRoutes />;
+  }
+
+  // Normale Webseite (Haupt-Domain)
+  return <MainRoutes />;
+};
+
+import { AuthProvider } from "./components/AuthProvider";
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
