@@ -162,7 +162,7 @@ export const Impressum = memo(function Impressum() {
 
             <Section id="rechtliches" title="Rechtliche Angaben">
               <div className="space-y-6 text-base">
-                <p>Gemäß §19 UStG wird keine Umsatzsteuer berechnet (Kleinunternehmerregelung).</p>
+                <p></p>
                 <p>Projektart: Privates Open-Source-Projekt (nicht-kommerziell).</p>
               </div>
             </Section>

@@ -7,6 +7,7 @@ Pfad: src/bot/core/dashboard.py
 """
 
 import json
+import discord
 from datetime import datetime
 from pathlib import Path
 from discord.ext import tasks
@@ -49,7 +50,7 @@ class DashboardTask:
                     "uptime": self._get_uptime(),
                     "python_version": self._get_python_version()
                 },
-                "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                "updated_at": discord.utils.utcnow().strftime("%Y-%m-%d %H:%M:%S")
             }
             
             # In Datei schreiben
@@ -62,7 +63,7 @@ class DashboardTask:
     def _get_uptime(self) -> str:
         """Berechnet die Bot-Uptime"""
         if hasattr(self.bot, 'start_time'):
-            delta = datetime.now() - self.bot.start_time
+            delta = discord.utils.utcnow() - self.bot.start_time
             hours, remainder = divmod(int(delta.total_seconds()), 3600)
             minutes, seconds = divmod(remainder, 60)
             return f"{hours}h {minutes}m {seconds}s"
@@ -76,7 +77,7 @@ class DashboardTask:
     def register(self):
         """Registriert den Task (startet ihn noch nicht)"""
         # Startzeit speichern
-        self.bot.start_time = datetime.now()
+        self.bot.start_time = discord.utils.utcnow()
         
     
     def start(self):

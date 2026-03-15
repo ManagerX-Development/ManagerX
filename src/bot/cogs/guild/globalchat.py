@@ -942,7 +942,7 @@ class GlobalChat(ezcord.Cog):
             )
             container.add_text(feature_text)
 
-            view = discord.ui.View(container, timeout=None)
+            view = discord.ui.DesignerView(container, timeout=None)
             await ctx.respond(view=view, ephemeral=True)
 
         except Exception as e:

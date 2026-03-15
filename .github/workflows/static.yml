@@ -35,7 +35,11 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Build project
-        run: npm run build # WICHTIG: Erstellt den fertigen 'dist' Ordner
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_DISCORD_CLIENT_ID: ${{ secrets.VITE_DISCORD_CLIENT_ID }}
+          VITE_DISCORD_REDIRECT_URI: ${{ secrets.VITE_DISCORD_REDIRECT_URI }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

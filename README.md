@@ -30,6 +30,10 @@
 
 **Entwickelt von** [**ManagerX Development**](https://github.com/ManagerX-Development) **|** ⚡ **Powered by OPPRO.NET Network™**
 
+
+Webseite: https://managerx-bot.de
+Dokumentation: https://docs.managerx-bot.de
+API: https://api.managerx-bot.de
 <br>
 
 <p align="center">

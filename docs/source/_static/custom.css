@@ -3,8 +3,6 @@
    PyData Sphinx Theme - Optimized & Refined
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 :root {
     /* ManagerX Premium Color System */
     --mx-red-primary: #dc2626;
@@ -13,7 +11,7 @@
     --mx-red-light: #fef2f2;
     --mx-red-accent: #f87171;
     --mx-red-glow: rgba(220, 38, 38, 0.1);
-    
+
     /* Neutral Palette */
     --mx-gray-50: #f8fafc;
     --mx-gray-100: #f1f5f9;
@@ -25,37 +23,37 @@
     --mx-gray-700: #334155;
     --mx-gray-800: #1e293b;
     --mx-gray-900: #0f172a;
-    
+
     /* Semantic Colors */
     --mx-success: #059669;
     --mx-warning: #d97706;
     --mx-danger: #dc2626;
     --mx-info: #0284c7;
-    
+
     /* Typography System */
     --pst-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --pst-font-family-heading: 'Space Grotesk', 'Inter', sans-serif;
     --pst-font-family-monospace: 'JetBrains Mono', 'Consolas', 'Monaco', monospace;
-    
+
     /* PyData Theme Overrides */
     --pst-color-primary: var(--mx-red-primary);
     --pst-color-secondary: var(--mx-gray-600);
     --pst-color-link: var(--mx-red-primary);
     --pst-color-link-hover: var(--mx-red-dark);
     --pst-color-target: #fbbf24;
-    
+
     /* Shadows & Effects */
     --mx-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
     --mx-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
     --mx-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
     --mx-shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.1);
     --mx-shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.12);
-    
+
     /* Transitions */
     --mx-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     --mx-transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --mx-transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     /* Border Radius */
     --mx-radius-sm: 6px;
     --mx-radius-md: 10px;
@@ -107,7 +105,12 @@ body {
 }
 
 /* Improved Typography Hierarchy */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-family: var(--pst-font-family-heading);
     font-weight: 700;
     letter-spacing: -0.025em;
@@ -255,8 +258,8 @@ h2::before {
 }
 
 /* Active Navigation Item */
-.bd-sidebar-primary .nav-item.current > a,
-.bd-sidebar-primary .nav-item.active > a {
+.bd-sidebar-primary .nav-item.current>a,
+.bd-sidebar-primary .nav-item.active>a {
     background: linear-gradient(90deg, var(--mx-red-light) 0%, transparent 100%);
     color: var(--mx-red-primary) !important;
     font-weight: 600;
@@ -264,7 +267,7 @@ h2::before {
     padding-left: calc(1rem - 3px);
 }
 
-[data-theme="dark"] .bd-sidebar-primary .nav-item.current > a {
+[data-theme="dark"] .bd-sidebar-primary .nav-item.current>a {
     background: linear-gradient(90deg, rgba(220, 38, 38, 0.15) 0%, transparent 100%);
 }
 
@@ -301,10 +304,13 @@ article p {
 }
 
 @keyframes highlight-pulse {
-    0%, 50% {
+
+    0%,
+    50% {
         background-color: var(--mx-red-glow);
         box-shadow: 0 0 0 8px var(--mx-red-glow);
     }
+
     100% {
         background-color: transparent;
         box-shadow: 0 0 0 0 transparent;
@@ -861,11 +867,9 @@ dt.sig {
 .mx-hero {
     text-align: center;
     padding: 5rem 2rem;
-    background: radial-gradient(
-        circle at center,
-        var(--mx-red-glow) 0%,
-        transparent 70%
-    );
+    background: radial-gradient(circle at center,
+            var(--mx-red-glow) 0%,
+            transparent 70%);
     border-radius: var(--mx-radius-xl);
     margin: 3rem 0;
 }
@@ -950,19 +954,19 @@ dt.sig {
     h1 {
         font-size: 2rem;
     }
-    
+
     h2 {
         font-size: 1.65rem;
     }
-    
+
     h3 {
         font-size: 1.35rem;
     }
-    
+
     .bd-main {
         padding-top: 1rem;
     }
-    
+
     .mx-hero {
         padding: 3rem 1.5rem;
     }
@@ -972,19 +976,19 @@ dt.sig {
     h1 {
         font-size: 1.75rem;
     }
-    
+
     h2 {
         font-size: 1.5rem;
     }
-    
+
     .admonition {
         padding: 1.25rem !important;
     }
-    
+
     table.docutils {
         font-size: 0.85rem;
     }
-    
+
     .prev-next-area a {
         padding: 1.25rem !important;
     }
@@ -995,6 +999,7 @@ dt.sig {
    ========================================================================== */
 
 @media print {
+
     .bd-header,
     .bd-sidebar-primary,
     .bd-sidebar-secondary,
@@ -1002,11 +1007,11 @@ dt.sig {
     .prev-next-area {
         display: none !important;
     }
-    
+
     article {
         max-width: 100% !important;
     }
-    
+
     .admonition {
         page-break-inside: avoid;
     }
@@ -1044,6 +1049,7 @@ input:focus-visible {
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
