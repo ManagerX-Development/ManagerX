@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-interface User {
-    id: string;
-    username: string;
-    avatar: string | null;
-}
-
 interface AuthContextType {
     token: string | null;
     user: any | null;
@@ -30,9 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(newUser);
         localStorage.setItem("token", newToken);
         localStorage.setItem("user", JSON.stringify(newUser));
-        if (newDiscordToken) {
-            localStorage.setItem("discord_token", newDiscordToken);
-        }
+        if (newDiscordToken) localStorage.setItem("discord_token", newDiscordToken);
     };
 
     const logout = () => {
@@ -40,109 +32,69 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setGuilds([]);
         setSelectedGuildId(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("discord_token");
-        localStorage.removeItem("selectedGuildId");
+        localStorage.clear();
     };
 
-    const handleSetSelectedGuildId = (id: string) => {
-        setSelectedGuildId(id);
-        localStorage.setItem("selectedGuildId", id);
-    };
-
-    // --- NEU: OAUTH CALLBACK HANDLER ---
+    // --- AUTOMATISCHER CALLBACK-HANDLER ---
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const code = params.get("code");
         const path = params.get("p");
 
-        // Prüfen, ob wir im Callback sind (direkt oder via GitHub Pages Proxy ?p=)
-        if (code && (window.location.pathname.includes("dashboard/auth/callback") || path?.includes("/auth/callback"))) {
+        if (code && (window.location.pathname.includes("auth/callback") || path?.includes("/auth/callback"))) {
             const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
             
-            console.log("[Auth] Code gefunden, tausche gegen Token...");
-
-            fetch(`${baseUrl}/auth/callback`, {
+            fetch(`${baseUrl}/dashboard/auth/callback`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code })
             })
-            .then(async (res) => {
-                if (!res.ok) {
-                    const error = await res.json();
-                    throw new Error(error.detail || "Login failed");
-                }
-                return res.json();
-            })
+            .then(res => res.ok ? res.json() : Promise.reject(res))
             .then(data => {
-                console.log("[Auth] Login erfolgreich!");
                 login(data.access_token, data.user, data.discord_token);
-                
-                // URL aufräumen: ?code=... entfernen und zur Startseite
                 window.history.replaceState({}, document.title, "/");
             })
-            .catch(err => {
-                console.error("[Auth] Callback Fehler:", err);
-            });
+            .catch(err => console.error("Login Error:", err));
         }
     }, []);
 
-    // --- GUILDS & SESSION VALIDIERUNG ---
+    // --- USER & GUILDS LADEN ---
     useEffect(() => {
         if (token) {
-            const discordToken = localStorage.getItem("discord_token");
             const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
-
-            fetch(`${baseUrl}/auth/me`, { // Pfad angepasst an deinen Python-Router Prefix
+            fetch(`${baseUrl}/dashboard/auth/me`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
-                    "X-Discord-Token": discordToken || ""
+                    "X-Discord-Token": localStorage.getItem("discord_token") || ""
                 }
             })
-            .then(async (res) => {
-                if (res.status === 401) {
-                    logout();
-                    throw new Error("Session expired");
-                }
-                if (!res.ok) throw new Error("Failed to fetch user data");
-                return res.json();
-            })
+            .then(res => res.status === 401 ? logout() : res.json())
             .then(data => {
-                if (data.user) setUser(data.user);
-                if (data.guilds) {
+                if (data?.user) setUser(data.user);
+                if (data?.guilds) {
                     setGuilds(data.guilds);
                     if (!selectedGuildId && data.guilds.length > 0) {
-                        handleSetSelectedGuildId(data.guilds[0].id);
+                        setSelectedGuildId(data.guilds[0].id);
+                        localStorage.setItem("selectedGuildId", data.guilds[0].id);
                     }
                 }
             })
-            .catch(err => {
-                console.error("[Auth] Session Error:", err);
-            });
+            .catch(() => logout());
         }
     }, [token]);
 
     return (
         <AuthContext.Provider value={{
-            token,
-            user,
-            guilds,
-            selectedGuildId,
+            token, user, guilds, selectedGuildId,
             isAuthenticated: !!token,
-            login,
-            logout,
-            setSelectedGuildId: handleSetSelectedGuildId
+            login, logout, setSelectedGuildId: (id) => {
+                setSelectedGuildId(id);
+                localStorage.setItem("selectedGuildId", id);
+            }
         }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export function useAuth() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
-}
+export const useAuth = () => useContext(AuthContext)!;
