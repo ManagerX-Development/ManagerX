@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const path = params.get("p");
 
         // Prüfen, ob wir im Callback sind (direkt oder via GitHub Pages Proxy ?p=)
-        if (code && (window.location.pathname.includes("/auth/callback") || path?.includes("/auth/callback"))) {
+        if (code && (window.location.pathname.includes("dashboard/auth/callback") || path?.includes("/auth/callback"))) {
             const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
             
             console.log("[Auth] Code gefunden, tausche gegen Token...");
