@@ -5,7 +5,6 @@ import path from "path";
 export default defineConfig(({ mode }) => ({
   // WICHTIG: Erlaubt korrekte Pfade auf deiner Subdomain
   root: "src/web",
-  // WICHTIG: Erlaubt korrekte Pfade auf deiner Subdomain
   base: "/",
 
   server: {
@@ -25,11 +24,14 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    // Stellt sicher, dass der Output-Ordner 'dist' heißt (passend zur deploy.yml)
     outDir: "../../dist",
     emptyOutDir: true,
-    // Optimierung für sauberen Code
-    minify: "esbuild",
+    
+    // ÄNDERUNG: Wir entfernen 'esbuild' als Minifier, da Vite 8 
+    // standardmäßig 'terser' oder den internen 'oxc'/'rolldown' Weg nutzt.
+    // Wenn du es weglässt, nutzt Vite den stabilsten Standard für v8.
+    minify: true, 
+    
     reportCompressedSize: false,
     rollupOptions: {
       input: {

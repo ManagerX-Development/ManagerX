@@ -25,7 +25,7 @@ classifiers = [
 # Korrigierte Syntax: Direktes Array
 dependencies = [
     "ezcord==0.7.4",
-    "py-cord==2.7.0",
+    "py-cord==2.7.1",
     "aiosqlite==0.22.1",
     "aiohttp==3.13.3",
     "aiocache==0.12.3",
@@ -34,19 +34,19 @@ dependencies = [
     "wikipedia==1.4.0",
     "beautifulsoup4==4.14.3",
     "soupsieve==2.8.3",
-    "yarl==1.22.0",
+    "yarl==1.23.0",
     "frozenlist==1.8.0",
     "h11==0.16.0",
     "multidict==6.7.1",
     "SimpleColoredLogs==1.16.1.2026",
-    "FastAPI==0.128.4",
-    "uvicorn==0.40.0",
+    "FastAPI==0.135.1",
+    "uvicorn==0.41.0",
     "Jinja2==3.1.6",
     "MarkupSafe==3.0.3",
     "starlette==0.52.1",
     "timedelta==2020.12.3",
-    "ManagerX-Handler==1.2026.01.10",
-    "ManagerX-DevTools==1.2026.01.11.1"
+    "ManagerX-Handler==1.2026.2.9.4",
+    "ManagerX-DevTools==1.2026.2.26"
 ]
 
 [project.urls]
@@ -57,7 +57,7 @@ BugTracker = "https://github.com/Oppro-net-Development/ManagerX/issues"
 
 [project.optional-dependencies]
 dev = [
-    "python-dotenv==1.2.1",
+    "python-dotenv==1.2.2",
     "click==8.3.1",
     "colorama==0.4.6",
     "typing_extensions==4.15.0",
@@ -65,8 +65,8 @@ dev = [
     "attrs==25.4.0",
     "annotated-types==0.7.0",
     "anyio==4.12.1",
-    "certifi==2026.1.4",
-    "charset-normalizer==3.4.4",
+    "certifi==2026.2.25",
+    "charset-normalizer==3.4.5",
     "idna==3.11",
     "urllib3==2.6.3",
     "build==1.4.0",
@@ -83,7 +83,7 @@ docs = [
 
 all = [
     "ezcord==0.7.4",
-    "py-cord==2.7.0",
+    "py-cord==2.7.1",
     "aiosqlite==0.22.1",
     "aiohttp==3.13.3",
     "aiocache==0.12.3",
@@ -92,11 +92,11 @@ all = [
     "wikipedia==1.4.0",
     "beautifulsoup4==4.14.3",
     "soupsieve==2.8.3",
-    "yarl==1.22.0",
+    "yarl==1.23.0",
     "frozenlist==1.8.0",
     "h11==0.16.0",
     "multidict==6.7.1",
-    "python-dotenv==1.2.1",
+    "python-dotenv==1.2.2",
     "click==8.3.1",
     "colorama==0.4.6",
     "typing_extensions==4.15.0",
@@ -104,15 +104,15 @@ all = [
     "attrs==25.4.0",
     "annotated-types==0.7.0",
     "anyio==4.12.1",
-    "certifi==2026.1.4",
-    "charset-normalizer==3.4.4",
+    "certifi==2026.2.25",
+    "charset-normalizer==3.4.5",
     "idna==3.11",
     "urllib3==2.6.3",
     "Jinja2==3.1.6",
     "MarkupSafe==3.0.3",
     "starlette==0.52.1",
-    "FastAPI==0.128.4",
-    "uvicorn==0.40.0",
+    "FastAPI==0.135.1",
+    "uvicorn==0.41.0",
     "SimpleColoredLogs==1.16.1.2026",
     "timedelta==2020.12.3",
     "sphinx==9.1.0",
