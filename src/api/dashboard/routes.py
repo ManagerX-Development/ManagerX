@@ -97,13 +97,13 @@ async def get_api_key(api_key_header: str = Security(API_KEY_HEADER)):
         )
     return api_key_header
 
-router = APIRouter(
+dashboard_main_router = APIRouter(
     prefix="/dashboard",
     tags=["dashboard"]
 )
 
 # Public sub-routers (no global X-API-KEY required, they manage their own like JWT)
-@router.get("/guilds/{guild_id}/channels")
+@dashboard_main_router.get("/guilds/{guild_id}/channels")
 async def get_guild_channels(guild_id: int, user: dict = Depends(get_current_user)):
     """Fetches text channels for a specific guild."""
     if bot_instance is None:
@@ -124,7 +124,7 @@ async def get_guild_channels(guild_id: int, user: dict = Depends(get_current_use
     ]
     return {"channels": channels}
 
-@router.get("/guilds/{guild_id}/roles")
+@dashboard_main_router.get("/guilds/{guild_id}/roles")
 async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user)):
     """Fetches manageable roles for a specific guild."""
     if bot_instance is None:
@@ -144,7 +144,7 @@ async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user))
     ]
     return {"roles": roles}
 
-@router.get("/guilds/{guild_id}/categories")
+@dashboard_main_router.get("/guilds/{guild_id}/categories")
 async def get_guild_categories(guild_id: int, user: dict = Depends(get_current_user)):
     """Fetches categories for a specific guild."""
     if bot_instance is None:
@@ -164,7 +164,7 @@ async def get_guild_categories(guild_id: int, user: dict = Depends(get_current_u
     ]
     return {"categories": categories}
 
-@router.get("/guilds/{guild_id}/voice_channels")
+@dashboard_main_router.get("/guilds/{guild_id}/voice_channels")
 async def get_guild_voice_channels(guild_id: int, user: dict = Depends(get_current_user)):
     """Fetches voice channels for a specific guild."""
     if bot_instance is None:
@@ -184,7 +184,7 @@ async def get_guild_voice_channels(guild_id: int, user: dict = Depends(get_curre
     ]
     return {"channels": channels}
 
-@router.get("/guilds/{guild_id}/stats")
+@dashboard_main_router.get("/guilds/{guild_id}/stats")
 async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user)):
     """Fetches server statistics (Daily joins, message count, member total)."""
     if bot_instance is None:
@@ -285,8 +285,8 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
             "messages_today": 0
         }
 
-router.include_router(auth_router)
-router.include_router(settings_router)
-router.include_router(user_router)
-router.include_router(router_public)
+dashboard_main_router.include_router(auth_router)
+dashboard_main_router.include_router(settings_router)
+dashboard_main_router.include_router(user_router)
+dashboard_main_router.include_router(router_public)
 

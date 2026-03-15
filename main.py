@@ -40,7 +40,7 @@ from src.bot.core.dashboard import DashboardTask
 from src.bot.core.utils import print_logo
 
 # API Routes für Dashboard
-from src.api.dashboard.routes import set_bot_instance, router as dashboard_router
+from src.api.dashboard.routes import set_bot_instance, dashboard_main_router
 from mx_handler import TranslationHandler
 
 colorama_init(autoreset=True)
@@ -77,7 +77,7 @@ app.add_middleware(
 )
 
 # Dashboard-Routes einbinden
-app.include_router(dashboard_router)
+app.include_router(dashboard_main_router)
 
 async def start_webserver():
     """Startet den FastAPI Webserver auf Port 8040"""
