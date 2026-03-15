@@ -14,10 +14,10 @@ const Status = lazy(() => import("./pages/Status"));
 const CommandsPage = lazy(() => import("./pages/CommandsPage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
-const RoadmaPage = lazy(() => import("./pages/RoadmapPage"));
 const License = lazy(() => import("./pages/License").then(module => ({ default: module.License })));
 const LoginPage = lazy(() => import("./dashboard/LoginPage"));
 const SettingsPage = lazy(() => import("./dashboard/SettingsPage"));
+const UserSettingsPage = lazy(() => import("./dashboard/UserSettingsPage"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 const queryClient = new QueryClient();
@@ -108,6 +108,7 @@ const MainRoutes = () => {
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dash/settings" element={<SettingsPage />} />
             <Route path="/dash/login" element={<LoginPage />} />
+            <Route path="/dash/user/settings" element={<UserSettingsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

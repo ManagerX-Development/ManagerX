@@ -105,7 +105,7 @@ if __name__ == '__main__':
     bot = bot_setup.create_bot()
     
     # Speichere Bot Start-Zeit für Uptime-Berechnung
-    bot.start_time = datetime.utcnow()
+    bot.start_time = discord.utils.utcnow()
     
     # Übergebe Bot-Instanz an die API-Routes
     set_bot_instance(bot)

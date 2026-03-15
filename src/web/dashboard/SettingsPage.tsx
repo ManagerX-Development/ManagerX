@@ -21,7 +21,8 @@ import {
     Zap,
     Heart,
     Lock,
-    Search
+    Search,
+    Mic
 } from "lucide-react";
 import { useAuth } from "../components/AuthProvider";
 import { Button } from "../components/ui/button";
@@ -39,6 +40,7 @@ import GlobalChatSettings from "../components/GlobalChatSettings";
 import LevelSettings from "../components/LevelSettings";
 import LoggingSettings from "../components/LoggingSettings";
 import AutoDeleteSettings from "../components/AutoDeleteSettings";
+import TempVCSettings from "../components/TempVCSettings";
 import GuildSelector from "../components/GuildSelector";
 import OverviewSettings from "../components/OverviewSettings";
 
@@ -50,7 +52,12 @@ export default function SettingsPage() {
     const { token, selectedGuildId } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [activeTab, setActiveTab] = useState("overview");
-    const [guildData, setGuildData] = useState<{ channels: any[], roles: any[] }>({ channels: [], roles: [] });
+    const [guildData, setGuildData] = useState<{ channels: any[], roles: any[], categories: any[], voiceChannels: any[] }>({
+        channels: [],
+        roles: [],
+        categories: [],
+        voiceChannels: []
+    });
 
     const guildId = selectedGuildId;
 
@@ -83,22 +90,32 @@ export default function SettingsPage() {
                     }
                 }
 
-                // Fetch Guild Data (Channels & Roles)
-                const [channelsRes, rolesRes] = await Promise.all([
+                // Fetch Guild Data (Channels, Roles, Categories, VoiceChannels)
+                const [channelsRes, rolesRes, catsRes, vcsRes] = await Promise.all([
                     fetch(`${baseUrl}/dashboard/guilds/${guildId}/channels`, {
                         headers: { "Authorization": `Bearer ${token}` }
                     }),
                     fetch(`${baseUrl}/dashboard/guilds/${guildId}/roles`, {
                         headers: { "Authorization": `Bearer ${token}` }
+                    }),
+                    fetch(`${baseUrl}/dashboard/guilds/${guildId}/categories`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    }),
+                    fetch(`${baseUrl}/dashboard/guilds/${guildId}/voice_channels`, {
+                        headers: { "Authorization": `Bearer ${token}` }
                     })
                 ]);
 
-                if (channelsRes.ok && rolesRes.ok) {
+                if (channelsRes.ok && rolesRes.ok && catsRes.ok && vcsRes.ok) {
                     const channels = await channelsRes.json();
                     const roles = await rolesRes.json();
+                    const categories = await catsRes.json();
+                    const voiceChannels = await vcsRes.json();
                     setGuildData({
                         channels: channels.channels || [],
-                        roles: roles.roles || []
+                        roles: roles.roles || [],
+                        categories: categories.categories || [],
+                        voiceChannels: voiceChannels.channels || []
                     });
                 }
             } catch (e) {
@@ -214,6 +231,7 @@ export default function SettingsPage() {
                                     <TabItem value="globalchat" icon={Globe} label="Global Network" />
                                     <TabItem value="autorole" icon={ShieldCheck} label="Auto-Roles" />
                                     <TabItem value="autodelete" icon={Trash2} label="Auto-Delete" />
+                                    <TabItem value="tempvc" icon={Mic} label="TempVC Suite" />
                                 </TabsList>
                             </div>
                         </aside>
@@ -318,6 +336,16 @@ export default function SettingsPage() {
 
                                     <TabsContent value="autodelete" className="mt-0 outline-none">
                                         {guildId ? <AutoDeleteSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
+                                    </TabsContent>
+
+                                    <TabsContent value="tempvc" className="mt-0 outline-none">
+                                        {guildId ? (
+                                            <TempVCSettings
+                                                guildId={guildId}
+                                                categories={guildData.categories}
+                                                voiceChannels={guildData.voiceChannels}
+                                            />
+                                        ) : <NoGuildPlaceholder />}
                                     </TabsContent>
 
                                     <TabsContent value="notifications" className="mt-0 outline-none">

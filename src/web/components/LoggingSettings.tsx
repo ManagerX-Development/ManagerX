@@ -16,7 +16,7 @@ import {
     History,
     Search
 } from "lucide-react";
-import { toast } from "sonner";
+import { SearchableSelect } from "./ui/SearchableSelect";
 
 interface LoggingSettingsProps {
     guildId: string;
@@ -125,24 +125,13 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
                         <Label className="text-white/90 font-semibold flex items-center gap-2">
                             <Hash className="w-4 h-4 text-primary" /> Log-Kanal
                         </Label>
-                        <div className="relative group">
-                            <select
-                                value={settings.channel_id}
-                                onChange={(e) => setSettings({ ...settings, channel_id: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 focus:border-primary/50 transition-all rounded-xl h-12 px-4 appearance-none outline-none text-white"
-                            >
-                                <option value="" disabled className="bg-[#1a1c1e]">Kanal auswählen...</option>
-                                {channels.map(channel => (
-                                    <option key={channel.id} value={channel.id} className="bg-[#1a1c1e]">
-                                        #{channel.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                                <Search className="w-4 h-4 text-muted-foreground" />
-                            </div>
-                            <div className="absolute inset-0 rounded-xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                        </div>
+                        <SearchableSelect
+                            options={channels}
+                            value={settings.channel_id}
+                            onChange={(val) => setSettings({ ...settings, channel_id: val })}
+                            placeholder="Log-Kanal auswählen..."
+                            type="channel"
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

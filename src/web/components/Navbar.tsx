@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import {
   Shield, Menu, X, Sparkles, Puzzle, Activity, Terminal,
-  Newspaper, Users, Milestone, ChevronDown, LayoutDashboard // Added LayoutDashboard
+  Newspaper, Users, Milestone, ChevronDown, LayoutDashboard, User // Added User
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useAuth } from "./AuthProvider";
@@ -160,13 +160,21 @@ export function Navbar() {
           <div className="flex-1 flex justify-end items-center gap-4">
             <div className="hidden md:flex items-center gap-3">
               {isAuthenticated ? (
-                <Link
-                  to="/dash/settings"
-                  className="btn-primary inline-flex items-center gap-2.5 !px-6 !py-2.5 !text-sm group"
-                >
-                  <LayoutDashboard className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                  <span>Dashboard</span>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to="/dash/user/settings"
+                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 transition-all text-muted-foreground hover:text-white group"
+                  >
+                    <User className="w-5 h-5" />
+                  </Link>
+                  <Link
+                    to="/dash/settings"
+                    className="btn-primary inline-flex items-center gap-2.5 !px-6 !py-2.5 !text-sm group"
+                  >
+                    <LayoutDashboard className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                    <span>Dashboard</span>
+                  </Link>
+                </div>
               ) : (
                 <Link
                   to="/dash/login"
@@ -232,14 +240,24 @@ export function Navbar() {
               ))}
               <hr className="border-white/5 my-2" />
               {isAuthenticated ? (
-                <Link
-                  to="/dash/settings"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="inline-flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white p-5 rounded-2xl text-center font-bold tracking-tight"
-                >
-                  <LayoutDashboard className="w-5 h-5" />
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    to="/dash/user/settings"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="inline-flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white p-5 rounded-2xl text-center font-bold tracking-tight"
+                  >
+                    <User className="w-5 h-5 text-primary" />
+                    Profil-Einstellungen
+                  </Link>
+                  <Link
+                    to="/dash/settings"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="inline-flex items-center justify-center gap-3 bg-white/5 border border-white/10 text-white p-5 rounded-2xl text-center font-bold tracking-tight"
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                    Server Dashboard
+                  </Link>
+                </>
               ) : (
                 <Link
                   to="/dash/login"

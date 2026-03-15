@@ -14,6 +14,7 @@ import {
     Search
 } from "lucide-react";
 import { toast } from "sonner";
+import { SearchableSelect } from "./ui/SearchableSelect";
 
 interface AutoRoleSettingsProps {
     guildId: string;
@@ -120,24 +121,13 @@ export default function AutoRoleSettings({ guildId, roles }: AutoRoleSettingsPro
                         <Label className="text-white/90 font-semibold flex items-center gap-2">
                             <AtSign className="w-4 h-4 text-primary" /> Ziel-Rolle
                         </Label>
-                        <div className="relative group">
-                            <select
-                                value={settings.role_id}
-                                onChange={(e) => setSettings({ ...settings, role_id: e.target.value })}
-                                className="w-full bg-white/5 border border-white/10 focus:border-primary/50 transition-all rounded-xl h-12 px-4 appearance-none outline-none text-white"
-                            >
-                                <option value="" disabled className="bg-[#1a1c1e]">Rolle auswählen...</option>
-                                {roles.map(role => (
-                                    <option key={role.id} value={role.id} className="bg-[#1a1c1e]">
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                                <Search className="w-4 h-4 text-muted-foreground" />
-                            </div>
-                            <div className="absolute inset-0 rounded-xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                        </div>
+                        <SearchableSelect
+                            options={roles}
+                            value={settings.role_id}
+                            onChange={(val) => setSettings({ ...settings, role_id: val })}
+                            placeholder="Ziel-Rolle auswählen..."
+                            type="role"
+                        />
                         <p className="text-[11px] text-muted-foreground italic">Stelle sicher, dass die Bot-Rolle über der Ziel-Rolle steht!</p>
                     </div>
 

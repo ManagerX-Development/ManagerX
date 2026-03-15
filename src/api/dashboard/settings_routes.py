@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Security, status, Depends
 from src.api.dashboard.auth_routes import get_current_user
-from mx_devtools import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase, AutoDeleteDB, AutoRoleDatabase
+from mx_devtools import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase, AutoDeleteDB, AutoRoleDatabase, TempVCDatabase
 import discord
 from datetime import datetime
 
@@ -352,3 +352,60 @@ async def update_autodelete_settings(guild_id: int, request: Request, user: dict
         return {"success": success}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save autodelete settings: {e}")
+# --- TempVC Module Routes ---
+
+@router.get("/{guild_id}/tempvc")
+async def get_tempvc_settings(guild_id: int, user: dict = Depends(get_current_user)):
+    """Fetch TempVC-specific settings."""
+    db = TempVCDatabase()
+    try:
+        settings = db.get_tempvc_settings(guild_id)
+        if settings:
+            # result is tuple: (creator_channel_id, category_id, auto_delete_time)
+            data = {
+                "creator_channel_id": str(settings[0]),
+                "category_id": str(settings[1]),
+                "auto_delete_time": settings[2]
+            }
+        else:
+            data = {}
+            
+        # Get UI settings
+        ui_settings = db.get_ui_settings(guild_id)
+        if ui_settings:
+            data["ui_enabled"] = bool(ui_settings[0])
+            data["ui_prefix"] = ui_settings[1]
+        else:
+            data["ui_enabled"] = False
+            data["ui_prefix"] = "🔧"
+            
+        return {"success": True, "data": data}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+
+@router.post("/{guild_id}/tempvc")
+async def update_tempvc_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+    """Update TempVC-specific settings."""
+    data = await request.json()
+    db = TempVCDatabase()
+    
+    try:
+        # Update main settings
+        creator_channel_id = int(data.get("creator_channel_id")) if data.get("creator_channel_id") else 0
+        category_id = int(data.get("category_id")) if data.get("category_id") else 0
+        auto_delete_time = int(data.get("auto_delete_time", 0))
+        
+        if creator_channel_id and category_id:
+            db.set_tempvc_settings(guild_id, creator_channel_id, category_id, auto_delete_time)
+        
+        # Update UI settings
+        ui_enabled = bool(data.get("ui_enabled", False))
+        ui_prefix = data.get("ui_prefix", "🔧")
+        db.set_ui_settings(guild_id, ui_enabled, ui_prefix)
+        
+        user_name = user.get("username", "Unbekannter User")
+        await send_dashboard_notification(guild_id, "TempVC System", user_name, creator_channel_id or None)
+        
+        return {"success": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save TempVC settings: {e}")

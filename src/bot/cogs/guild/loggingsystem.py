@@ -47,7 +47,7 @@ class Logging(ezcord.Cog):
             'logs_sent': 0,
             'errors': 0,
             'cache_hits': 0,
-            'startup_time': datetime.utcnow(),
+            'startup_time': discord.utils.utcnow(),
         }
 
         # Start background tasks
@@ -106,7 +106,7 @@ class Logging(ezcord.Cog):
                 cleanup_count += 1
 
             # Bulk Delete Cache bereinigen (älter als 5 Minuten)
-            current_time = datetime.utcnow()
+            current_time = discord.utils.utcnow()
             expired_guilds = []
             
             for guild_id, data in self._bulk_deletes.items():
@@ -187,7 +187,7 @@ class Logging(ezcord.Cog):
                         title="⚠️ Log-Fehler",
                         description="Originale Log-Nachricht konnte nicht angezeigt werden (zu lang oder ungültig)",
                         color=discord.Color.orange(),
-                        timestamp=datetime.utcnow()
+                        timestamp=discord.utils.utcnow()
                     )
                     await channel.send(embed=fallback_embed)
                 except:
@@ -208,7 +208,7 @@ class Logging(ezcord.Cog):
             title=title,
             description=description,
             color=color,
-            timestamp=datetime.utcnow()
+            timestamp=discord.utils.utcnow()
         )
 
         # User Info - immer als erstes
@@ -339,7 +339,7 @@ class Logging(ezcord.Cog):
                 title="🧪 Test-Nachricht",
                 description=f"Log-Channel für **{log_type}** erfolgreich konfiguriert!",
                 color=discord.Color.blue(),
-                timestamp=datetime.utcnow()
+                timestamp=discord.utils.utcnow()
             )
             test_embed.set_footer(text="Dies ist eine Test-Nachricht")
             await self.send_log(ctx.guild.id, test_embed, "general" if log_type == "all" else log_type)
@@ -375,7 +375,7 @@ class Logging(ezcord.Cog):
                 title="🗑️ Log-Channel entfernt",
                 description=description,
                 color=discord.Color.red(),
-                timestamp=datetime.utcnow()
+                timestamp=discord.utils.utcnow()
             )
             embed.set_footer(text=f"Entfernt von {ctx.author}")
             await ctx.respond(embed=embed, ephemeral=True)
@@ -400,7 +400,7 @@ class Logging(ezcord.Cog):
             embed = discord.Embed(
                 title="📊 Logging Status",
                 color=discord.Color.blue(),
-                timestamp=datetime.utcnow()
+                timestamp=discord.utils.utcnow()
             )
 
             if not channels:
@@ -423,7 +423,7 @@ class Logging(ezcord.Cog):
                 embed.description = status_text
 
             # Bot Statistiken
-            uptime = datetime.utcnow() - self._stats['startup_time']
+            uptime = discord.utils.utcnow() - self._stats['startup_time']
             uptime_str = f"{uptime.days}d {uptime.seconds//3600}h {(uptime.seconds%3600)//60}m"
             
             embed.add_field(
@@ -472,7 +472,7 @@ class Logging(ezcord.Cog):
     async def log_backup(self, ctx):
         """Erstellt ein Datenbank-Backup"""
         try:
-            backup_path = f"data/log_channels_backup_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.db"
+            backup_path = f"data/log_channels_backup_{discord.utils.utcnow().strftime('%Y%m%d_%H%M%S')}.db"
             success = await self.db.backup_database(backup_path)
             
             if success:
@@ -509,7 +509,7 @@ class Logging(ezcord.Cog):
         try:
             self._stats['events_processed'] += 1
             
-            account_age = datetime.utcnow() - member.created_at
+            account_age = discord.utils.utcnow() - member.created_at
             age_days = account_age.days
             
             # Verdächtigkeits-Score
@@ -519,7 +519,7 @@ class Logging(ezcord.Cog):
             elif age_days < 7:
                 suspicious_factors.append("Neues Konto (< 7 Tage)")
             
-            if member.display_avatar.is_default():
+            if member.avatar is None:
                 suspicious_factors.append("Standard Avatar")
             
             # Default Username Pattern
@@ -573,7 +573,7 @@ class Logging(ezcord.Cog):
             }
 
             if member.joined_at:
-                duration = datetime.utcnow() - member.joined_at
+                duration = discord.utils.utcnow() - member.joined_at
                 days = duration.days
                 hours = duration.seconds // 3600
                 
@@ -617,7 +617,7 @@ class Logging(ezcord.Cog):
             guild_id = message.guild.id
 
             # Bulk Delete Detection
-            current_time = datetime.utcnow()
+            current_time = discord.utils.utcnow()
             
             if guild_id not in self._bulk_deletes:
                 self._bulk_deletes[guild_id] = {
@@ -646,7 +646,7 @@ class Logging(ezcord.Cog):
                     title="🗑️ Bulk-Löschung erkannt",
                     description=f"**{len(bulk_data['messages'])}** Nachrichten wurden in kurzer Zeit gelöscht",
                     color=discord.Color.dark_red(),
-                    timestamp=datetime.utcnow()
+                    timestamp=discord.utils.utcnow()
                 )
                 
                 # Channel Info
@@ -680,7 +680,7 @@ class Logging(ezcord.Cog):
             embed = discord.Embed(
                 title="🗑️ Nachricht gelöscht",
                 color=discord.Color.red(),
-                timestamp=datetime.utcnow()
+                timestamp=discord.utils.utcnow()
             )
 
             # Author Info

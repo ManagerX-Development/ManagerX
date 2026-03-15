@@ -4,12 +4,13 @@ import os
 import discord
 from src.api.dashboard.auth_routes import get_current_user
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 # Falls du Schemas nutzt: from .schemas import ServerStatus, UserInfo
 
 from .auth_routes import router as auth_router
 from .settings_routes import router as settings_router
+from .user_routes import router as user_router
 
 # Wir erstellen einen Router, den wir später in die Haupt-App einbinden
 router_public = APIRouter(
@@ -143,6 +144,46 @@ async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user))
     ]
     return {"roles": roles}
 
+@router.get("/guilds/{guild_id}/categories")
+async def get_guild_categories(guild_id: int, user: dict = Depends(get_current_user)):
+    """Fetches categories for a specific guild."""
+    if bot_instance is None:
+        raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
+    
+    guild = bot_instance.get_guild(guild_id)
+    if not guild:
+         raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
+    
+    member = guild.get_member(int(user["id"]))
+    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+        raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+    categories = [
+        {"id": str(c.id), "name": c.name}
+        for c in guild.categories
+    ]
+    return {"categories": categories}
+
+@router.get("/guilds/{guild_id}/voice_channels")
+async def get_guild_voice_channels(guild_id: int, user: dict = Depends(get_current_user)):
+    """Fetches voice channels for a specific guild."""
+    if bot_instance is None:
+        raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
+    
+    guild = bot_instance.get_guild(guild_id)
+    if not guild:
+         raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
+    
+    member = guild.get_member(int(user["id"]))
+    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+        raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+    channels = [
+        {"id": str(c.id), "name": c.name}
+        for c in guild.voice_channels
+    ]
+    return {"channels": channels}
+
 @router.get("/guilds/{guild_id}/stats")
 async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user)):
     """Fetches server statistics (Daily joins, message count, member total)."""
@@ -158,9 +199,13 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     # Fetch daily growth/activity
-    today_str = datetime.now().strftime('%Y-%m-%d')
+    today_dt = discord.utils.utcnow()
+    today_str = today_dt.strftime('%Y-%m-%d')
+    yesterday_str = (today_dt - timedelta(days=1)).strftime('%Y-%m-%d')
     joined_today = 0
+    joined_yesterday = 0
     messages_today = 0
+    messages_yesterday = 0
     history = []
 
     try:
@@ -173,36 +218,41 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
             for day in welcome_history:
                 if day['date'] == today_str:
                     joined_today = day['joins']
+                elif day['date'] == yesterday_str:
+                    joined_yesterday = day['joins']
         
         if hasattr(bot_instance, 'stats_db'):
             messages_today = await bot_instance.stats_db.get_daily_messages(guild_id, today_str)
+            messages_yesterday = await bot_instance.stats_db.get_daily_messages(guild_id, yesterday_str)
             stats_history = await bot_instance.stats_db.get_weekly_stats(guild_id)
 
         # 2. Combine history for the last 7 days
         for i in range(6, -1, -1):
-            date_obj = datetime.now() - timedelta(days=i)
+            date_obj = today_dt - timedelta(days=i)
             d_str = date_obj.strftime('%Y-%m-%d')
             day_name = date_obj.strftime('%a')
-            
             m_count = 0
             j_count = 0
-            
-            # Find in pre-fetched histories
             for h in stats_history:
                 if h['date'] == d_str:
-                    m_count = h['messages']
-                    break
-            
+                    m_count = h['messages']; break
             for h in welcome_history:
                 if h['date'] == d_str:
-                    j_count = h['joins']
-                    break
-            
-            history.append({
-                "name": day_name,
-                "messages": m_count,
-                "joins": j_count
-            })
+                    j_count = h['joins']; break
+            history.append({"name": day_name, "messages": m_count, "joins": j_count})
+
+        # Calculate Trends
+        def calc_trend(today, yesterday):
+            if today == yesterday:
+                return "neutral", "0%"
+            if yesterday == 0:
+                return "up", "+100%"
+            diff = today - yesterday
+            pct = round((abs(diff) / yesterday) * 100)
+            return ("up" if diff > 0 else "down"), f"{'+' if diff > 0 else '-'}{pct}%"
+
+        m_trend, m_trend_val = calc_trend(messages_today, messages_yesterday)
+        j_trend, j_trend_val = calc_trend(joined_today, joined_yesterday)
 
         # Prepare final stats object
         total_members = guild.member_count or len(guild.members)
@@ -216,10 +266,13 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
             "text_channels": len(guild.text_channels),
             "voice_channels": len(guild.voice_channels),
             "joined_today": joined_today,
+            "joined_trend": j_trend,
+            "joined_trend_value": j_trend_val,
             "messages_today": messages_today,
+            "messages_trend": m_trend,
+            "messages_trend_value": m_trend_val,
             "history": history
         }
-        
         return stats
     except Exception as e:
         print(f"Stats error: {e}")
@@ -234,5 +287,6 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
 
 router.include_router(auth_router)
 router.include_router(settings_router)
+router.include_router(user_router)
 router.include_router(router_public)
 

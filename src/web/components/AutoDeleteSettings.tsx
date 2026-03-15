@@ -14,6 +14,7 @@ import {
     Search
 } from "lucide-react";
 import { toast } from "sonner";
+import { SearchableSelect } from "./ui/SearchableSelect";
 
 interface AutoDeleteSettingsProps {
     guildId: string;
@@ -138,18 +139,14 @@ export default function AutoDeleteSettings({ guildId, channels }: AutoDeleteSett
                                 <div key={index} className="flex flex-col md:flex-row gap-4 p-6 rounded-2xl bg-white/5 border border-white/5 relative group transition-all hover:border-primary/30">
                                     <div className="flex-1 space-y-2">
                                         <Label className="text-xs uppercase tracking-wider text-muted-foreground">Kanal-ID</Label>
-                                        <select
+                                        <SearchableSelect
+                                            options={channels}
                                             value={config.channel_id}
-                                            onChange={(e) => updateChannel(index, "channel_id", e.target.value)}
-                                            className="w-full bg-white/5 border border-white/10 focus:border-primary/50 transition-all rounded-xl h-10 px-4 appearance-none outline-none text-white text-sm"
-                                        >
-                                            <option value="" disabled className="bg-[#1a1c1e]">Kanal wählen...</option>
-                                            {channels.map(ch => (
-                                                <option key={ch.id} value={ch.id} className="bg-[#1a1c1e]">
-                                                    #{ch.name}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            onChange={(val) => updateChannel(index, "channel_id", val)}
+                                            placeholder="Kanal auswählen..."
+                                            type="channel"
+                                            className="h-10 text-sm"
+                                        />
                                     </div>
                                     <div className="flex-1 space-y-2">
                                         <Label className="text-xs uppercase tracking-wider text-muted-foreground">Verzögerung (Sekunden)</Label>

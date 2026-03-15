@@ -61,8 +61,9 @@ export default function OverviewSettings({ guildId }: OverviewSettingsProps) {
                 <div className={`p-3 rounded-2xl bg-${color}/10 border border-${color}/20 text-${color}`}>
                     <Icon className="w-6 h-6" />
                 </div>
-                <div className={`flex items-center gap-1 font-medium text-xs ${trend === 'up' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {trend === 'up' ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                <div className={`flex items-center gap-1 font-medium text-xs ${trend === 'up' ? 'text-emerald-400' : (trend === 'down' ? 'text-rose-400' : 'text-muted-foreground')}`}>
+                    {trend === 'up' && <ArrowUpRight className="w-3 h-3" />}
+                    {trend === 'down' && <ArrowDownRight className="w-3 h-3" />}
                     {trendValue}
                 </div>
             </div>
@@ -99,16 +100,16 @@ export default function OverviewSettings({ guildId }: OverviewSettingsProps) {
                     title="Nachrichten Heute"
                     value={stats?.messages_today || 0}
                     icon={MessageSquare}
-                    trend="up"
-                    trendValue="+24%"
+                    trend={stats?.messages_trend || "up"}
+                    trendValue={stats?.messages_trend_value || "0%"}
                     color="emerald-400"
                 />
                 <StatCard
                     title="Neue Member"
                     value={stats?.joined_today || 0}
                     icon={TrendingUp}
-                    trend="down"
-                    trendValue="-2%"
+                    trend={stats?.joined_trend || "up"}
+                    trendValue={stats?.joined_trend_value || "0%"}
                     color="indigo-400"
                 />
             </div>

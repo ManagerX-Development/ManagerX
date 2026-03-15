@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "../lib/utils";
+import { SearchableSelect } from "./ui/SearchableSelect";
 
 interface LevelSettingsProps {
     guildId: string;
@@ -148,22 +149,13 @@ export default function LevelSettings({ guildId, channels }: LevelSettingsProps)
                                 <Hash className="w-4 h-4 text-primary" /> Ankündigungskanal
                             </Label>
                             <div className="relative group">
-                                <select
+                                <SearchableSelect
+                                    options={channels}
                                     value={settings.level_up_channel}
-                                    onChange={(e) => setSettings({ ...settings, level_up_channel: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 focus:border-primary/50 transition-all rounded-xl h-12 px-4 appearance-none outline-none text-white text-sm"
-                                >
-                                    <option value="" className="bg-[#1a1c1e]">Aktueller Kanal</option>
-                                    {channels.map(channel => (
-                                        <option key={channel.id} value={channel.id} className="bg-[#1a1c1e]">
-                                            #{channel.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                                    <Search className="w-4 h-4 text-muted-foreground" />
-                                </div>
-                                <div className="absolute inset-0 rounded-xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                    onChange={(val) => setSettings({ ...settings, level_up_channel: val })}
+                                    placeholder="Aktueller Kanal"
+                                    type="channel"
+                                />
                             </div>
                         </div>
                     </div>

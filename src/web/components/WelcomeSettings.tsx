@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../components/AuthProvider";
 import { toast } from "sonner";
+import { SearchableSelect } from "./ui/SearchableSelect";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -138,16 +139,13 @@ export default function WelcomeSettings({ guildId }: { guildId: string }) {
                             <Label className="text-white/90 font-semibold flex items-center gap-2">
                                 <Hash className="w-4 h-4" /> Welcome Channel
                             </Label>
-                            <select
+                            <SearchableSelect
+                                options={channels}
                                 value={channelId}
-                                onChange={(e) => setChannelId(e.target.value)}
-                                className="w-full h-12 rounded-xl bg-black/20 border border-white/10 text-white px-4 focus:ring-2 focus:ring-primary outline-none transition-all appearance-none"
-                            >
-                                <option value="" className="bg-[#1a1c1e]">Kanal auswählen...</option>
-                                {channels.map(c => (
-                                    <option key={c.id} value={c.id} className="bg-[#1a1c1e] text-white">#{c.name}</option>
-                                ))}
-                            </select>
+                                onChange={setChannelId}
+                                placeholder="Welcome-Kanal auswählen..."
+                                type="channel"
+                            />
                         </div>
 
                         <div className="space-y-3">
