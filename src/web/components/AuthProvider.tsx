@@ -51,39 +51,75 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("selectedGuildId", id);
     };
 
-    // Fetch guilds and validate session if authenticated
+    // --- NEU: OAUTH CALLBACK HANDLER ---
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+        const path = params.get("p");
+
+        // Prüfen, ob wir im Callback sind (direkt oder via GitHub Pages Proxy ?p=)
+        if (code && (window.location.pathname.includes("/auth/callback") || path?.includes("/auth/callback"))) {
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
+            
+            console.log("[Auth] Code gefunden, tausche gegen Token...");
+
+            fetch(`${baseUrl}/auth/callback`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code })
+            })
+            .then(async (res) => {
+                if (!res.ok) {
+                    const error = await res.json();
+                    throw new Error(error.detail || "Login failed");
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("[Auth] Login erfolgreich!");
+                login(data.access_token, data.user, data.discord_token);
+                
+                // URL aufräumen: ?code=... entfernen und zur Startseite
+                window.history.replaceState({}, document.title, "/");
+            })
+            .catch(err => {
+                console.error("[Auth] Callback Fehler:", err);
+            });
+        }
+    }, []);
+
+    // --- GUILDS & SESSION VALIDIERUNG ---
     useEffect(() => {
         if (token) {
             const discordToken = localStorage.getItem("discord_token");
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
 
-            fetch(`${baseUrl}/dashboard/auth/me`, {
+            fetch(`${baseUrl}/auth/me`, { // Pfad angepasst an deinen Python-Router Prefix
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "X-Discord-Token": discordToken || ""
                 }
             })
-                .then(async (res) => {
-                    if (res.status === 401) {
-                        logout();
-                        throw new Error("Session expired");
+            .then(async (res) => {
+                if (res.status === 401) {
+                    logout();
+                    throw new Error("Session expired");
+                }
+                if (!res.ok) throw new Error("Failed to fetch user data");
+                return res.json();
+            })
+            .then(data => {
+                if (data.user) setUser(data.user);
+                if (data.guilds) {
+                    setGuilds(data.guilds);
+                    if (!selectedGuildId && data.guilds.length > 0) {
+                        handleSetSelectedGuildId(data.guilds[0].id);
                     }
-                    if (!res.ok) throw new Error("Failed to fetch user data");
-                    return res.json();
-                })
-                .then(data => {
-                    if (data.user) setUser(data.user);
-                    if (data.guilds) {
-                        setGuilds(data.guilds);
-                        // Select first guild if none selected
-                        if (!selectedGuildId && data.guilds.length > 0) {
-                            handleSetSelectedGuildId(data.guilds[0].id);
-                        }
-                    }
-                })
-                .catch(err => {
-                    console.error("Auth me error:", err);
-                });
+                }
+            })
+            .catch(err => {
+                console.error("[Auth] Session Error:", err);
+            });
         }
     }, [token]);
 
