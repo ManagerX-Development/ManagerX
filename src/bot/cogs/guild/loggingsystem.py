@@ -924,8 +924,8 @@ class Logging(ezcord.Cog):
                     changes.append(f"Server Mute: {'✅' if after.mute else '❌'}")
                 if before.deaf != after.deaf:
                     changes.append(f"Server Deaf: {'✅' if after.deaf else '❌'}")
-                if before.streaming != after.streaming:
-                    changes.append(f"Streaming: {'✅' if after.streaming else '❌'}")
+                if getattr(before, 'streaming', None) != getattr(after, 'streaming', None):
+                    changes.append(f"Streaming: {'✅' if getattr(after, 'streaming', None) else '❌'}")
                 if before.self_video != after.self_video:
                     changes.append(f"Camera: {'✅' if after.self_video else '❌'}")
 

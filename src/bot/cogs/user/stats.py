@@ -286,7 +286,10 @@ class EnhancedStatsCog(ezcord.Cog):
 
             # Activity stats
             total_voice_hours = int(global_info['total_voice_minutes'] // 60)
-            days_since_joined = (datetime.now() - datetime.fromisoformat(global_info['first_seen'])).days + 1
+            first_seen = datetime.fromisoformat(global_info['first_seen'])
+            if first_seen.tzinfo is None:
+                first_seen = first_seen.replace(tzinfo=discord.utils.utcnow().tzinfo)
+            days_since_joined = (discord.utils.utcnow() - first_seen).days + 1
             avg_messages_per_day = global_info['total_messages'] / days_since_joined
 
             embed.add_field(
