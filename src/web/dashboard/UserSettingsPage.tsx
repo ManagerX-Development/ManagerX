@@ -375,12 +375,23 @@ export default function UserSettingsPage() {
                                         settings.topServers.map((srv: any, i: number) => (
                                             <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 group hover:border-yellow-500/30 transition-colors">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-yellow-500">
-                                                        #{i + 1}
+                                                    <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center overflow-hidden border border-white/10 shadow-inner group-hover:border-yellow-500/20 transition-all">
+                                                        {srv.icon_url ? (
+                                                            <img src={srv.icon_url} alt={srv.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center font-black text-yellow-500/50 bg-yellow-500/5">
+                                                                {srv.name?.substring(0, 1).toUpperCase() || srv.guild_id.substring(0, 1)}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-white">Server ID: {srv.guild_id}</p>
-                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Level {srv.level}</p>
+                                                    <div className="space-y-0.5">
+                                                        <p className="text-sm font-bold text-white leading-tight group-hover:text-yellow-500 transition-colors">{srv.name}</p>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="px-1.5 py-0.5 rounded-md bg-white/5 border border-white/5">
+                                                                <p className="text-[8px] font-black uppercase tracking-tighter text-slate-500">ID: {srv.guild_id}</p>
+                                                            </div>
+                                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Level {srv.level}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
