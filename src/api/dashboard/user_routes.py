@@ -2,6 +2,15 @@ from fastapi import APIRouter, Request, HTTPException, Depends
 from src.api.dashboard.auth_routes import get_current_user
 from mx_devtools import SettingsDB, StatsDB
 import discord
+import sqlite3
+import os
+from pathlib import Path
+
+# Paths to databases
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+DATA_DIR = BASE_DIR / "data"
+MOD_DIR = BASE_DIR / "src" / "bot" / "cogs" / "moderation"
+
 
 router = APIRouter(
     prefix="/user",
@@ -23,13 +32,72 @@ async def get_user_settings(user: dict = Depends(get_current_user)):
         stats_db = StatsDB()
         global_info = await stats_db.get_global_user_info(user_id)
         
+        # 1. Moderation Stats (Global Warnings)
+        warns_count = 0
+        warns_db_path = MOD_DIR / "Datenbanken" / "warns.db"
+        if warns_db_path.exists():
+            try:
+                conn = sqlite3.connect(warns_db_path)
+                cursor = conn.cursor()
+                cursor.execute("SELECT COUNT(*) FROM warns WHERE user_id = ?", (user_id,))
+                warns_count = cursor.fetchone()[0]
+                conn.close()
+            except Exception:
+                pass
+                
+        # 2. Global Chat Stats
+        global_chat_messages = 0
+        gc_db_path = DATA_DIR / "globalchat.db"
+        if gc_db_path.exists():
+            try:
+                conn = sqlite3.connect(gc_db_path)
+                cursor = conn.cursor()
+                cursor.execute("SELECT COUNT(*) FROM message_log WHERE user_id = ?", (user_id,))
+                global_chat_messages = cursor.fetchone()[0]
+                conn.close()
+            except Exception:
+                pass
+                
+        # 3. Top Servers (from LevelSystem)
+        top_servers = []
+        ls_db_path = DATA_DIR / "levelsystem.db"
+        if ls_db_path.exists():
+            try:
+                conn = sqlite3.connect(ls_db_path)
+                cursor = conn.cursor()
+                # Get top 3 guilds by XP for this user
+                cursor.execute("""
+                    SELECT guild_id, level, xp 
+                    FROM user_levels 
+                    WHERE user_id = ? 
+                    ORDER BY xp DESC 
+                    LIMIT 3
+                """, (user_id,))
+                rows = cursor.fetchall()
+                for row in rows:
+                    top_servers.append({
+                        "guild_id": str(row[0]),
+                        "level": row[1],
+                        "xp": row[2]
+                    })
+                conn.close()
+            except Exception:
+                pass
+
         return {
             "success": True, 
             "data": {
                 "user_id": str(user_id),
                 "language": language,
                 "username": user.get("username", "Unknown"),
-                "global_stats": global_info
+                "global_stats": global_info,
+                "moderation": {
+                    "total_warnings": warns_count
+                },
+                "global_chat": {
+                    "total_messages": global_chat_messages
+                },
+                "top_servers": top_servers
             }
         }
     except Exception as e:

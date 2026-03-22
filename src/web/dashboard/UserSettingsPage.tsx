@@ -22,7 +22,11 @@ import {
     Trophy,
     Mic,
     Server,
-    Flame
+    Flame,
+    Calendar,
+    Award,
+    Activity,
+    History
 } from "lucide-react";
 import { useAuth } from "../components/AuthProvider";
 import { Button } from "../components/ui/button";
@@ -42,7 +46,10 @@ export default function UserSettingsPage() {
     const [settings, setSettings] = useState({
         username: "",
         language: "de",
-        globalStats: null as any
+        globalStats: null as any,
+        moderation: null as any,
+        globalChat: null as any,
+        topServers: [] as any[]
     });
 
     useEffect(() => {
@@ -61,7 +68,10 @@ export default function UserSettingsPage() {
                         setSettings({
                             username: data.data.username || "",
                             language: data.data.language || "de",
-                            globalStats: data.data.global_stats
+                            globalStats: data.data.global_stats,
+                            moderation: data.data.moderation,
+                            globalChat: data.data.global_chat,
+                            topServers: data.data.top_servers || []
                         });
                     }
                 }
@@ -261,6 +271,31 @@ export default function UserSettingsPage() {
                                         </div>
                                     </div>
 
+                                    {/* Advanced Global Stats */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                                                <Calendar className="w-5 h-5 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Mitglied seit</p>
+                                                <p className="text-sm font-bold text-white">
+                                                    {settings.globalStats.first_seen ? new Date(settings.globalStats.first_seen).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Unbekannt'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                                                <Award className="w-5 h-5 text-accent" />
+                                            </div>
+                                            <div>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Beste Streak</p>
+                                                <p className="text-sm font-bold text-white">{settings.globalStats.best_streak || settings.globalStats.daily_streak} Tage</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
                                     {/* Achievements Preview */}
                                     {settings.globalStats.achievements && settings.globalStats.achievements.length > 0 && (
                                         <div className="space-y-4">
@@ -281,6 +316,88 @@ export default function UserSettingsPage() {
                                 </CardContent>
                             </Card>
                         )}
+
+                        {/* Moderation & Community */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            {/* Moderation Card */}
+                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+                                <CardHeader className="p-10 pb-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                                            <Shield className="w-6 h-6 text-red-500" />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-2xl font-bold">Moderation</CardTitle>
+                                            <CardDescription>Deine globale History.</CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-10 pt-4 space-y-6">
+                                    <div className="flex items-center justify-between p-6 rounded-3xl bg-white/5 border border-white/10">
+                                        <div className="space-y-1">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Gesamt Verwarnungen</p>
+                                            <h3 className={cn("text-4xl font-black", (settings.moderation?.total_warnings || 0) > 0 ? "text-red-500" : "text-green-500")}>
+                                                {settings.moderation?.total_warnings || 0}
+                                            </h3>
+                                        </div>
+                                        <div className="px-4 py-2 rounded-xl bg-white/5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                            {(settings.moderation?.total_warnings || 0) === 0 ? "Clean Record ✓" : "Achtung"}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
+                                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                            <MessageSquare className="w-5 h-5 text-blue-500" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Global-Chat Nachrichten</p>
+                                            <p className="text-lg font-bold text-white">{settings.globalChat?.total_messages?.toLocaleString() || 0}</p>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Top Servers Card */}
+                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+                                <CardHeader className="p-10 pb-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20">
+                                            <History className="w-6 h-6 text-yellow-500" />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-2xl font-bold">Top Server</CardTitle>
+                                            <CardDescription>Deine aktivsten Communities.</CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-10 pt-4 space-y-4">
+                                    {settings.topServers && settings.topServers.length > 0 ? (
+                                        settings.topServers.map((srv: any, i: number) => (
+                                            <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10 group hover:border-yellow-500/30 transition-colors">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-yellow-500">
+                                                        #{i + 1}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-bold text-white">Server ID: {srv.guild_id}</p>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Level {srv.level}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-xs font-bold text-yellow-500">{srv.xp.toLocaleString()} XP</p>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="p-10 text-center space-y-2 opacity-50">
+                                            <Activity className="w-8 h-8 mx-auto text-slate-500" />
+                                            <p className="text-xs font-bold uppercase tracking-widest">Noch keine Level-Daten</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
 
                         {/* Preferences */}
                         <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
