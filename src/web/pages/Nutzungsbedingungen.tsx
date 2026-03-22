@@ -137,20 +137,19 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             </p>
             <div className="mt-8 flex items-center gap-6 opacity-40">
               <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Last Updated</span>
-                <span className="text-xs font-bold text-white">February 06, 2026</span>
+                <span className="text-xs font-bold text-white">March 22, 2026</span>
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div className="flex flex-col">
                 <span className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Version</span>
-                <span className="text-xs font-bold text-white">2.2.0 (Stable)</span>
+                <span className="text-xs font-bold text-white">2.0.0-beta</span>
               </div>
             </div>
           </header>
 
           <article className="space-y-24">
             <Section id="overview" title="1. Übersicht">
-              <p>ManagerX ist ein Discord-Bot, der Server-Management, Moderation, Leveling und Unterhaltungsfunktionen bereitstellt. Diese Bedingungen regeln den Zugriff auf und die Nutzung der ManagerX-Dienste, einschließlich unserer Website und API.</p>
+              <p>ManagerX ist ein Discord-Bot, der Server-Management, Moderation, Leveling und Unterhaltungsfunktionen bereitstellt. Diese Bedingungen regeln den Zugriff auf und die Nutzung der ManagerX-Dienste, einschließlich unserer Website und API. Die Nutzung erfolgt in Übereinstimmung mit unserer <Link to="/datenschutz" className="text-primary hover:underline font-bold">Datenschutzerklärung</Link>.</p>
               <p className="mt-4 text-slate-400 italic">Unsere Mission ist es, Discord-Communities sicherere und engagiertere Werkzeuge zur Verfügung zu stellen.</p>
             </Section>
 
@@ -179,10 +178,17 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
                   <span>Schutz Ihres Discord-Accounts vor unbefugtem Zugriff.</span>
                 </li>
                 <li className="flex gap-4 p-4 rounded-xl bg-white/5 border border-white/5">
-                  <span className="text-primary font-black">03</span>
-                  <span>Verantwortung für alle Aktionen, die durch falsch konfigurierte Moderations-Tools entstehen.</span>
+                   <span>Verantwortung für alle Aktionen, die durch falsch konfigurierte Moderations-Tools oder Berechtigungen entstehen.</span>
                 </li>
               </ul>
+              <div className="mt-8 p-6 rounded-2xl bg-primary/[0.02] border border-primary/20">
+                <h5 className="text-white font-bold mb-2 flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-primary" /> Globale Funktionen
+                </h5>
+                <p className="text-xs text-slate-400 leading-relaxed italic">
+                  Bestimmte Funktionen von ManagerX, wie etwa das globale Level-System (Global XP), wirken sich serverübergreifend aus. Durch Ihre Aktivität in teilnehmenden Communities willigen Sie ein, dass Ihre Daten (wie Level und XP) in einem globalen Kontext verarbeitet werden.
+                </p>
+              </div>
             </Section>
 
             <Section id="acceptable-use" title="5. Zulässige Nutzung">
@@ -196,7 +202,9 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
                   "DDoS-Angriffe",
                   "Verbreitung von Malware",
                   "Automatisierte API-Abfragen",
-                  "Reverse Engineering"
+                   "Reverse Engineering",
+                  "Raiding oder Massen-Spamming",
+                  "Nutzung von Self-Bots"
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 p-3 rounded-lg bg-[#111318] border border-white/5">
                     <AlertCircle className="w-3 h-3 text-red-500" />

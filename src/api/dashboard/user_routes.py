@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from src.api.dashboard.auth_routes import get_current_user
-from mx_devtools import SettingsDB
+from mx_devtools import SettingsDB, StatsDB
 import discord
 
 router = APIRouter(
@@ -19,12 +19,17 @@ async def get_user_settings(user: dict = Depends(get_current_user)):
         # Get language setting from SettingsDB
         language = settings_db.get_user_language(user_id)
         
+        # Get global stats from StatsDB
+        stats_db = StatsDB()
+        global_info = await stats_db.get_global_user_info(user_id)
+        
         return {
             "success": True, 
             "data": {
                 "user_id": str(user_id),
                 "language": language,
-                "username": user.get("username", "Unknown")
+                "username": user.get("username", "Unknown"),
+                "global_stats": global_info
             }
         }
     except Exception as e:

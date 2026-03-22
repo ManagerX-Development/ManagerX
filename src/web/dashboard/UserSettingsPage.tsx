@@ -16,7 +16,13 @@ import {
     Camera,
     Mail,
     Bell,
-    Lock
+    Lock,
+    BarChart3,
+    MessageSquare,
+    Trophy,
+    Mic,
+    Server,
+    Flame
 } from "lucide-react";
 import { useAuth } from "../components/AuthProvider";
 import { Button } from "../components/ui/button";
@@ -35,7 +41,8 @@ export default function UserSettingsPage() {
     // User Settings state
     const [settings, setSettings] = useState({
         username: "",
-        language: "de"
+        language: "de",
+        globalStats: null as any
     });
 
     useEffect(() => {
@@ -53,7 +60,8 @@ export default function UserSettingsPage() {
                     if (data.success && data.data) {
                         setSettings({
                             username: data.data.username || "",
-                            language: data.data.language || "de"
+                            language: data.data.language || "de",
+                            globalStats: data.data.global_stats
                         });
                     }
                 }
@@ -180,6 +188,99 @@ export default function UserSettingsPage() {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* Global Statistics */}
+                        {settings.globalStats && (
+                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+                                <CardHeader className="p-10 pb-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                                            <BarChart3 className="w-6 h-6 text-primary" />
+                                        </div>
+                                        <div>
+                                            <CardTitle className="text-2xl font-bold">Global Statistics</CardTitle>
+                                            <CardDescription>Deine Aktivitäten im gesamten ManagerX Network.</CardDescription>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="p-10 pt-4 space-y-8">
+                                    {/* Level Progress */}
+                                    <div className="p-6 rounded-3xl bg-white/5 border border-white/10 overflow-hidden relative">
+                                       <div className="absolute top-0 right-0 p-6 opacity-10">
+                                           <Sparkles className="w-16 h-16 text-primary" />
+                                       </div>
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="space-y-1">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Global Level</span>
+                                                <h3 className="text-4xl font-black text-white italic">Level {settings.globalStats.level}</h3>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total XP</span>
+                                                <p className="text-xl font-bold text-white">{Math.floor(settings.globalStats.xp).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
+                                                <span className="text-slate-500">Progress to Level {settings.globalStats.level + 1}</span>
+                                                <span className="text-primary">{Math.round((settings.globalStats.xp_progress / settings.globalStats.xp_needed) * 100)}%</span>
+                                            </div>
+                                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                                                <motion.div 
+                                                   initial={{ width: 0 }}
+                                                   animate={{ width: `${(settings.globalStats.xp_progress / settings.globalStats.xp_needed) * 100}%` }}
+                                                   className="h-full bg-gradient-to-r from-primary to-accent rounded-full" 
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-right">
+                                                {Math.floor(settings.globalStats.xp_needed - settings.globalStats.xp_progress).toLocaleString()} XP LEFT
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Simple Stats Grid */}
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
+                                            <MessageSquare className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                            <span className="text-2xl font-black text-white">{settings.globalStats.total_messages.toLocaleString()}</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Messages</span>
+                                        </div>
+                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
+                                            <Mic className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                            <span className="text-2xl font-black text-white">{Math.floor(settings.globalStats.total_voice_minutes).toLocaleString()}m</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Voice Time</span>
+                                        </div>
+                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
+                                            <Server className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                            <span className="text-2xl font-black text-white">{settings.globalStats.total_servers}</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Servers</span>
+                                        </div>
+                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
+                                            <Flame className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-colors" />
+                                            <span className="text-2xl font-black text-white">{settings.globalStats.daily_streak}d</span>
+                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Streak</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Achievements Preview */}
+                                    {settings.globalStats.achievements && settings.globalStats.achievements.length > 0 && (
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2">
+                                                <Trophy className="w-4 h-4 text-primary" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-white">Achievements ({settings.globalStats.achievements.length})</span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {settings.globalStats.achievements.map((a: any, i: number) => (
+                                                    <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-[10px] font-bold text-slate-300">
+                                                        <span>{a.icon}</span>
+                                                        <span>{a.name}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
 
                         {/* Preferences */}
                         <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">

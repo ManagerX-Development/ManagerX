@@ -138,7 +138,7 @@ export const Datenschutz = memo(function Datenschutz() {
             </p>
             <div className="mt-12 p-1 px-6 rounded-full bg-white/5 border border-white/10 w-fit flex items-center gap-4">
               <span className="w-2 h-2 rounded-full bg-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Status: DSGVO / GDPR Standard v2.0</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Status: DSGVO / GDPR Standard v2.1 (Aktualisiert)</span>
             </div>
           </header>
 
@@ -169,11 +169,11 @@ export const Datenschutz = memo(function Datenschutz() {
               <p>Bei der Interaktion mit ManagerX verarbeiten wir nur die absolut notwendigen Daten:</p>
               <div className="mt-8 grid gap-4">
                 {[
-                  { label: "Discord-IDs", desc: "Benutzer-, Server- und Channel-IDs für funktionale Zuweisungen." },
-                  { label: "Metadaten", desc: "Usernames, Rollen-Namen und Avatare für Embed-Darstellungen." },
-                  { label: "Moderationsdaten", desc: "Warnungen, Bann-Begründungen und Notizen zur Sicherheit." },
-                  { label: "Statistiken", desc: "XP-Werte, Level und Aktivitäts-Timestamps." },
-                  { label: "Configs", desc: "Server-spezifische Einstellungen (z.B. Willkommens-Kanäle)." }
+                   { label: "Discord-IDs", desc: "Benutzer-, Server- und Channel-IDs zur Identifizierung und Zuordnung von Befehlen." },
+                  { label: "Metadaten", desc: "Usernames, Rollen-Namen und Avatare zur Anzeige in Statistiken und Embeds." },
+                  { label: "Moderationsdaten", desc: "Warnungen, temporäre Notizen und Logs zur Sicherheit des Netzwerks." },
+                  { label: "Globale Statistiken", desc: "Globales Level-System, XP-Werte, Achievements und Aktivitäts-Streaks." },
+                  { label: "Server-Konfiguration", desc: "Einstellungen wie Willkommens-Kanäle, Log-Channels und Auto-Rollen." }
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4 p-5 rounded-2xl bg-[#111318] border border-white/5 group hover:border-primary/20 transition-all">
                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 border border-white/10 group-hover:bg-primary/10 transition-colors">
@@ -222,10 +222,11 @@ export const Datenschutz = memo(function Datenschutz() {
             <Section id="storage" title="6. Speicherdauer">
               <p>Wir speichern Daten nur so lange, wie es der Zweck erfordert:</p>
               <div className="mt-8 relative border-l border-white/10 ml-4 pl-8 space-y-12">
-                {[
-                  { title: "Moderationsdaten", time: "2 Jahre", info: "Zur Nachverfolgung." },
-                  { title: "Log-Dateien", time: "90 Tage", info: "Automatische Löschung." },
-                  { title: "Server-Daten", time: "Bis Beendigung", info: "Werden gelöscht, wenn der Bot den Server verlässt." }
+                 {[
+                  { title: "Statistiken & Level", time: "30 Tage", info: "Rohdaten der Aktivität werden nach 30 Tagen gelöscht (aggregierte Werte bleiben)." },
+                  { title: "Log-Dateien", time: "90 Tage", info: "System-Logs zur Fehlerbehebung werden automatisch bereinigt." },
+                  { title: "Moderationsdaten", time: "180 Tage", info: "Warnungen werden nach 180 Tagen automatisch aus dem aktiven System entfernt." },
+                  { title: "Server-Daten", time: "Permanent", info: "Werden sofort gelöscht, wenn der Bot den Server verlässt." }
                 ].map((t, i) => (
                   <div key={i} className="relative">
                     <div className="absolute -left-[2.35rem] top-1.5 w-6 h-6 rounded-full bg-[#0a0c10] border-2 border-primary flex items-center justify-center">
@@ -274,12 +275,25 @@ export const Datenschutz = memo(function Datenschutz() {
             </Section>
 
             <Section id="deletion" title="14. Daten löschen">
-              <p>Verwenden Sie den Command:</p>
-              <div className="mt-6 p-6 rounded-2xl bg-[#111318] border border-primary/20 font-mono text-primary flex items-center justify-between group">
-                <span className="text-xl">/user data delete</span>
-                <Trash2 className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+               <p>Transparenz ist uns wichtig. Sie können Ihre Daten jederzeit einsehen oder löschen:</p>
+              <div className="mt-8 grid gap-4">
+                <div className="p-6 rounded-2xl bg-[#111318] border border-primary/20 group">
+                  <p className="text-white font-bold text-sm mb-4">Exportieren (Art. 15 DSGVO):</p>
+                  <div className="font-mono text-primary flex items-center justify-between">
+                    <span className="text-lg">/user data get</span>
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <p className="mt-2 text-[10px] text-slate-500 italic">Erstellt ein JSON-Paket mit allen verknüpften Daten.</p>
+                </div>
+                <div className="p-6 rounded-2xl bg-[#111318] border border-primary/20 group">
+                  <p className="text-white font-bold text-sm mb-4">Löschen (Art. 17 DSGVO):</p>
+                  <div className="font-mono text-primary flex items-center justify-between">
+                    <span className="text-lg">/user data delete</span>
+                    <Trash2 className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                  </div>
+                  <p className="mt-2 text-[10px] text-slate-500 italic">Löscht Profile, Level und Einstellungen permanent.</p>
+                </div>
               </div>
-              <p className="mt-4 text-sm text-slate-500">Dies löscht alle persönlichen Daten permanent.</p>
             </Section>
 
             <Section id="contact" title="15. Kontakt">
