@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from src.api.dashboard.auth_routes import get_current_user
-from src.api.dashboard.routes import bot_instance
 from mx_devtools import SettingsDB, StatsDB
 import discord
 import sqlite3
@@ -22,6 +21,7 @@ router = APIRouter(
 @router.get("/settings")
 async def get_user_settings(user: dict = Depends(get_current_user)):
     """Fetch user settings from SettingsDB."""
+    from src.api.dashboard.routes import bot_instance
     settings_db = SettingsDB()
     try:
         user_id = int(user["id"])
