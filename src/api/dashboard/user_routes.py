@@ -21,6 +21,7 @@ router = APIRouter(
 @router.get("/settings")
 async def get_user_settings(user: dict = Depends(get_current_user)):
     """Fetch user settings from SettingsDB."""
+    from src.api.dashboard.routes import bot_instance
     settings_db = SettingsDB()
     try:
         user_id = int(user["id"])
@@ -75,8 +76,20 @@ async def get_user_settings(user: dict = Depends(get_current_user)):
                 """, (user_id,))
                 rows = cursor.fetchall()
                 for row in rows:
+                    guild_id = row[0]
+                    guild_name = "Unknown Server"
+                    guild_icon = None
+                    
+                    if bot_instance:
+                        guild = bot_instance.get_guild(guild_id)
+                        if guild:
+                            guild_name = guild.name
+                            guild_icon = guild.icon.url if guild.icon else None
+                            
                     top_servers.append({
-                        "guild_id": str(row[0]),
+                        "guild_id": str(guild_id),
+                        "name": guild_name,
+                        "icon_url": guild_icon,
                         "level": row[1],
                         "xp": row[2]
                     })

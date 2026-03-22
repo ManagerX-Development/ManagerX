@@ -202,7 +202,7 @@ class AutoDelete(ezcord.Cog):
 
             deleted_count = 0
             error_count = 0
-            cutoff_time = datetime.utcnow() - timedelta(seconds=duration)
+            cutoff_time = discord.utils.utcnow() - timedelta(seconds=duration)
 
             try:
                 messages_to_delete = []
@@ -265,7 +265,7 @@ class AutoDelete(ezcord.Cog):
         # Trenne alte und neue Nachrichten (Discord API Limitation)
         old_messages = []
         new_messages = []
-        two_weeks_ago = datetime.utcnow() - timedelta(days=14)
+        two_weeks_ago = discord.utils.utcnow() - timedelta(days=14)
 
         for msg in messages:
             if msg.created_at < two_weeks_ago:
