@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from src.api.dashboard.auth_routes import get_current_user
-from mx_devtools import SettingsDB, StatsDB
+from mx_devtools import SettingsDB, StatsDB, EconomyDatabase
 import discord
 import sqlite3
 import os
@@ -109,6 +109,10 @@ async def get_user_settings(user: dict = Depends(get_current_user)):
                 },
                 "global_chat": {
                     "total_messages": global_chat_messages
+                },
+                "economy": {
+                    "global_coins": EconomyDatabase().get_global_balance(user_id),
+                    "overrides": EconomyDatabase().get_equipped_overrides(user_id)
                 },
                 "top_servers": top_servers
             }
