@@ -49,7 +49,8 @@ export default function UserSettingsPage() {
         globalStats: null as any,
         moderation: null as any,
         globalChat: null as any,
-        topServers: [] as any[]
+        topServers: [] as any[],
+        is_private: false
     });
 
     useEffect(() => {
@@ -71,7 +72,8 @@ export default function UserSettingsPage() {
                             globalStats: data.data.global_stats,
                             moderation: data.data.moderation,
                             globalChat: data.data.global_chat,
-                            topServers: data.data.top_servers || []
+                            topServers: data.data.top_servers || [],
+                            is_private: data.data.is_private === 1
                         });
                     }
                 }
@@ -96,7 +98,10 @@ export default function UserSettingsPage() {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ language: settings.language })
+                body: JSON.stringify({ 
+                    language: settings.language,
+                    is_private: settings.is_private
+                })
             });
 
             if (res.ok) {
@@ -429,14 +434,31 @@ export default function UserSettingsPage() {
                                         <Label className="text-lg font-bold">System Sprache</Label>
                                         <p className="text-sm text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">Wähle deine bevorzugte Sprache für das Dashboard.</p>
                                     </div>
-                                    <select
-                                        className="bg-white/5 border border-white/10 rounded-xl px-6 h-12 text-white outline-none cursor-pointer hover:bg-white/10 transition-all font-bold"
-                                        value={settings.language}
-                                        onChange={(e) => setSettings({ ...settings, language: e.target.value })}
-                                    >
-                                        <option value="de" className="bg-[#1a1c1e]">Deutsch 🇩🇪</option>
-                                        <option value="en" className="bg-[#1a1c1e]">English 🇬🇧</option>
                                     </select>
+                                </div>
+
+                                <div className="p-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                                <div className="flex items-center justify-between group">
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <Shield className="w-4 h-4 text-primary" />
+                                            <Label className="text-lg font-bold">Privatsphäre bei Leaderboard</Label>
+                                        </div>
+                                        <p className="text-sm text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">
+                                            Wenn aktiviert, werden dein Name und dein Profilbild auf dem globalen Leaderboard anonymisiert.
+                                        </p>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <span className={cn("text-xs font-bold uppercase tracking-widest transition-colors", settings.is_private ? "text-primary" : "text-slate-500")}>
+                                            {settings.is_private ? "Anonym" : "Öffentlich"}
+                                        </span>
+                                        <Switch 
+                                            checked={settings.is_private}
+                                            onCheckedChange={(val) => setSettings({ ...settings, is_private: val })}
+                                            className="data-[state=checked]:bg-primary"
+                                        />
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>
