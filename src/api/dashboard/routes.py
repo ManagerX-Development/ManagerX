@@ -46,7 +46,7 @@ async def get_stats(request: Request):
     
     try:
         # Berechne Uptime (in Sekunden seit dem letzten Ready-Event)
-        uptime_seconds = (datetime.utcnow() - bot_instance.start_time).total_seconds() if hasattr(bot_instance, 'start_time') else 0
+        uptime_seconds = (discord.utils.utcnow() - bot_instance.start_time).total_seconds() if hasattr(bot_instance, 'start_time') else 0
         uptime_minutes, remainder = divmod(int(uptime_seconds), 60)
         uptime_hours, uptime_minutes = divmod(uptime_minutes, 60)
         uptime_days, uptime_hours = divmod(uptime_hours, 24)
@@ -85,14 +85,15 @@ async def get_leaderboard(limit: int = 50):
         leaderboard = []
         for row in rows:
             uid = row[0]
-            # Try to get user from cache first
-            user = bot_instance.get_user(uid)
+            is_private = row[5] if len(row) > 5 else 0
             
-            # If not in cache, we don't fetch_user here to avoid hitting rate limits 
-            # and slowing down the request significantly for 50 users.
-            
-            username = user.name if user else f"User {uid}"
-            avatar = user.display_avatar.url if user else None
+            if is_private:
+                username = "Anonymer Nutzer"
+                avatar = None
+            else:
+                user = bot_instance.get_user(uid)
+                username = user.name if user else f"User {uid}"
+                avatar = user.display_avatar.url if user else None
             
             leaderboard.append({
                 "user_id": str(uid),

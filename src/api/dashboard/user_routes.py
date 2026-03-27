@@ -114,7 +114,8 @@ async def get_user_settings(user: dict = Depends(get_current_user)):
                     "global_coins": EconomyDatabase().get_global_balance(user_id),
                     "overrides": EconomyDatabase().get_equipped_overrides(user_id)
                 },
-                "top_servers": top_servers
+                "top_servers": top_servers,
+                "is_private": global_info.get('is_private', 0) if global_info else 0
             }
         }
     except Exception as e:
@@ -131,6 +132,16 @@ async def update_user_settings(request: Request, user: dict = Depends(get_curren
         # Update language in SettingsDB if provided
         if "language" in data:
             settings_db.set_user_language(user_id, data["language"])
+            
+        # Update privacy in StatsDB if provided
+        if "is_private" in data:
+            stats_db = StatsDB()
+            async with stats_db.lock:
+                stats_db.cursor.execute(
+                    "UPDATE global_user_levels SET is_private = ? WHERE user_id = ?", 
+                    (1 if data["is_private"] else 0, user_id)
+                )
+                stats_db.conn.commit()
                 
         return {"success": True}
     except Exception as e:
