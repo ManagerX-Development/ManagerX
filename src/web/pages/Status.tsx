@@ -24,8 +24,8 @@ const Status = memo(function Status() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        // Abfrage an die neue FastAPI-Route für echte Bot-Daten
-        const response = await fetch("https://api.managerx-bot.de/v1/managerx/stats");
+        const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8040";
+        const response = await fetch(`${baseUrl}/v1/managerx/stats`);
         if (!response.ok) throw new Error("Offline");
 
         const result = await response.json();
