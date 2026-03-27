@@ -69,60 +69,51 @@ export default function SettingsPage() {
     const [theme, setTheme] = useState("dark");
     const [language, setLanguage] = useState("de");
 
+    const [stats, setStats] = useState<any>(null);
+
     React.useEffect(() => {
-        const fetchSettings = async () => {
+        const fetchAllData = async () => {
             if (!token || !guildId) return;
+            setIsLoading(true);
             try {
                 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
 
-                // Fetch settings
-                const settingsRes = await fetch(`${baseUrl}/dashboard/settings/${guildId}`, {
+                // Fetch EVERYTHING in ONE call
+                const res = await fetch(`${baseUrl}/dashboard/guilds/${guildId}/mega-data`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
-                if (settingsRes.ok) {
-                    const data = await settingsRes.json();
-                    if (data.success && data.data) {
-                        setBotName(data.data.bot_name || "ManagerX");
-                        setPrefix(data.data.prefix || "!");
-                        setAutoMod(data.data.auto_mod ?? true);
-                        setWelcomeMessage(data.data.welcome_message ?? false);
-                        setLanguage(data.data.language || "de");
+                
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.success && json.data) {
+                        const { settings, metadata, stats: guildStats } = json.data;
+                        
+                        // Set General Settings
+                        setBotName(settings.bot_name || "ManagerX");
+                        setPrefix(settings.prefix || "!");
+                        setAutoMod(settings.auto_mod ?? true);
+                        setWelcomeMessage(settings.welcome_message ?? false);
+                        setLanguage(settings.language || "de");
+
+                        // Set Guild Metadata
+                        setGuildData({
+                            channels: metadata.channels || [],
+                            roles: metadata.roles || [],
+                            categories: metadata.categories || [],
+                            voiceChannels: metadata.voice_channels || []
+                        });
+
+                        // Set Stats
+                        setStats(guildStats);
                     }
                 }
-
-                // Fetch Guild Data (Channels, Roles, Categories, VoiceChannels)
-                const [channelsRes, rolesRes, catsRes, vcsRes] = await Promise.all([
-                    fetch(`${baseUrl}/dashboard/guilds/${guildId}/channels`, {
-                        headers: { "Authorization": `Bearer ${token}` }
-                    }),
-                    fetch(`${baseUrl}/dashboard/guilds/${guildId}/roles`, {
-                        headers: { "Authorization": `Bearer ${token}` }
-                    }),
-                    fetch(`${baseUrl}/dashboard/guilds/${guildId}/categories`, {
-                        headers: { "Authorization": `Bearer ${token}` }
-                    }),
-                    fetch(`${baseUrl}/dashboard/guilds/${guildId}/voice_channels`, {
-                        headers: { "Authorization": `Bearer ${token}` }
-                    })
-                ]);
-
-                if (channelsRes.ok && rolesRes.ok && catsRes.ok && vcsRes.ok) {
-                    const channels = await channelsRes.json();
-                    const roles = await rolesRes.json();
-                    const categories = await catsRes.json();
-                    const voiceChannels = await vcsRes.json();
-                    setGuildData({
-                        channels: channels.channels || [],
-                        roles: roles.roles || [],
-                        categories: categories.categories || [],
-                        voiceChannels: voiceChannels.channels || []
-                    });
-                }
             } catch (e) {
-                console.error("Failed to fetch guild data", e);
+                console.error("Failed to fetch consolidated dashboard data", e);
+            } finally {
+                setIsLoading(false);
             }
         };
-        fetchSettings();
+        fetchAllData();
     }, [token, guildId]);
 
     const handleSave = async () => {

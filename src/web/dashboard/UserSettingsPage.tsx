@@ -434,6 +434,13 @@ export default function UserSettingsPage() {
                                         <Label className="text-lg font-bold">System Sprache</Label>
                                         <p className="text-sm text-muted-foreground group-hover:text-muted-foreground/80 transition-colors">Wähle deine bevorzugte Sprache für das Dashboard.</p>
                                     </div>
+                                    <select
+                                        className="bg-white/5 border border-white/10 rounded-xl px-6 h-12 text-white outline-none cursor-pointer hover:bg-white/10 transition-all font-bold"
+                                        value={settings.language}
+                                        onChange={(e) => setSettings({ ...settings, language: e.target.value })}
+                                    >
+                                        <option value="de" className="bg-[#1a1c1e]">Deutsch 🇩🇪</option>
+                                        <option value="en" className="bg-[#1a1c1e]">English 🇬🇧</option>
                                     </select>
                                 </div>
 

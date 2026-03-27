@@ -7,13 +7,20 @@ import OverviewCharts from "./OverviewCharts";
 
 interface OverviewSettingsProps {
     guildId: string | null;
+    initialStats?: any;
 }
 
-export default function OverviewSettings({ guildId }: OverviewSettingsProps) {
-    const [stats, setStats] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
+export default function OverviewSettings({ guildId, initialStats }: OverviewSettingsProps) {
+    const [stats, setStats] = useState<any>(initialStats || null);
+    const [loading, setLoading] = useState(!initialStats);
 
     useEffect(() => {
+        if (initialStats) {
+            setStats(initialStats);
+            setLoading(false);
+            return;
+        }
+
         const fetchStats = async () => {
             if (!guildId) return;
             const token = localStorage.getItem("token");
@@ -36,7 +43,7 @@ export default function OverviewSettings({ guildId }: OverviewSettingsProps) {
             setLoading(true);
             fetchStats();
         }
-    }, [guildId]);
+    }, [guildId, initialStats]);
 
     // Prepare chart data from API history
     const messageData = (stats?.history || []).map((h: any) => ({

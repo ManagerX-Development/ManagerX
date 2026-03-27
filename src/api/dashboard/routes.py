@@ -326,6 +326,60 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
             "messages_today": 0
         }
 
+@dashboard_main_router.get("/guilds/{guild_id}/mega-data")
+async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
+    """Consolidated endpoint for dashboard landing page (Settings, Stats, Metadata)."""
+    if bot_instance is None:
+        raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
+    
+    guild = bot_instance.get_guild(guild_id)
+    if not guild:
+         raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
+    
+    member = guild.get_member(int(user["id"]))
+    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+        raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+    try:
+        # 1. Fetch Stats (reuse logic)
+        try:
+            stats = await get_guild_stats(guild_id, user)
+        except:
+            stats = {}
+
+        # 2. Fetch Settings
+        guild_lang = "de"
+        if hasattr(bot_instance, 'settings_db'):
+            guild_lang = bot_instance.settings_db.get_guild_language(guild_id)
+
+        # 3. Fetch Metadata
+        channels = [{"id": str(c.id), "name": c.name} for c in guild.text_channels]
+        roles = [{"id": str(r.id), "name": r.name, "color": str(r.color)} for r in guild.roles if not r.is_default() and not r.managed]
+        categories = [{"id": str(c.id), "name": c.name} for c in guild.categories]
+        voice_channels = [{"id": str(c.id), "name": c.name} for c in guild.voice_channels]
+
+        return {
+            "success": True,
+            "data": {
+                "settings": {
+                    "bot_name": bot_instance.user.name,
+                    "prefix": "!",
+                    "auto_mod": True,
+                    "welcome_message": False,
+                    "language": guild_lang
+                },
+                "stats": stats,
+                "metadata": {
+                    "channels": channels,
+                    "roles": roles,
+                    "categories": categories,
+                    "voice_channels": voice_channels
+                }
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 dashboard_main_router.include_router(auth_router)
 dashboard_main_router.include_router(settings_router)
 dashboard_main_router.include_router(user_router)
