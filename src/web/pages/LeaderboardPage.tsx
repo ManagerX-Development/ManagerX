@@ -26,7 +26,7 @@ export const LeaderboardPage = memo(function LeaderboardPage() {
         const fetchLeaderboard = async () => {
             try {
                 const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8040";
-                const response = await fetch(`${baseUrl}/dashboard/v1/managerx/leaderboard`);
+                const response = await fetch(`${baseUrl}/v1/managerx/leaderboard`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success) {

@@ -4,7 +4,7 @@ import os
 import discord
 from src.api.dashboard.auth_routes import get_current_user
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import time
 # Falls du Schemas nutzt: from .schemas import ServerStatus, UserInfo
 
@@ -45,8 +45,15 @@ async def get_stats(request: Request):
         raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
     
     try:
-        # Berechne Uptime (in Sekunden seit dem letzten Ready-Event)
-        uptime_seconds = (discord.utils.utcnow() - bot_instance.start_time).total_seconds() if hasattr(bot_instance, 'start_time') else 0
+        # Berechne Uptime (Robust gegen Naive/Aware-Mix)
+        now = discord.utils.utcnow()
+        start = getattr(bot_instance, 'start_time', now)
+        
+        # Sicherstellen, dass beide aware sind
+        if start.tzinfo is None:
+             start = start.replace(tzinfo=timezone.utc)
+             
+        uptime_seconds = (now - start).total_seconds()
         uptime_minutes, remainder = divmod(int(uptime_seconds), 60)
         uptime_hours, uptime_minutes = divmod(uptime_minutes, 60)
         uptime_days, uptime_hours = divmod(uptime_hours, 24)
@@ -383,5 +390,5 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
 dashboard_main_router.include_router(auth_router)
 dashboard_main_router.include_router(settings_router)
 dashboard_main_router.include_router(user_router)
-dashboard_main_router.include_router(router_public)
+# dashboard_main_router.include_router(router_public) # Move to main.py for root access
 
