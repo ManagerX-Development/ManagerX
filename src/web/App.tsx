@@ -14,6 +14,7 @@ const Status = lazy(() => import("./pages/Status"));
 const CommandsPage = lazy(() => import("./pages/CommandsPage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
+const LeaderboardPage = lazy(() => import("./pages/LeaderboardPage"));
 const License = lazy(() => import("./pages/License").then(module => ({ default: module.License })));
 const LoginPage = lazy(() => import("./dashboard/LoginPage"));
 const SettingsPage = lazy(() => import("./dashboard/SettingsPage"));
@@ -104,6 +105,7 @@ const MainRoutes = () => {
             <Route path="/status" element={<Status />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
+            <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/dash/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dash/settings" element={<SettingsPage />} />

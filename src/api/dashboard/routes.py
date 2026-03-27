@@ -68,6 +68,46 @@ async def get_stats(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router_public.get("/leaderboard")
+async def get_leaderboard(limit: int = 50):
+    """
+    Fetches the global leaderboard from StatsDB and enriches it with Discord data.
+    """
+    from mx_devtools import StatsDB
+    if bot_instance is None:
+        raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
+    
+    try:
+        stats_db = StatsDB()
+        # get_leaderboard returns user_id, global_level, global_xp, total_messages, total_voice_minutes
+        rows = await stats_db.get_leaderboard(limit=limit)
+        
+        leaderboard = []
+        for row in rows:
+            uid = row[0]
+            # Try to get user from cache first
+            user = bot_instance.get_user(uid)
+            
+            # If not in cache, we don't fetch_user here to avoid hitting rate limits 
+            # and slowing down the request significantly for 50 users.
+            
+            username = user.name if user else f"User {uid}"
+            avatar = user.display_avatar.url if user else None
+            
+            leaderboard.append({
+                "user_id": str(uid),
+                "username": username,
+                "avatar_url": avatar,
+                "level": row[1],
+                "xp": row[2],
+                "messages": row[3],
+                "voice_minutes": round(row[4], 1)
+            })
+            
+        return {"success": True, "leaderboard": leaderboard}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router_public.get("/version")
 async def get_version(request: Request):
     return {

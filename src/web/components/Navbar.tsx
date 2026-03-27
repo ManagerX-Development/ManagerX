@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import {
   Shield, Menu, X, Sparkles, Puzzle, Activity, Terminal,
-  Newspaper, Users, Milestone, ChevronDown, LayoutDashboard, User // Added User
+  Newspaper, Users, Milestone, ChevronDown, LayoutDashboard, User, Trophy // Added Trophy
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useAuth } from "./AuthProvider";
@@ -11,6 +11,7 @@ import { useAuth } from "./AuthProvider";
 const mainLinks = [
   { label: "Features", href: "/#features", icon: Sparkles },
   { label: "Commands", href: "/commands", icon: Terminal },
+  { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
 ];
 
 const dropdownLinks = [

@@ -11,6 +11,7 @@ from typing import List, Optional, Dict, Tuple
 import aiohttp
 import io
 import json
+import random
 from datetime import datetime, timedelta
 import ezcord
 from collections import defaultdict
@@ -273,6 +274,24 @@ class EmbedBuilder:
         
         # Author mit Badges und Username-Tag
         author_text, badges = self._build_author_info(message.author)
+        
+        # --- ECONOMY OVERRIDES ---
+        from mx_devtools import EconomyDatabase
+        eco_db = EconomyDatabase()
+        overrides = eco_db.get_equipped_overrides(message.author.id)
+        
+        # Color Override
+        if 'color' in overrides:
+            embed_color = self._parse_color(overrides['color'])
+            embed.color = embed_color
+            
+        # Emoji Override
+        if 'emoji' in overrides:
+            emoji = overrides['emoji']
+            # Add emoji to the author name
+            author_text = f"{emoji} {author_text}"
+        # -------------------------
+
         embed.set_author(
             name=author_text,
             icon_url=message.author.display_avatar.url
@@ -835,6 +854,31 @@ class GlobalChat(ezcord.Cog):
                 except (discord.Forbidden, discord.NotFound):
                     pass # Kann Nachricht nicht löschen/reagieren
                 return
+
+        # --- ECONOMY: Award Coins ---
+        from mx_devtools import EconomyDatabase
+        eco_db = EconomyDatabase()
+        # Award 5-15 coins per message with a simple cooldown check
+        user_info = eco_db.get_user_economy_info(message.author.id)
+        last_msg_raw = user_info.get('last_message_at')
+        can_earn = True
+        if last_msg_raw:
+            try:
+                # Handle common SQLite formats
+                try:
+                    last_dt = datetime.strptime(last_msg_raw, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    last_dt = datetime.fromisoformat(last_msg_raw)
+                
+                if datetime.utcnow() < last_dt + timedelta(seconds=30):
+                    can_earn = False
+            except Exception: pass
+            
+        if can_earn:
+            amount = random.randint(5, 15)
+            eco_db.add_global_coins(message.author.id, amount)
+            eco_db.update_last_message(message.author.id)
+        # ----------------------------
 
         # Rate Limiting prüfen
         bucket = self.message_cooldown.get_bucket(message)
