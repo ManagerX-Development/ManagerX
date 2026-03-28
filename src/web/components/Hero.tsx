@@ -2,7 +2,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Shield, Users, MessageCircle, Sparkles, Zap, Activity, ArrowRight } from "lucide-react";
-import { useStats } from "@/hooks/useStats";
+import { useStats } from "../hooks/useStats";
 
 export const Hero = memo(function Hero() {
   const { data, isLoading } = useStats();
@@ -61,12 +61,12 @@ export const Hero = memo(function Hero() {
 
           {/* Title */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-7xl md:text-9xl font-bold mb-8 tracking-tighter leading-tight"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: "spring", damping: 20 }}
+            className="text-8xl md:text-[11rem] font-black mb-8 tracking-tighter leading-[0.85] select-none"
           >
-            Manager<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent drop-shadow-[0_0_30px_rgba(255,0,0,0.3)]">X</span>
+            Manager<span className="text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary to-accent drop-shadow-[0_0_50px_rgba(220,38,38,0.5)]">X</span>
           </motion.h1>
 
           {/* Description */}
@@ -74,10 +74,10 @@ export const Hero = memo(function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl text-muted-foreground max-w-3xl mb-12 font-medium leading-relaxed"
+            className="text-xl md:text-2xl text-muted-foreground max-w-2xl mb-14 font-medium leading-relaxed opacity-80"
           >
             Die nächste Generation der Discord Server-Verwaltung. <br className="hidden md:block" />
-            <span className="text-foreground">Sicher, schnell und vollständig anpassbar.</span>
+            <span className="text-white">Sicher, blitzschnell und grenzenlos anpassbar.</span>
           </motion.p>
 
           {/* Action Row */}
@@ -85,26 +85,26 @@ export const Hero = memo(function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-5 mb-20"
+            className="flex flex-col sm:flex-row items-center gap-6 mb-24"
           >
             <motion.a
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
               href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary inline-flex items-center gap-3"
+              className="btn-primary inline-flex items-center gap-3 !px-12 !py-5 !text-xl shadow-[0_20px_50px_-12px_rgba(220,38,38,0.5)]"
             >
               <span>Bot einladen</span>
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-6 h-6" />
             </motion.a>
             <motion.a
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05, bg: "rgba(255,255,255,0.1)" }}
+              whileTap={{ scale: 0.95 }}
               href="#features"
-              className="inline-flex items-center gap-2 px-10 py-4.5 rounded-2xl glass border border-white/10 font-bold text-lg text-white shadow-lg"
+              className="inline-flex items-center gap-2 px-12 py-5 rounded-2xl glass border border-white/10 font-bold text-xl text-white shadow-xl transition-all"
             >
-              Features entdecken
+              Learn More
             </motion.a>
           </motion.div>
 

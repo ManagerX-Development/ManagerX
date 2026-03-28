@@ -232,6 +232,12 @@ export default function UserSettingsPage() {
                                             <div className="text-right">
                                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total XP</span>
                                                 <p className="text-xl font-bold text-white">{Math.floor(settings.globalStats.xp).toLocaleString()}</p>
+                                                {settings.globalStats.rank && (
+                                                    <div className="mt-1 flex items-center justify-end gap-1 text-primary">
+                                                        <Trophy className="w-3 h-3" />
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest">Rank #{settings.globalStats.rank}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="space-y-2">

@@ -40,7 +40,7 @@ export default function AuthCallback() {
                 login(data.access_token, data.user, data.discord_token);
 
                 toast.success(`Willkommen zurück, ${data.user.username}!`);
-                navigate("/dash/settings"); // Redirect to dashboard / settings
+                navigate("/dash/guilds"); // Redirect to server hub
             } catch (err: any) {
                 console.error("Auth Error:", err);
                 setError(err.message || "Es gab ein Problem beim Anmelden.");

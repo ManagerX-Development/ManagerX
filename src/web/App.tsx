@@ -19,6 +19,7 @@ const License = lazy(() => import("./pages/License").then(module => ({ default: 
 const LoginPage = lazy(() => import("./dashboard/LoginPage"));
 const SettingsPage = lazy(() => import("./dashboard/SettingsPage"));
 const UserSettingsPage = lazy(() => import("./dashboard/UserSettingsPage"));
+const GuildSelectionPage = lazy(() => import("./dashboard/GuildSelectionPage"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 const queryClient = new QueryClient();
@@ -64,6 +65,7 @@ const DashboardRoutes = () => {
             <Route path="/dash/login" element={<LoginPage />} />
             <Route path="/dash/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/dash/guilds" element={<GuildSelectionPage />} />
             <Route path="/dash/settings" element={<SettingsPage />} />
             <Route path="/dash" element={<LoginPage />} />
             <Route path="/" element={<LoginPage />} />
@@ -108,6 +110,7 @@ const MainRoutes = () => {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/dash/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/dash/guilds" element={<GuildSelectionPage />} />
             <Route path="/dash/settings" element={<SettingsPage />} />
             <Route path="/dash/login" element={<LoginPage />} />
             <Route path="/dash/user/settings" element={<UserSettingsPage />} />

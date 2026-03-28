@@ -75,10 +75,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     if (data.user) setUser(data.user);
                     if (data.guilds) {
                         setGuilds(data.guilds);
-                        // Select first guild if none selected
-                        if (!selectedGuildId && data.guilds.length > 0) {
-                            handleSetSelectedGuildId(data.guilds[0].id);
-                        }
                     }
                 })
                 .catch(err => {

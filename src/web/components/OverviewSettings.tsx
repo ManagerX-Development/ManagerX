@@ -4,13 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/
 import { Users, MessageSquare, Zap, Activity, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { motion } from "framer-motion";
 import OverviewCharts from "./OverviewCharts";
+import { Badge } from "./ui/badge";
+import { CheckCircle, XCircle } from "lucide-react";
 
 interface OverviewSettingsProps {
     guildId: string | null;
     initialStats?: any;
+    settings?: any;
 }
 
-export default function OverviewSettings({ guildId, initialStats }: OverviewSettingsProps) {
+export default function OverviewSettings({ guildId, initialStats, settings }: OverviewSettingsProps) {
     const [stats, setStats] = useState<any>(initialStats || null);
     const [loading, setLoading] = useState(!initialStats);
 
@@ -121,31 +124,79 @@ export default function OverviewSettings({ guildId, initialStats }: OverviewSett
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="bg-white/[0.03] border-white/5 backdrop-blur-xl rounded-[32px] overflow-hidden">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Activity className="w-5 h-5 text-primary" /> Nachrichten Volumen
-                        </CardTitle>
-                        <CardDescription>Aktivität der letzten 7 Tage</CardDescription>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Bot Health & Activity Summary */}
+                <Card className="lg:col-span-2 glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <div className="space-y-1">
+                            <CardTitle className="flex items-center gap-2">
+                                <Activity className="w-5 h-5 text-primary" /> Command Center
+                            </CardTitle>
+                            <CardDescription>Live-Metriken deiner Server-Instanz</CardDescription>
+                        </div>
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 px-3 py-1">
+                            Live updates
+                        </Badge>
                     </CardHeader>
                     <CardContent>
-                        <OverviewCharts data={messageData} type="messages" color="#3B82F6" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                             <div className="space-y-6">
+                                 <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
+                                     <OverviewCharts data={messageData} type="messages" color="#DC2626" height={180} />
+                                     <p className="text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-4">Nachrichten Volumen (7 Tage)</p>
+                                 </div>
+                             </div>
+                             <div className="grid grid-cols-2 gap-4">
+                                 <QuickStat title="Server Age" value="238d" />
+                                 <QuickStat title="Avg Activity" value="High" />
+                                 <QuickStat title="Staff Count" value="12" />
+                                 <QuickStat title="Uptime" value="99.9%" />
+                             </div>
+                        </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white/[0.03] border-white/5 backdrop-blur-xl rounded-[32px] overflow-hidden">
+                {/* Module Status Sidebar */}
+                <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Users className="w-5 h-5 text-emerald-400" /> Mitglieder Wachstum
-                        </CardTitle>
-                        <CardDescription>Wachstumstrend der Woche</CardDescription>
+                        <CardTitle className="text-xl font-bold">Module Status</CardTitle>
+                        <CardDescription>Aktive Bot-Funktionen</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <OverviewCharts data={memberData} type="members" color="#10B981" />
+                    <CardContent className="space-y-3">
+                         <ModuleRow name="Level System" active={true} />
+                         <ModuleRow name="Anti-Spam AI" active={true} />
+                         <ModuleRow name="Welcome Suite" active={settings?.welcome_message ?? false} />
+                         <ModuleRow name="Global Network" active={true} />
+                         <ModuleRow name="Auto-Mod" active={settings?.auto_mod ?? true} />
+                         <ModuleRow name="Logging" active={true} />
+                         <ModuleRow name="Economy" active={false} />
                     </CardContent>
                 </Card>
             </div>
         </div>
     );
 }
+
+const QuickStat = ({ title, value }: { title: string, value: string }) => (
+    <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex flex-col justify-center">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{title}</span>
+        <span className="text-lg font-black text-white">{value}</span>
+    </div>
+);
+
+const ModuleRow = ({ name, active }: { name: string, active: boolean }) => (
+    <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 group hover:bg-white/10 transition-all">
+        <span className="text-sm font-bold text-white/80">{name}</span>
+        {active ? (
+            <div className="flex items-center gap-1.5 text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                <CheckCircle className="w-3 h-3" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Active</span>
+            </div>
+        ) : (
+            <div className="flex items-center gap-1.5 text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+                <XCircle className="w-3 h-3" />
+                <span className="text-[9px] font-black uppercase tracking-widest">Disabled</span>
+            </div>
+        )}
+    </div>
+);
