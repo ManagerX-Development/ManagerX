@@ -82,9 +82,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     if (data.guilds) {
                         setGuilds(data.guilds);
                     }
-                }
-            })
-            .catch(() => logout());
+                })
+                .catch(() => logout());
         }
     }, [token]);
 
