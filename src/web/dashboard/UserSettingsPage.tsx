@@ -139,19 +139,19 @@ export default function UserSettingsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
-                    <div className="flex items-center gap-6">
-                        <Link to="/dash/settings">
-                            <Button variant="outline" size="icon" className="group rounded-2xl w-14 h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all shadow-xl shadow-black/20">
-                                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+                    <div className="flex items-center gap-5">
+                        <Link to="/dash/guilds">
+                            <Button variant="outline" size="icon" className="group rounded-xl w-12 h-12 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all shadow-xl shadow-black/20">
+                                <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             </Button>
                         </Link>
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit">
-                                <Settings className="w-3.5 h-3.5 text-primary" />
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Global Settings</span>
+                        <div className="space-y-0.5">
+                            <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 w-fit">
+                                <User className="w-3 h-3 text-primary" />
+                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">User Intelligence</span>
                             </div>
-                            <h1 className="text-5xl font-extrabold tracking-tighter text-white">User <span className="text-primary">Settings</span></h1>
-                            <p className="text-muted-foreground text-sm font-medium opacity-70">Verwalte deine persönlichen Präferenzen im ManagerX Network.</p>
+                            <h1 className="text-4xl font-black tracking-tighter text-white leading-none">Profil <span className="text-primary">Kontrolle</span></h1>
+                            <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest opacity-40">Personalisierung & Metriken</p>
                         </div>
                     </div>
 
@@ -173,151 +173,153 @@ export default function UserSettingsPage() {
                     {/* Settings Form */}
                     <div className="space-y-8">
                         {/* Account Info */}
-                        <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                            <CardHeader className="p-10 pb-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                                        <User className="w-6 h-6 text-primary" />
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-2xl font-bold">Account</CardTitle>
-                                        <CardDescription>Angemeldet als {settings.username}</CardDescription>
-                                    </div>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="p-10 pt-4">
-                                <div className="flex items-center gap-6 p-6 rounded-3xl bg-white/5 border border-white/10">
-                                    <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-2xl">
+                        <Card className="glass border-white/10 shadow-2xl rounded-[2rem] overflow-hidden">
+                            <CardContent className="p-8 flex items-center justify-between gap-6">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-16 h-16 rounded-[1.25rem] overflow-hidden shadow-2xl border-2 border-primary/20 group relative">
                                         {user?.avatar ? (
                                             <img src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=256`} alt="Avatar" className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full bg-primary/20 flex items-center justify-center text-primary text-2xl font-bold">
+                                            <div className="w-full h-full bg-primary/20 flex items-center justify-center text-primary text-xl font-bold">
                                                 {settings.username?.substring(0, 1).toUpperCase()}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="space-y-1">
-                                        <h2 className="text-xl font-bold text-white leading-none">{settings.username}</h2>
-                                        <p className="text-muted-foreground text-sm font-medium opacity-70">Discord ID: {user?.id}</p>
+                                    <div className="space-y-0.5">
+                                        <h2 className="text-2xl font-black text-white leading-none tracking-tight">{settings.username}</h2>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-40">Discord ID: {user?.id}</p>
+                                    </div>
+                                </div>
+                                <div className="hidden md:block">
+                                    <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                                        ManagerX Account Verified
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        {/* Global Statistics */}
+                        {/* Quick Metrics & Rank */}
+                        {settings.globalStats && (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Rank Card */}
+                                <Card className="glass border-primary/20 bg-primary/5 shadow-2xl rounded-[2rem] flex flex-col items-center justify-center p-8 text-center relative overflow-hidden group hover:border-primary/40 transition-all">
+                                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                                        <Trophy className="w-16 h-16 text-primary" />
+                                    </div>
+                                    <Trophy className="w-8 h-8 text-primary mb-4" />
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-1">Globaler Rang</p>
+                                    <h2 className="text-6xl font-black text-white italic tracking-tighter">
+                                        #{settings.globalStats.rank || "???"}
+                                    </h2>
+                                    <div className="mt-4 px-3 py-1 rounded-full bg-primary/20 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-widest">
+                                        Top Tier Network
+                                    </div>
+                                </Card>
+
+                                <Card className="md:col-span-2 glass border-white/10 shadow-2xl rounded-[2rem] p-8 flex flex-col justify-center">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
+                                                <Zap className="w-6 h-6 text-primary" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold text-white tracking-tight">Level {settings.globalStats.level}</h3>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">{Math.floor(settings.globalStats.xp).toLocaleString()} Gesamt XP</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs font-black text-primary uppercase tracking-widest">{Math.round((settings.globalStats.xp_progress / settings.globalStats.xp_needed) * 100)}%</p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <div className="h-2.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                            <motion.div 
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${(settings.globalStats.xp_progress / settings.globalStats.xp_needed) * 100}%` }}
+                                                className="h-full bg-gradient-to-r from-primary to-accent rounded-full" 
+                                            />
+                                        </div>
+                                        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-40">
+                                            <span>Level {settings.globalStats.level}</span>
+                                            <span>{Math.floor(settings.globalStats.xp_needed - settings.globalStats.xp_progress).toLocaleString()} XP bis Level {settings.globalStats.level + 1}</span>
+                                        </div>
+                                    </div>
+                                </Card>
+                            </div>
+                        )}
+
+                        {/* Global Network Insights */}
                         {settings.globalStats && (
                             <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                                <CardHeader className="p-10 pb-4">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                                            <BarChart3 className="w-6 h-6 text-primary" />
-                                        </div>
-                                        <div>
-                                            <CardTitle className="text-2xl font-bold">Global Statistics</CardTitle>
-                                            <CardDescription>Deine Aktivitäten im gesamten ManagerX Network.</CardDescription>
-                                        </div>
+                                <CardHeader className="p-10 pb-4 flex flex-row items-center gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
+                                        <BarChart3 className="w-6 h-6 text-primary" />
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-2xl font-bold">Netzwerk Insights</CardTitle>
+                                        <CardDescription>Deine Performance im gesamten ManagerX Network.</CardDescription>
                                     </div>
                                 </CardHeader>
-                                <CardContent className="p-10 pt-4 space-y-8">
-                                    {/* Level Progress */}
-                                    <div className="p-6 rounded-3xl bg-white/5 border border-white/10 overflow-hidden relative">
-                                       <div className="absolute top-0 right-0 p-6 opacity-10">
-                                           <Sparkles className="w-16 h-16 text-primary" />
-                                       </div>
-                                        <div className="flex items-center justify-between mb-4">
-                                            <div className="space-y-1">
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Global Level</span>
-                                                <h3 className="text-4xl font-black text-white italic">Level {settings.globalStats.level}</h3>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total XP</span>
-                                                <p className="text-xl font-bold text-white">{Math.floor(settings.globalStats.xp).toLocaleString()}</p>
-                                                {settings.globalStats.rank && (
-                                                    <div className="mt-1 flex items-center justify-end gap-1 text-primary">
-                                                        <Trophy className="w-3 h-3" />
-                                                        <span className="text-[10px] font-bold uppercase tracking-widest">Rank #{settings.globalStats.rank}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                                                <span className="text-slate-500">Progress to Level {settings.globalStats.level + 1}</span>
-                                                <span className="text-primary">{Math.round((settings.globalStats.xp_progress / settings.globalStats.xp_needed) * 100)}%</span>
-                                            </div>
-                                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                                <motion.div 
-                                                   initial={{ width: 0 }}
-                                                   animate={{ width: `${(settings.globalStats.xp_progress / settings.globalStats.xp_needed) * 100}%` }}
-                                                   className="h-full bg-gradient-to-r from-primary to-accent rounded-full" 
-                                                />
-                                            </div>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest text-right">
-                                                {Math.floor(settings.globalStats.xp_needed - settings.globalStats.xp_progress).toLocaleString()} XP LEFT
-                                            </p>
-                                        </div>
-                                    </div>
-
+                                <CardContent className="p-10 pt-4 space-y-10">
                                     {/* Simple Stats Grid */}
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
-                                            <MessageSquare className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-all">
+                                            <MessageSquare className="w-4 h-4 text-primary mb-2 opacity-40 group-hover:opacity-100 transition-opacity" />
                                             <span className="text-2xl font-black text-white">{settings.globalStats.total_messages.toLocaleString()}</span>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Messages</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Messages</span>
                                         </div>
-                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
-                                            <Mic className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity" />
-                                            <span className="text-2xl font-black text-white">{Math.floor(settings.globalStats.total_voice_minutes).toLocaleString()}m</span>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Voice Time</span>
+                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-all">
+                                            <Mic className="w-4 h-4 text-primary mb-2 opacity-40 group-hover:opacity-100 transition-opacity" />
+                                            <span className="text-2xl font-black text-white">{Math.floor(settings.globalStats.total_voice_minutes / 60).toLocaleString()}h</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Talk Time</span>
                                         </div>
-                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
-                                            <Server className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-opacity" />
+                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-all">
+                                            <Server className="w-4 h-4 text-primary mb-2 opacity-40 group-hover:opacity-100 transition-opacity" />
                                             <span className="text-2xl font-black text-white">{settings.globalStats.total_servers}</span>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Servers</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Presence</span>
                                         </div>
-                                        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-colors">
-                                            <Flame className="w-4 h-4 text-primary mb-2 opacity-50 group-hover:opacity-100 transition-colors" />
+                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/10 flex flex-col gap-1 group hover:border-primary/30 transition-all">
+                                            <Flame className="w-4 h-4 text-primary mb-2 opacity-40 group-hover:opacity-100 transition-opacity" />
                                             <span className="text-2xl font-black text-white">{settings.globalStats.daily_streak}d</span>
-                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Streak</span>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40">Streak</span>
                                         </div>
                                     </div>
 
                                     {/* Advanced Global Stats */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                                <Calendar className="w-5 h-5 text-primary" />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/10 flex items-center gap-5 group hover:bg-white/[0.07] transition-all">
+                                            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <Calendar className="w-6 h-6 text-primary" />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Mitglied seit</p>
-                                                <p className="text-sm font-bold text-white">
-                                                    {settings.globalStats.first_seen ? new Date(settings.globalStats.first_seen).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Unbekannt'}
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 mb-1">Dabei seit</p>
+                                                <p className="text-base font-bold text-white">
+                                                    {settings.globalStats.first_seen ? new Date(settings.globalStats.first_seen).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' }) : '---'}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                                                <Award className="w-5 h-5 text-accent" />
+                                        <div className="p-5 rounded-3xl bg-white/5 border border-white/10 flex items-center gap-5 group hover:bg-white/[0.07] transition-all">
+                                            <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <History className="w-6 h-6 text-accent" />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Beste Streak</p>
-                                                <p className="text-sm font-bold text-white">{settings.globalStats.best_streak || settings.globalStats.daily_streak} Tage</p>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-40 mb-1">Letzte Aktivität</p>
+                                                <p className="text-base font-bold text-white">Heute</p>
                                             </div>
                                         </div>
                                     </div>
 
-
                                     {/* Achievements Preview */}
                                     {settings.globalStats.achievements && settings.globalStats.achievements.length > 0 && (
-                                        <div className="space-y-4">
+                                        <div className="space-y-4 pt-4">
                                             <div className="flex items-center gap-2">
-                                                <Trophy className="w-4 h-4 text-primary" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-white">Achievements ({settings.globalStats.achievements.length})</span>
+                                                <Award className="w-4 h-4 text-primary" />
+                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white opacity-60">Freigeschalete Achievements ({settings.globalStats.achievements.length})</span>
                                             </div>
-                                            <div className="flex flex-wrap gap-2">
+                                            <div className="flex flex-wrap gap-3">
                                                 {settings.globalStats.achievements.map((a: any, i: number) => (
-                                                    <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-[10px] font-bold text-slate-300">
-                                                        <span>{a.icon}</span>
+                                                    <div key={i} className="flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/5 border border-white/5 text-[11px] font-bold text-slate-300 hover:bg-white/10 hover:border-primary/20 transition-all cursor-default group">
+                                                        <span className="group-hover:scale-125 transition-transform">{a.icon}</span>
                                                         <span>{a.name}</span>
                                                     </div>
                                                 ))}
@@ -423,15 +425,13 @@ export default function UserSettingsPage() {
 
                         {/* Preferences */}
                         <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                            <CardHeader className="p-10 pb-4">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center border border-accent/20">
-                                        <Globe className="w-6 h-6 text-accent" />
-                                    </div>
-                                    <div>
-                                        <CardTitle className="text-2xl font-bold">Präferenzen</CardTitle>
-                                        <CardDescription>System-Einstellungen und Verhaltensweisen.</CardDescription>
-                                    </div>
+                            <CardHeader className="p-10 pb-4 flex flex-row items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center border border-accent/20">
+                                    <Globe className="w-6 h-6 text-accent" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-2xl font-bold">Präferenzen</CardTitle>
+                                    <CardDescription>System-Einstellungen und Verhaltensweisen.</CardDescription>
                                 </div>
                             </CardHeader>
                             <CardContent className="p-10 pt-4 space-y-10">
@@ -477,14 +477,14 @@ export default function UserSettingsPage() {
                         </Card>
                     </div>
                 </div>
-            </div>
 
-            {/* Footer */}
-            <div className="mt-20 py-10 w-full text-center opacity-30 border-t border-white/5 flex flex-col items-center gap-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-white">© 2026 OPPRO.NET DEVELOPMENT</p>
-                <div className="flex items-center gap-2">
-                    <Zap className="w-3 h-3 text-primary" />
-                    <span className="text-[10px] uppercase font-bold tracking-widest">User Intelligence Module</span>
+                {/* Footer */}
+                <div className="mt-20 py-10 w-full text-center opacity-30 border-t border-white/5 flex flex-col items-center gap-2">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-white">© 2026 OPPRO.NET DEVELOPMENT</p>
+                    <div className="flex items-center gap-2">
+                        <Zap className="w-3 h-3 text-primary" />
+                        <span className="text-[10px] uppercase font-bold tracking-widest">User Intelligence Module</span>
+                    </div>
                 </div>
             </div>
         </div>

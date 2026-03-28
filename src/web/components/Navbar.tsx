@@ -119,37 +119,37 @@ export function Navbar() {
         )}>
           {/* Left: Logo */}
           <div className="flex-1 flex justify-start">
-            <Link to="/" className="flex items-center gap-3 group shrink-0">
+            <Link to="/" className="flex items-center gap-2 group shrink-0">
               <motion.div
-                className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 text-white relative overflow-hidden"
+                className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 text-white relative overflow-hidden"
                 whileHover={{ scale: 1.1, rotate: -5 }}
               >
-                <Shield className="w-5 h-5 drop-shadow-glow" />
+                <Shield className="w-4.5 h-4.5 drop-shadow-glow" />
               </motion.div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold tracking-tight text-white leading-none">
+                <span className="text-lg font-black tracking-tighter text-white leading-none">
                   Manager<span className="text-primary">X</span>
                 </span>
-                <span className="text-[9px] text-muted-foreground font-semibold uppercase tracking-[0.2em] mt-1 opacity-50">Stable 2.0.0</span>
+                <span className="text-[8px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1 opacity-40">v2.0 Stable</span>
               </div>
             </Link>
           </div>
 
           {/* Center: Desktop Navigation */}
-          <div className="hidden md:flex flex-1 justify-center">
-            <div className="flex items-center gap-1">
+          <div className="hidden md:flex flex-[2] justify-center">
+            <div className="flex items-center gap-0.5">
               {mainLinks.map((link) => (
                 <Link
                   key={link.label}
                   to={link.href}
                   className={cn(
-                    "relative text-sm font-medium transition-all duration-300 flex items-center gap-2 px-4 py-2 rounded-xl",
+                    "relative text-[13px] font-bold transition-all duration-300 flex items-center gap-2 px-3.5 py-1.5 rounded-lg",
                     location.pathname === link.href
                       ? "text-primary bg-primary/5"
                       : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                   )}
                 >
-                  <link.icon className={cn("w-4 h-4 opacity-70", location.pathname === link.href && "opacity-100")} />
+                  <link.icon className={cn("w-3.5 h-3.5 opacity-60", location.pathname === link.href && "opacity-100 text-primary")} />
                   {link.label}
                 </Link>
               ))}
@@ -158,32 +158,32 @@ export function Navbar() {
           </div>
 
           {/* Right: CTA & Mobile Menu */}
-          <div className="flex-1 flex justify-end items-center gap-4">
-            <div className="hidden md:flex items-center gap-3">
+          <div className="flex-1 flex justify-end items-center gap-3">
+            <div className="hidden md:flex items-center gap-2">
               {isAuthenticated ? (
                 <div className="flex items-center gap-2">
                   <Link
                     to="/dash/user/settings"
-                    className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 transition-all text-muted-foreground hover:text-white group"
+                    className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-primary/50 transition-all text-muted-foreground hover:text-white group"
                   >
-                    <User className="w-5 h-5" />
+                    <User className="w-4 h-4" />
                   </Link>
                   <Link
                     to="/dash/guilds"
-                    className="btn-primary inline-flex items-center gap-2.5 !px-6 !py-2.5 !text-sm group"
+                    className="btn-primary inline-flex items-center gap-2 !px-4 !py-2 !text-[13px] group"
                   >
-                    <LayoutDashboard className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                    <LayoutDashboard className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
                     <span>Dashboard</span>
                   </Link>
                 </div>
               ) : (
                 <Link
                   to="/dash/login"
-                  className="relative group px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-primary/50 transition-all overflow-hidden"
+                  className="relative group px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-primary/50 transition-all overflow-hidden"
                 >
                   <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative flex items-center gap-2 text-sm font-semibold text-white">
-                    <Sparkles className="w-4 h-4 text-primary" />
+                  <div className="relative flex items-center gap-2 text-[13px] font-bold text-white">
+                    <Sparkles className="w-3.5 h-3.5 text-primary" />
                     Login
                   </div>
                 </Link>
