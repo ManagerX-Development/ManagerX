@@ -18,7 +18,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
         avatar: "L",
         github: "https://github.com/Medicopter117",
         youtube: "https://youtube.com/@LennyPegauOfficial117",
-        instagram: "https://instagram.com/LennyPegauOfficial",
+        instagram: "https://instagram.com/lenny.pegau.official",
         website: "https://oppro-network.de",
         color: "from-primary to-accent"
     },

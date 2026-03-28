@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-interface User {
-    id: string;
-    username: string;
-    avatar: string | null;
-}
-
 interface AuthContextType {
     token: string | null;
     user: any | null;
@@ -30,9 +24,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(newUser);
         localStorage.setItem("token", newToken);
         localStorage.setItem("user", JSON.stringify(newUser));
-        if (newDiscordToken) {
-            localStorage.setItem("discord_token", newDiscordToken);
-        }
+        if (newDiscordToken) localStorage.setItem("discord_token", newDiscordToken);
     };
 
     const logout = () => {
@@ -40,29 +32,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setGuilds([]);
         setSelectedGuildId(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("discord_token");
-        localStorage.removeItem("selectedGuildId");
+        localStorage.clear();
     };
 
-    const handleSetSelectedGuildId = (id: string) => {
-        setSelectedGuildId(id);
-        localStorage.setItem("selectedGuildId", id);
-    };
+    // --- AUTOMATISCHER CALLBACK-HANDLER ---
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+        const path = params.get("p");
 
-    // Fetch guilds and validate session if authenticated
+        if (code && (window.location.pathname.includes("auth/callback") || path?.includes("/auth/callback"))) {
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
+            
+            fetch(`${baseUrl}/dashboard/auth/callback`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code })
+            })
+            .then(res => res.ok ? res.json() : Promise.reject(res))
+            .then(data => {
+                login(data.access_token, data.user, data.discord_token);
+                window.history.replaceState({}, document.title, "/");
+            })
+            .catch(err => console.error("Login Error:", err));
+        }
+    }, []);
+
+    // --- USER & GUILDS LADEN ---
     useEffect(() => {
         if (token) {
-            const discordToken = localStorage.getItem("discord_token");
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-
+            const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
             fetch(`${baseUrl}/dashboard/auth/me`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
-                    "X-Discord-Token": discordToken || ""
+                    "X-Discord-Token": localStorage.getItem("discord_token") || ""
                 }
             })
+
                 .then(async (res) => {
                     if (res.status === 401) {
                         logout();
@@ -76,33 +82,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     if (data.guilds) {
                         setGuilds(data.guilds);
                     }
-                })
-                .catch(err => {
-                    console.error("Auth me error:", err);
-                });
+                }
+            })
+            .catch(() => logout());
         }
     }, [token]);
 
     return (
         <AuthContext.Provider value={{
-            token,
-            user,
-            guilds,
-            selectedGuildId,
+            token, user, guilds, selectedGuildId,
             isAuthenticated: !!token,
-            login,
-            logout,
-            setSelectedGuildId: handleSetSelectedGuildId
+            login, logout, setSelectedGuildId: (id) => {
+                setSelectedGuildId(id);
+                localStorage.setItem("selectedGuildId", id);
+            }
         }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export function useAuth() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
-}
+export const useAuth = () => useContext(AuthContext)!;
