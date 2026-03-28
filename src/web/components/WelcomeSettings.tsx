@@ -45,10 +45,10 @@ export default function WelcomeSettings({ guildId }: { guildId: string }) {
         const fetchData = async () => {
             if (!token || !guildId) return;
             try {
-                const base = "http://localhost:8040/dashboard/settings";
+                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
 
                 // Fetch Channels
-                const channelRes = await fetch(`http://localhost:8040/v1/managerx/dashboard/guilds/${guildId}/channels`, {
+                const channelRes = await fetch(`${baseUrl}/dashboard/guilds/${guildId}/channels`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (channelRes.ok) {
@@ -57,7 +57,7 @@ export default function WelcomeSettings({ guildId }: { guildId: string }) {
                 }
 
                 // Fetch Welcome Settings
-                const settingsRes = await fetch(`${base}/${guildId}/welcome`, {
+                const settingsRes = await fetch(`${baseUrl}/dashboard/settings/${guildId}/welcome`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (settingsRes.ok) {
@@ -97,7 +97,8 @@ export default function WelcomeSettings({ guildId }: { guildId: string }) {
                 ping_user: pingUser
             };
 
-            const res = await fetch(`http://localhost:8040/dashboard/settings/${guildId}/welcome`, {
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
+            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/welcome`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
