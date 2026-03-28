@@ -205,20 +205,33 @@ export default function SettingsPage() {
                             <div className="glass rounded-[2rem] border border-white/10 p-4 sticky top-8 shadow-2xl">
                                 <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1 items-stretch">
                                     <TabItem value="overview" icon={LayoutDashboard} label="Dashboard" />
-                                    <CategoryHeader>System</CategoryHeader>
+                                    
+                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Core Suite</span>
+                                    </div>
                                     <TabItem value="general" icon={Settings} label="Zentrale" />
                                     <TabItem value="appearance" icon={Palette} label="Design & Theme" />
                                     <TabItem value="notifications" icon={Bell} label="Alerts & Logs" />
 
-                                    <CategoryHeader>Engagement</CategoryHeader>
+                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Engagement</span>
+                                    </div>
                                     <TabItem value="levels" icon={Trophy} label="Level System" />
                                     <TabItem value="welcome" icon={Heart} label="Welcome Suite" />
 
-                                    <CategoryHeader>Security & Safety</CategoryHeader>
+                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Protection</span>
+                                    </div>
                                     <TabItem value="antispam" icon={Zap} label="Anti-Spam AI" />
                                     <TabItem value="logging" icon={ClipboardList} label="Advanced Audit" />
 
-                                    <CategoryHeader>Utility</CategoryHeader>
+                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Expansion</span>
+                                    </div>
                                     <TabItem value="globalchat" icon={Globe} label="Global Network" />
                                     <TabItem value="autorole" icon={ShieldCheck} label="Auto-Roles" />
                                     <TabItem value="autodelete" icon={Trash2} label="Auto-Delete" />
@@ -238,7 +251,7 @@ export default function SettingsPage() {
                                     transition={{ duration: 0.3, ease: "easeOut" }}
                                 >
                                     <TabsContent value="overview" className="mt-0 outline-none">
-                                        {guildId ? <OverviewSettings guildId={guildId} /> : <NoGuildPlaceholder />}
+                                        {guildId ? <OverviewSettings guildId={guildId} initialStats={stats} settings={{ auto_mod: autoMod, welcome_message: welcomeMessage }} /> : <NoGuildPlaceholder />}
                                     </TabsContent>
 
                                     <TabsContent value="general" className="mt-0 outline-none">

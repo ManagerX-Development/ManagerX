@@ -68,14 +68,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     "X-Discord-Token": localStorage.getItem("discord_token") || ""
                 }
             })
-            .then(res => res.status === 401 ? logout() : res.json())
-            .then(data => {
-                if (data?.user) setUser(data.user);
-                if (data?.guilds) {
-                    setGuilds(data.guilds);
-                    if (!selectedGuildId && data.guilds.length > 0) {
-                        setSelectedGuildId(data.guilds[0].id);
-                        localStorage.setItem("selectedGuildId", data.guilds[0].id);
+
+                .then(async (res) => {
+                    if (res.status === 401) {
+                        logout();
+                        throw new Error("Session expired");
+                    }
+                    if (!res.ok) throw new Error("Failed to fetch user data");
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.user) setUser(data.user);
+                    if (data.guilds) {
+                        setGuilds(data.guilds);
                     }
                 }
             })

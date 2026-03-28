@@ -169,7 +169,7 @@ export function Navbar() {
                     <User className="w-5 h-5" />
                   </Link>
                   <Link
-                    to="/dash/settings"
+                    to="/dash/guilds"
                     className="btn-primary inline-flex items-center gap-2.5 !px-6 !py-2.5 !text-sm group"
                   >
                     <LayoutDashboard className="w-4 h-4 group-hover:rotate-12 transition-transform" />
