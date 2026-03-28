@@ -138,7 +138,7 @@ export const Datenschutz = memo(function Datenschutz() {
             </p>
             <div className="mt-12 p-1 px-6 rounded-full bg-white/5 border border-white/10 w-fit flex items-center gap-4">
               <span className="w-2 h-2 rounded-full bg-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Status: DSGVO / GDPR Standard v2.1 (Aktualisiert)</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Status: DSGVO / GDPR Standard v2.2 (Aktualisiert am 28. März 2026)</span>
             </div>
           </header>
 
@@ -264,6 +264,14 @@ export const Datenschutz = memo(function Datenschutz() {
             <Section id="decisions" title="11. Automatische Entscheidungen">
               <p>ManagerX trifft keine vollautomatisierten Entscheidungen im Sinne des Art. 22 DSGVO, die Ihnen gegenüber rechtliche Wirkung entfalten oder Sie in ähnlicher Weise erheblich beeinträchtigen.</p>
               <p className="mt-4">Der Bot führt jedoch funktionale Automatisierungen durch, wie etwa die automatische Zuweisung von Community-Rollen basierend auf Ihrer Aktivität (Level-System) oder das automatische Löschen von Nachrichten gemäß den Server-Einstellungen.</p>
+              <div className="mt-8 p-6 rounded-2xl bg-[#111318] border border-primary/20">
+                <h5 className="text-white font-bold mb-2 flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-primary" /> Anonymität im Leaderboard
+                </h5>
+                <p className="text-sm text-slate-400 leading-relaxed italic">
+                  Sie haben das Recht und die technische Möglichkeit, Ihr Profil auf dem globalen Leaderboard zu anonymisieren. Über das Dashboard können Sie festlegen, ob Ihr Discord-Name und Ihr Profilbild ausgeblendet werden sollen. In diesem Fall erscheinen Sie als 'Anonymer Nutzer'. Die technischen XP-Daten bleiben zur Aufrechterhaltung des Level-Systems gespeichert, werden aber nicht mehr öffentlich mit Ihrer Identität verknüpft.
+                </p>
+              </div>
             </Section>
 
             <Section id="tracking" title="12. Cookies & Tracking">

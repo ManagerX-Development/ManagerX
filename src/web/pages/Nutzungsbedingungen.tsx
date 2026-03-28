@@ -137,7 +137,7 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             </p>
             <div className="mt-8 flex items-center gap-6 opacity-40">
               <div className="flex flex-col">
-                <span className="text-xs font-bold text-white">March 22, 2026</span>
+                <span className="text-xs font-bold text-white">March 28, 2026</span>
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div className="flex flex-col">
@@ -186,7 +186,7 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
                   <Shield className="w-4 h-4 text-primary" /> Globale Funktionen
                 </h5>
                 <p className="text-xs text-slate-400 leading-relaxed italic">
-                  Bestimmte Funktionen von ManagerX, wie etwa das globale Level-System (Global XP), wirken sich serverübergreifend aus. Durch Ihre Aktivität in teilnehmenden Communities willigen Sie ein, dass Ihre Daten (wie Level und XP) in einem globalen Kontext verarbeitet werden.
+                  Bestimmte Funktionen von ManagerX, wie etwa das globale Level-System (Global XP), wirken sich serverübergreifend aus. Durch Ihre Aktivität in teilnehmenden Communities willigen Sie ein, dass Ihre Daten (wie Level und XP) in einem globalen Kontext verarbeitet werden. Innerhalb des Global XP Systems bieten wir die Option zur Anonymisierung Ihres Profils auf dem globalen Leaderboard an (erreichbar über die User-Einstellungen im Dashboard).
                 </p>
               </div>
             </Section>
