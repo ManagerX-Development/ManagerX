@@ -48,7 +48,7 @@ export default function WelcomeSettings({ guildId }: { guildId: string }) {
                 const base = "http://localhost:8040/dashboard/settings";
 
                 // Fetch Channels
-                const channelRes = await fetch(`${base}/${guildId}/channels`, {
+                const channelRes = await fetch(`http://localhost:8040/v1/managerx/dashboard/guilds/${guildId}/channels`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (channelRes.ok) {

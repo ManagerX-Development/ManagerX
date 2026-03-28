@@ -163,7 +163,13 @@ async def get_guild_channels(guild_id: int, user: dict = Depends(get_current_use
     
     # Check if user is in guild and has appropriate permissions (Manage Guild or Admin)
     member = guild.get_member(int(user["id"]))
-    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+    if not member:
+        try:
+            member = await guild.fetch_member(int(user["id"]))
+        except:
+            raise HTTPException(status_code=403, detail="Nutzer nicht auf dem Server gefunden")
+
+    if not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     channels = [
@@ -183,7 +189,13 @@ async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user))
          raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
     
     member = guild.get_member(int(user["id"]))
-    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+    if not member:
+        try:
+            member = await guild.fetch_member(int(user["id"]))
+        except:
+            raise HTTPException(status_code=403, detail="Nutzer nicht auf dem Server gefunden")
+
+    if not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     roles = [
@@ -203,7 +215,13 @@ async def get_guild_categories(guild_id: int, user: dict = Depends(get_current_u
          raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
     
     member = guild.get_member(int(user["id"]))
-    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+    if not member:
+        try:
+            member = await guild.fetch_member(int(user["id"]))
+        except:
+            raise HTTPException(status_code=403, detail="Nutzer nicht auf dem Server gefunden")
+
+    if not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     categories = [
@@ -223,7 +241,13 @@ async def get_guild_voice_channels(guild_id: int, user: dict = Depends(get_curre
          raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
     
     member = guild.get_member(int(user["id"]))
-    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+    if not member:
+        try:
+            member = await guild.fetch_member(int(user["id"]))
+        except:
+            raise HTTPException(status_code=403, detail="Nutzer nicht auf dem Server gefunden")
+
+    if not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     channels = [
@@ -243,7 +267,13 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
          raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
     
     member = guild.get_member(int(user["id"]))
-    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+    if not member:
+        try:
+            member = await guild.fetch_member(int(user["id"]))
+        except:
+            raise HTTPException(status_code=403, detail="Nutzer nicht auf dem Server gefunden")
+
+    if not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     # Fetch daily growth/activity
@@ -344,7 +374,13 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
          raise HTTPException(status_code=404, detail="Guild not found or bot not in guild")
     
     member = guild.get_member(int(user["id"]))
-    if not member or not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
+    if not member:
+        try:
+            member = await guild.fetch_member(int(user["id"]))
+        except:
+            raise HTTPException(status_code=403, detail="Nutzer nicht auf dem Server gefunden")
+
+    if not (member.guild_permissions.manage_guild or member.guild_permissions.administrator):
         raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     try:
