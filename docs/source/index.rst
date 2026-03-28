@@ -181,3 +181,13 @@ We welcome contributions from the community! Whether it's bug reports, feature r
 
 **© 2026 ManagerX Development**
 *Version 2.0.0-dev | Last Updated: December 7, 2025*
+
+.. toctree::
+   :maxdepth: 2
+   :caption: User Guide:
+
+   user_guide/index
+   :maxdepth: 2
+   :caption: Developer Guide:
+
+   Developer Guide <dev_guide/index>

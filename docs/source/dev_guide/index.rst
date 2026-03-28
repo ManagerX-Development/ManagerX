@@ -1,15 +1,12 @@
-Developer Guide
-======================
+Welcome to the Developer Guide for ManagerX.
+==========================================================
 
-Welcome to the ManagerX Developer Guide! This guide provides everything you need to understand the inner workings of ManagerX, contribute to its development, and extend its functionality.
-
-Whether you're looking to set up a local development environment, explore the architecture, build new features, or deploy your own instance — you'll find all the information here.
+learn about the API, the Dashboard, the Bot and more.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents
+   :caption: API:
 
-   Quick Start <getting_started/fast_setting_up>
-   architecture/index
-   contributing/index
-   deployment/index
+   Getting Started <api/getting_started>
+   Public Endpoints <api/publics_endpoints>
+   

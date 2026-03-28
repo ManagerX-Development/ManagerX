@@ -39,7 +39,7 @@ export default function GlobalChatSettings({ guildId }: { guildId: string }) {
                 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
 
                 // Fetch Channels
-                const channelRes = await fetch(`${baseUrl}/dashboard/settings/${guildId}/channels`, {
+                const channelRes = await fetch(`${baseUrl}/dashboard/guilds/${guildId}/channels`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (channelRes.ok) {
