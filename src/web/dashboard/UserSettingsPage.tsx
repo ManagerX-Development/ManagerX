@@ -140,7 +140,7 @@ export default function UserSettingsPage() {
                     className="flex flex-col md:flex-row md:items-center justify-between gap-6"
                 >
                     <div className="flex items-center gap-5">
-                        <Link to="/dash/guilds">
+                        <Link to="/">
                             <Button variant="outline" size="icon" className="group rounded-xl w-12 h-12 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all shadow-xl shadow-black/20">
                                 <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
                             </Button>
