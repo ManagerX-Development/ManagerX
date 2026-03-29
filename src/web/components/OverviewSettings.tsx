@@ -163,13 +163,13 @@ export default function OverviewSettings({ guildId, initialStats, settings }: Ov
                         <CardDescription>Aktive Bot-Funktionen</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                         <ModuleRow name="Level System" active={true} />
-                         <ModuleRow name="Anti-Spam AI" active={true} />
+                         <ModuleRow name="Level System" active={settings?.level_system ?? true} />
+                         <ModuleRow name="Anti-Spam AI" active={settings?.anti_spam ?? true} />
                          <ModuleRow name="Welcome Suite" active={settings?.welcome_message ?? false} />
-                         <ModuleRow name="Global Network" active={true} />
+                         <ModuleRow name="Global Network" active={settings?.global_network ?? true} />
                          <ModuleRow name="Auto-Mod" active={settings?.auto_mod ?? true} />
-                         <ModuleRow name="Logging" active={true} />
-                         <ModuleRow name="Economy" active={false} />
+                         <ModuleRow name="Logging" active={settings?.logging ?? true} />
+                         <ModuleRow name="Economy" active={settings?.economy ?? false} />
                     </CardContent>
                 </Card>
             </div>
