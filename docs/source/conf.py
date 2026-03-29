@@ -58,12 +58,25 @@ html_static_path = ['_static']
 html_css_files = [
     'custom.css',
 ]
+html_favicon = '_static/favicon.ico'
 html_theme_options = {
     "icon_links": [
         {
             "name": "GitHub",
             "url": "https://github.com/ManagerX-Development/ManagerX",
             "icon": "fa-brands fa-square-github",
+            "type": "fontawesome",
+        },
+        {
+            "name": "Website",
+            "url": "https://managerx-bot.de",
+            "icon": "fa-solid fa-globe",
+            "type": "fontawesome",
+        },
+        {
+            "name": "Instagram",
+            "url": "https://www.instagram.com/managerx_development",
+            "icon": "fa-brands fa-instagram",
             "type": "fontawesome",
         }
    ],

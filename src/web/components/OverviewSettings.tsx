@@ -146,11 +146,40 @@ export default function OverviewSettings({ guildId, initialStats, settings }: Ov
                                      <p className="text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-4">Nachrichten Volumen (7 Tage)</p>
                                  </div>
                              </div>
-                             <div className="grid grid-cols-2 gap-4">
-                                 <QuickStat title="Server Age" value="238d" />
-                                 <QuickStat title="Avg Activity" value="High" />
-                                 <QuickStat title="Staff Count" value="12" />
-                                 <QuickStat title="Uptime" value="99.9%" />
+                             <div className="flex flex-col gap-6">
+                                 <div className="grid grid-cols-2 gap-4">
+                                     <QuickStat title="Server Age" value={stats?.server_age || "--"} />
+                                     <QuickStat title="Avg Activity" value="High" />
+                                 </div>
+                                 
+                                 <div className="space-y-4">
+                                     <div className="flex items-center justify-between">
+                                         <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Team & Community</span>
+                                         <Badge variant="outline" className="text-[9px] h-4 bg-white/5 border-white/10 uppercase tracking-tighter">
+                                             { (stats?.staff_members?.length || 0) + (stats?.user_members?.length || 0) } Members
+                                         </Badge>
+                                     </div>
+                                     
+                                     <div className="space-y-2 max-h-[120px] overflow-y-auto pr-2 custom-scrollbar">
+                                         {stats?.staff_members?.map((m: any) => (
+                                             <div key={m.id} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
+                                                 <img src={m.avatar} alt="" className="w-6 h-6 rounded-full border border-primary/30" />
+                                                 <span className="text-xs font-bold text-white/90 truncate">{m.name}</span>
+                                                 <Badge className="ml-auto text-[8px] bg-primary/20 text-primary border-primary/20 h-4">TEAM</Badge>
+                                             </div>
+                                         ))}
+                                         {stats?.user_members?.map((m: any) => (
+                                             <div key={m.id} className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
+                                                 <img src={m.avatar} alt="" className="w-6 h-6 rounded-full border border-white/10" />
+                                                 <span className="text-xs font-bold text-white/90 truncate">{m.name}</span>
+                                                 <Badge className="ml-auto text-[8px] bg-white/10 text-white/60 border-white/10 h-4">USER</Badge>
+                                             </div>
+                                         ))}
+                                         {(!stats?.staff_members?.length && !stats?.user_members?.length) && (
+                                             <p className="text-[10px] text-muted-foreground italic text-center py-4">Keine Rollen definiert oder keine Mitglieder gefunden.</p>
+                                         )}
+                                     </div>
+                                 </div>
                              </div>
                         </div>
                     </CardContent>
