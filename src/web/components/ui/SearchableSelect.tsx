@@ -67,7 +67,7 @@ export function SearchableSelect({
                                 {type === "role" && (
                                     <div
                                         className="w-3 h-3 rounded-full shrink-0"
-                                        style={{ backgroundColor: selectedOption.color || "#99aab5" }}
+                                        style={{ backgroundColor: (selectedOption.color && selectedOption.color !== "#000000") ? selectedOption.color : "#99aab5" }}
                                     />
                                 )}
                                 <span className="truncate">{selectedOption.name}</span>
@@ -107,7 +107,7 @@ export function SearchableSelect({
                                     {type === "role" && (
                                         <div
                                             className="w-3 h-3 rounded-full shrink-0"
-                                            style={{ backgroundColor: option.color || "#99aab5" }}
+                                            style={{ backgroundColor: (option.color && option.color !== "#000000") ? option.color : "#99aab5" }}
                                         />
                                     )}
                                     <span className="truncate flex-1 text-white/90">{option.name}</span>

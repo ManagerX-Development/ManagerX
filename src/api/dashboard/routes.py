@@ -200,7 +200,8 @@ async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user))
 
     roles = [
         {"id": str(r.id), "name": r.name, "color": str(r.color)}
-        for r in guild.roles if not r.is_default() and not r.managed
+        for r in guild.roles
+        if not r.is_default() and not r.managed
     ]
     return {"roles": roles}
 
@@ -397,7 +398,11 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
 
         # 3. Fetch Metadata
         channels = [{"id": str(c.id), "name": c.name} for c in guild.text_channels]
-        roles = [{"id": str(r.id), "name": r.name, "color": str(r.color)} for r in guild.roles if not r.is_default() and not r.managed]
+        roles = [
+            {"id": str(r.id), "name": r.name, "color": str(r.color)}
+            for r in guild.roles
+            if not r.is_default() and not r.managed
+        ]
         categories = [{"id": str(c.id), "name": c.name} for c in guild.categories]
         voice_channels = [{"id": str(c.id), "name": c.name} for c in guild.voice_channels]
 
