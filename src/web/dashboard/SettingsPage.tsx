@@ -68,6 +68,8 @@ export default function SettingsPage() {
     const [welcomeMessage, setWelcomeMessage] = useState(false);
     const [theme, setTheme] = useState("dark");
     const [language, setLanguage] = useState("de");
+    const [userRoleId, setUserRoleId] = useState<string | null>(null);
+    const [teamRoleId, setTeamRoleId] = useState<string | null>(null);
 
     const [stats, setStats] = useState<any>(null);
 
@@ -94,6 +96,8 @@ export default function SettingsPage() {
                         setAutoMod(settings.auto_mod ?? true);
                         setWelcomeMessage(settings.welcome_message ?? false);
                         setLanguage(settings.language || "de");
+                        setUserRoleId(settings.user_role_id || null);
+                        setTeamRoleId(settings.team_role_id || null);
 
                         // Set Guild Metadata
                         setGuildData({
@@ -122,7 +126,7 @@ export default function SettingsPage() {
             const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
             const apiUrl = `${baseUrl}/dashboard/settings/${guildId}`;
 
-            const payload = { prefix, autoMod, welcomeMessage, language };
+            const payload = { prefix, autoMod, welcomeMessage, language, user_role_id: userRoleId, team_role_id: teamRoleId };
 
             const res = await fetch(apiUrl, {
                 method: "POST",
@@ -292,6 +296,38 @@ export default function SettingsPage() {
                                                         <div className="flex-1 flex items-center px-6 rounded-2xl border border-white/10 bg-white/5 text-sm md:text-base font-medium text-muted-foreground">
                                                             Beispiel: <span className="text-white font-mono ml-2 font-bold">{prefix}help</span>
                                                         </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                                                    <div className="space-y-4">
+                                                        <Label className="text-sm font-bold uppercase tracking-widest text-primary">Team Rolle</Label>
+                                                        <select 
+                                                            value={teamRoleId || ""} 
+                                                            onChange={(e) => setTeamRoleId(e.target.value || null)}
+                                                            className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
+                                                        >
+                                                            <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
+                                                            {guildData.roles.map(role => (
+                                                                <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
+                                                            ))}
+                                                        </select>
+                                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Mitglieder mit dieser Rolle werden als Staff im Dashboard angezeigt.</p>
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        <Label className="text-sm font-bold uppercase tracking-widest text-primary">User Rolle</Label>
+                                                        <select 
+                                                            value={userRoleId || ""} 
+                                                            onChange={(e) => setUserRoleId(e.target.value || null)}
+                                                            className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
+                                                        >
+                                                            <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
+                                                            {guildData.roles.map(role => (
+                                                                <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
+                                                            ))}
+                                                        </select>
+                                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Benutzer mit dieser Rolle werden im User-Quick-View angezeigt.</p>
                                                     </div>
                                                 </div>
                                             </CardContent>

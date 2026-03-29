@@ -333,6 +333,31 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
         m_trend, m_trend_val = calc_trend(messages_today, messages_yesterday)
         j_trend, j_trend_val = calc_trend(joined_today, joined_yesterday)
 
+        # Calculate Server Age (NEU)
+        server_age_days = (today_dt - guild.created_at).days
+        server_age_str = f"{server_age_days}d"
+
+        # Fetch Staff / User Role members (NEU)
+        staff_members_list = []
+        user_members_list = []
+        
+        if hasattr(bot_instance, 'settings_db') and hasattr(bot_instance.settings_db, 'get_guild_settings'):
+            guild_settings = bot_instance.settings_db.get_guild_settings(guild_id)
+            team_role_id = guild_settings.get("team_role_id")
+            user_role_id = guild_settings.get("user_role_id")
+            
+            if team_role_id:
+                team_role = guild.get_role(int(team_role_id))
+                if team_role:
+                    for m in team_role.members:
+                        staff_members_list.append({"name": m.display_name, "id": str(m.id), "avatar": m.display_avatar.url})
+            
+            if user_role_id:
+                user_role = guild.get_role(int(user_role_id))
+                if user_role:
+                    for m in user_role.members:
+                        user_members_list.append({"name": m.display_name, "id": str(m.id), "avatar": m.display_avatar.url})
+
         # Prepare final stats object
         total_members = guild.member_count or len(guild.members)
         online_members = 0
@@ -350,7 +375,10 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
             "messages_today": messages_today,
             "messages_trend": m_trend,
             "messages_trend_value": m_trend_val,
-            "history": history
+            "history": history,
+            "server_age": server_age_str,
+            "staff_members": staff_members_list,
+            "user_members": user_members_list
         }
         return stats
     except Exception as e:

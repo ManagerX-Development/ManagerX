@@ -54,7 +54,8 @@ async def get_settings(guild_id: int):
          raise HTTPException(status_code=503, detail="Bot database not ready")
          
     try:
-        guild_lang = bot_instance.settings_db.get_guild_language(guild_id) if hasattr(bot_instance.settings_db, 'get_guild_language') else "de"
+        guild_settings = bot_instance.settings_db.get_guild_settings(guild_id) if hasattr(bot_instance.settings_db, 'get_guild_settings') else {}
+        guild_lang = guild_settings.get("language", "de")
         
         return {
             "success": True,
@@ -63,7 +64,9 @@ async def get_settings(guild_id: int):
                 "prefix": "!" ,
                 "auto_mod": True,
                 "welcome_message": False,
-                "language": guild_lang
+                "language": guild_lang,
+                "user_role_id": str(guild_settings.get("user_role_id")) if guild_settings.get("user_role_id") else None,
+                "team_role_id": str(guild_settings.get("team_role_id")) if guild_settings.get("team_role_id") else None
             }
         }
     except Exception as e:
@@ -80,7 +83,18 @@ async def update_settings(guild_id: int, request: Request, user: dict = Depends(
     data = await request.json()
     
     try:
-        # Update logic...
+        # Update logic
+        update_data = {}
+        if "language" in data:
+             update_data["language"] = data["language"]
+        if "user_role_id" in data:
+             update_data["user_role_id"] = int(data["user_role_id"]) if data["user_role_id"] else None
+        if "team_role_id" in data:
+             update_data["team_role_id"] = int(data["team_role_id"]) if data["team_role_id"] else None
+             
+        if update_data and hasattr(bot_instance.settings_db, 'update_guild_settings'):
+            bot_instance.settings_db.update_guild_settings(guild_id, **update_data)
+
         user_name = user.get("username", "Unbekannter User")
         await send_dashboard_notification(guild_id, "Allgemein", user_name)
         return {"success": True, "message": "Settings updated"}
