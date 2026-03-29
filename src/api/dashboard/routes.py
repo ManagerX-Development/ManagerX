@@ -391,10 +391,45 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
         except:
             stats = {}
 
-        # 2. Fetch Settings
+        # 2. Fetch Settings & Module Status
+        from mx_devtools import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase
+        
+        # Check Level System
+        try:
+            lvl_conf = LevelDatabase().get_guild_config(guild_id)
+            level_active = lvl_conf.get("enabled", True) if lvl_conf else False
+        except:
+            level_active = False
+
+        # Check AntiSpam
+        try:
+            spam_conf = AntiSpamDatabase().get_spam_settings(guild_id)
+            antispam_active = bool(spam_conf)
+        except:
+            antispam_active = False
+
+        # Check Welcome
+        try:
+            welcome_conf = await WelcomeDatabase().get_welcome_settings(guild_id)
+            welcome_active = bool(welcome_conf and welcome_conf.get("channel_id"))
+        except:
+            welcome_active = False
+
+        # Check GlobalChat
+        try:
+            global_conf = GlobalChatDatabase().get_guild_settings(guild_id)
+            global_active = bool(global_conf and global_conf.get("channel_id"))
+        except:
+            global_active = False
+
+        # Check Logging
+        try:
+            log_conf = await LoggingDatabase().get_all_log_channels(guild_id)
+            logging_active = len(log_conf) > 0 if log_conf else False
+        except:
+            logging_active = False
+
         guild_lang = "de"
-        if hasattr(bot_instance, 'settings_db'):
-            guild_lang = bot_instance.settings_db.get_guild_language(guild_id)
 
         # 3. Fetch Metadata
         channels = [{"id": str(c.id), "name": c.name} for c in guild.text_channels]
@@ -412,9 +447,14 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
                 "settings": {
                     "bot_name": bot_instance.user.name,
                     "prefix": "!",
-                    "auto_mod": True,
-                    "welcome_message": False,
-                    "language": guild_lang
+                    "auto_mod": antispam_active,
+                    "welcome_message": welcome_active,
+                    "language": guild_lang,
+                    "level_system": level_active,
+                    "anti_spam": antispam_active,
+                    "global_network": global_active,
+                    "logging": logging_active,
+                    "economy": False
                 },
                 "stats": stats,
                 "metadata": {
