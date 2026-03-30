@@ -21,23 +21,7 @@ ALLOWED_IDS = [1427994077332373554]
 AUDIT_LOG_FILE = Path("data/admin_audit.json")
 BLACKLIST_FILE = Path("data/blacklist.json")
 
-class ConfirmView(View):
-    """Bestätigungsdialog für kritische Aktionen"""
-    def __init__(self, timeout=30):
-        super().__init__(timeout=timeout)
-        self.value = None
 
-    @discord.ui.button(label="✅ Bestätigen", style=discord.ButtonStyle.danger)
-    async def confirm(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.value = True
-        self.stop()
-        await interaction.response.defer()
-
-    @discord.ui.button(label="❌ Abbrechen", style=discord.ButtonStyle.secondary)
-    async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
-        self.value = False
-        self.stop()
-        await interaction.response.defer()
 
 
 class ServerListView:
@@ -322,6 +306,34 @@ class admin(ezcord.Cog, hidden=True):
         
         return True
 
+    async def request_confirmation(self, ctx: discord.ApplicationContext, container: Container, timeout: int = 30) -> bool:
+        """Helper to create a confirmation dialog with buttons and a designer container."""
+        view = discord.ui.DesignerView(container, timeout=timeout)
+        view.value = None
+        
+        async def confirm_callback(interaction: discord.Interaction):
+            view.value = True
+            view.stop()
+            await interaction.response.defer()
+            
+        async def cancel_callback(interaction: discord.Interaction):
+            view.value = False
+            view.stop()
+            await interaction.response.defer()
+            
+        confirm_btn = Button(label="✅ Bestätigen", style=discord.ButtonStyle.danger)
+        confirm_btn.callback = confirm_callback
+        
+        cancel_btn = Button(label="❌ Abbrechen", style=discord.ButtonStyle.secondary)
+        cancel_btn.callback = cancel_callback
+        
+        view.add_item(confirm_btn)
+        view.add_item(cancel_btn)
+        
+        await ctx.respond(view=view, ephemeral=True)
+        await view.wait()
+        return view.value if view.value is not None else False
+
     def log_command(self, ctx):
         """Loggt Admin-Commands"""
         AUDIT_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -414,11 +426,7 @@ class admin(ezcord.Cog, hidden=True):
         container.add_text("# ⚠️ Shutdown bestätigen")
         container.add_text("Bist du sicher, dass du den Bot herunterfahren möchtest?")
         
-        view = ConfirmView()
-        await ctx.respond(view=discord.ui.DesignerView(container, timeout=30), ephemeral=True)
-        await view.wait()
-        
-        if view.value:
+        if await self.request_confirmation(ctx, container):
             container = Container(color=discord.Color.red())
             container.add_text("# ⚠️ ManagerX wird heruntergefahren...")
             container.add_separator()
@@ -437,11 +445,7 @@ class admin(ezcord.Cog, hidden=True):
         container.add_text("# ⚠️ Restart bestätigen")
         container.add_text("Bist du sicher, dass du den Bot neustarten möchtest?")
         
-        view = ConfirmView()
-        await ctx.respond(view=discord.ui.DesignerView(container, timeout=30), ephemeral=True)
-        await view.wait()
-        
-        if view.value:
+        if await self.request_confirmation(ctx, container):
             container = Container(color=discord.Color.orange())
             container.add_text("# 🔄 ManagerX wird neugestartet...")
             container.add_separator()
@@ -804,11 +808,7 @@ class admin(ezcord.Cog, hidden=True):
         container.add_text("# ⚠️ Reload All bestätigen")
         container.add_text("Alle Cogs (außer Admin) werden neu geladen. Fortfahren?")
         
-        view = ConfirmView()
-        await ctx.respond(view=discord.ui.DesignerView(container, timeout=30), ephemeral=True)
-        await view.wait()
-        
-        if not view.value:
+        if not await self.request_confirmation(ctx, container):
             container = Container(color=discord.Color.green())
             container.add_text("## ✅ Reload abgebrochen")
             await ctx.edit(view=discord.ui.DesignerView(container, timeout=0))
@@ -924,11 +924,7 @@ class admin(ezcord.Cog, hidden=True):
             container.add_text(f"**ID:** `{guild_id}`")
             container.add_text(f"**Mitglieder:** {guild.member_count:,}")
             
-            view = ConfirmView()
-            await ctx.respond(view=discord.ui.DesignerView(container, timeout=30), ephemeral=True)
-            await view.wait()
-            
-            if view.value:
+            if await self.request_confirmation(ctx, container):
                 await guild.leave()
                 
                 container = Container(color=discord.Color.green())
@@ -1075,6 +1071,26 @@ class admin(ezcord.Cog, hidden=True):
             
             container.add_text("## ✨ Features")
             container.add_text(features_text)
+            container.add_separator()
+            
+            # Befehls-Statistiken (NEU)
+            if hasattr(self.bot, "stats_db"):
+                guild_top = await self.bot.stats_db.get_top_commands(guild.id, 3)
+                global_top = await self.bot.stats_db.get_global_top_commands(3)
+                
+                container.add_text("## 📊 Top 3 Befehle")
+                
+                if guild_top:
+                    gt_text = "\n".join([f"• `/{name}` ({count}x)" for name, count in guild_top])
+                    container.add_text(f"**Dieser Server:**\n{gt_text}")
+                else:
+                    container.add_text("**Dieser Server:** Keine Daten")
+                    
+                if global_top:
+                    glob_text = "\n".join([f"• `/{name}` ({count}x)" for name, count in global_top])
+                    container.add_text(f"**Global:**\n{glob_text}")
+                else:
+                    container.add_text("**Global:** Keine Daten")
             
             await ctx.respond(view=discord.ui.DesignerView(container, timeout=0), ephemeral=True)
         
@@ -1374,11 +1390,7 @@ class admin(ezcord.Cog, hidden=True):
         container.add_text("# ⚠️ Logs löschen bestätigen")
         container.add_text("Alle Admin-Logs werden permanent gelöscht!")
         
-        view = ConfirmView()
-        await ctx.respond(view=discord.ui.DesignerView(container, timeout=30), ephemeral=True)
-        await view.wait()
-        
-        if view.value:
+        if await self.request_confirmation(ctx, container):
             if AUDIT_LOG_FILE.exists():
                 AUDIT_LOG_FILE.unlink()
             

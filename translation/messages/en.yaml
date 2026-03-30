@@ -131,7 +131,7 @@ cog_about:
     title: "# ℹ️ About ManagerX"
     description: "An advanced management bot developed for professional communities.\nManagerX offers comprehensive tools for moderation, statistics, and server management."
     dev_header: "## 👨💻 Development"
-    dev_info: "Developed by **ManagerX Development**\n❯ [🌐 Website](https://managerx-bot.de)\n❯ [💬 Support Server](https://discord.gg/uDDWzsZNzD)"
+    dev_info: "Developed by **ManagerX Development**\n❯ [🌐 Website](https://managerx-bot.de)\n❯ [💬 Support Server](https://discord.gg/9T28DWup3g)"
     stats_header: "## 📊 Statistics"
     stats_info: "❯ **Servers:** `{server_count}`\n❯ **Users:** `{member_count}`\n❯ **Ping:** {ping}\n❯ **Uptime:** {uptime}"
     tech_header: "## 🛠️ Technology & Versions"

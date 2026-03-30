@@ -21,8 +21,9 @@ class EnhancedStatsCog(ezcord.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.db = StatsDB()
-        self.bot.stats_db = self.db
+        self.db = getattr(bot, "stats_db", None) or StatsDB()
+        if not hasattr(bot, "stats_db"):
+            bot.stats_db = self.db
         self.level_db = LevelDatabase()
         self.cleanup_task.start()
         self.monthly_reset_task.start()

@@ -9,10 +9,11 @@ Pfad: src/bot/core/database.py
 from logger import logger, Category
 
 try:
-    from mx_devtools import SettingsDB
+    from mx_devtools import SettingsDB, StatsDB
 except ImportError as e:
-    logger.critical(Category.DATABASE, f"SettingsDB Import fehlgeschlagen: {e}")
+    logger.critical(Category.DATABASE, f"Database Imports fehlgeschlagen: {e}")
     SettingsDB = None
+    StatsDB = None
 
 class DatabaseManager:
     """Verwaltet die Datenbank-Initialisierung"""
@@ -38,6 +39,11 @@ class DatabaseManager:
             self.db = SettingsDB()
             bot.settings_db = self.db
             logger.success(Category.DATABASE, "Settings Database initialized ✓")
+            
+            if StatsDB:
+                bot.stats_db = StatsDB()
+                logger.success(Category.DATABASE, "Stats Database initialized ✓")
+            
             return True
             
         except Exception as e:

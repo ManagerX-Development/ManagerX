@@ -65,7 +65,7 @@ class BotSetup:
             name="🔗 **Important Links**",
             value=(
                 "🌐 [**Website**](https://managerx-bot.de) • "
-                "🚑 [**Support**](https://discord.gg/SrcE6zJZ) • "
+                "🚑 [**Support**](https://discord.gg/9T28DWup3g) • "
                 "💻 [**GitHub**](https://github.com/ManagerX-Development/ManagerX)"
             ),
             inline=False

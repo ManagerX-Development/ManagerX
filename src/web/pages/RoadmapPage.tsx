@@ -115,7 +115,7 @@ export const RoadmapPage = memo(function RoadmapPage() {
                     <p className="text-slate-400 font-medium max-w-md mx-auto mb-10 relative z-10">
                         ManagerX wird für euch entwickelt. Schlag uns neue Features auf unserem Support-Server vor!
                     </p>
-                    <a href="https://discord.gg/nWWBWy6EbX" className="relative z-10 px-10 py-4 bg-accent text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-accent/20">
+                    <a href="https://discord.gg/9T28DWup3g" className="relative z-10 px-10 py-4 bg-accent text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-accent/20">
                         Feedback geben
                     </a>
                 </section>
