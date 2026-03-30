@@ -197,7 +197,7 @@ export default function LoginPage() {
                         >
                             <Link to="/legal/privacy" className="text-xs text-muted-foreground hover:text-white transition-colors no-underline">Datenschutz</Link>
                             <Link to="/legal/terms" className="text-xs text-muted-foreground hover:text-white transition-colors no-underline">Nutzungsbedingungen</Link>
-                            <a href="https://discord.gg/managerx" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-white transition-colors no-underline">Hilfe erhalten</a>
+                            <a href="https://discord.gg/9T28DWup3g" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-white transition-colors no-underline">Hilfe erhalten</a>
                         </motion.div>
                     </motion.div>
 

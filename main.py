@@ -142,10 +142,6 @@ if __name__ == '__main__':
                 )
             )
             
-        # Commands sync
-        await bot.sync_commands()
-        logger.success("COMMANDS", "Application Commands synchronisiert")
-
         # --- LIMIT CHECK START ---
         all_cmds = bot.pending_application_commands
         # Wir zählen nur die echten Top-Level Slash Commands (Slots)
@@ -154,6 +150,15 @@ if __name__ == '__main__':
         logger.info("LIMITS", f"EzCord zählt (alle Funktionen): {len(bot.commands)}")
         logger.info("LIMITS", f"Discord-API Slots belegt: {len(root_slots)} / 100")
         # --- LIMIT CHECK ENDE ---
+
+    @bot.event
+    async def on_application_command_completion(ctx: discord.ApplicationContext):
+        """Track command usage across all guilds."""
+        if ctx.guild and hasattr(bot, 'stats_db'):
+            try:
+                await bot.stats_db.log_command(ctx.guild.id, ctx.command.qualified_name)
+            except Exception as e:
+                logger.error("STATS", f"Fehler beim Loggen des Commands: {e}")
 
     # Minimaler KeepAlive Cog
     class KeepAlive(discord.ext.commands.Cog):

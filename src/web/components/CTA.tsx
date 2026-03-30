@@ -77,7 +77,7 @@ export const CTA = memo(function CTA() {
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
-              href="https://discord.gg/oppro"
+              href="https://discord.gg/9T28DWup3g"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-10 py-4.5 rounded-2xl glass border border-white/10 font-bold text-lg text-white shadow-xl"

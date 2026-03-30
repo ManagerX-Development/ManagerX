@@ -224,7 +224,7 @@ export const CommandsPage = memo(function CommandsPage() {
                     </p>
                     <div className="flex flex-wrap gap-4 justify-center">
                         <a
-                            href="https://discord.gg/dein-link"
+                            href="https://discord.gg/9T28DWup3g"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-10 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-xl shadow-primary/20 flex items-center gap-3"

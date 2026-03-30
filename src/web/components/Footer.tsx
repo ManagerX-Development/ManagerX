@@ -5,7 +5,7 @@ import { Shield, Heart, Github, MessageCircle, ExternalLink, Terminal, Sparkles,
 
 const socialLinks = [
   { icon: Github, href: "https://github.com/ManagerX-Development/ManagerX", label: "GitHub" },
-  { icon: MessageCircle, href: "https://discord.gg/dein-link", label: "Discord Support" },
+  { icon: MessageCircle, href: "https://discord.gg/9T28DWup3g", label: "Discord Support" },
 ];
 
 export const Footer = memo(function Footer() {
@@ -113,7 +113,7 @@ export const Footer = memo(function Footer() {
             <div className="flex flex-col gap-5">
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mb-2">Ressourcen</span>
               <a href="https://docs.managerx-bot.de/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Dokumentation</a>
-              <a href="https://discord.gg/oppro" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Support Server</a>
+              <a href="https://discord.gg/9T28DWup3g" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Support Server</a>
               <a href="https://github.com/ManagerX-Development/ManagerX" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">GitHub Repository</a>
             </div>
 

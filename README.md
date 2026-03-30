@@ -138,7 +138,7 @@ python main.py
 
 Brauchst du Hilfe oder möchtest du das Projekt unterstützen?
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Now-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/oppro)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Now-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/9T28DWup3g)
 [![GitHub Issues](https://img.shields.io/github/issues/Oppro-net-Development/ManagerX?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Oppro-net-Development/ManagerX/issues)
 
 <br>
