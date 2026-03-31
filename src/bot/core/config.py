@@ -1,74 +1,107 @@
 """
-ManagerX - Configuration Loader
-================================
+ManagerX - Dynamic Configuration (Zero-Mapping)
+==============================================
 
-Lädt und verwaltet die Bot-Konfiguration aus config.yaml
+Lädt alles aus config.yaml ohne manuelles Mapping.
+Zugriff via BotConfig.section.key (entspricht der YAML Struktur)
 """
 
-import os
-import sys
 import yaml
 from pathlib import Path
 from colorama import Fore, Style
-from dotenv import load_dotenv
-base_path = Path(__file__).resolve().parent.parent.parent.parent
-env_path = base_path / "config" / ".env"
+import sys
+import os
 
-# Lade die .env Datei
-load_dotenv(dotenv_path=env_path)
+class ConfigDict(dict):
+    """Ein Dictionary, das Punkt-Notation erlaubt (Config.section.key)"""
+    def __getattr__(self, name):
+        if name in self:
+            val = self[name]
+            if isinstance(val, dict):
+                return ConfigDict(val)
+            return val
+        # Fallback für verschachtelte Zugriffe auf nicht existierende Keys
+        return ConfigDict() 
+
+    def __setattr__(self, name, value):
+        self[name] = value
+    
+    def get(self, key, default=None):
+        return super().get(key, default)
+
+class classproperty(object):
+    def __init__(self, fget):
+        self.fget = fget
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)
 
 class BotConfig:
-    """Zentrale Konfigurationsklasse"""
+    """Zentrale Konfigurations-Schnittstelle"""
+    _data = ConfigDict()
     TOKEN = os.getenv("TOKEN")
-    VERSION = "2.0.0"
-
-class ConfigLoader:
-    """Lädt die Bot-Konfiguration aus config.yaml"""
     
-    def __init__(self, basedir: Path):
-        self.basedir = basedir
-        self.config_path = basedir / 'config' / 'config.yaml'
-    
-    def load(self) -> dict:
-        """
-        Lädt die Konfigurationsdatei und gibt alle Einstellungen zurück.
+    @classmethod
+    def load(cls, basedir: Path):
+        """Lädt die config.yaml und initialisiert das _data Objekt"""
+        config_path = basedir / 'config' / 'config.yaml'
         
-        Returns:
-            dict: Vollständige Konfiguration
-            
-        Raises:
-            SystemExit: Bei kritischen Fehlern
-        """
         try:
-            with open(self.config_path, 'r', encoding='utf-8') as f:
-                config = yaml.safe_load(f)
-            
-            # Bot deaktiviert?
-            if not config.get('enabled', True):
-                print(f"[{Fore.YELLOW}INFO{Style.RESET_ALL}] Bot ist in config.yaml deaktiviert. Beende...")
-                sys.exit(0)
-            
-            # Version übernehmen
-            BotConfig.VERSION = config.get('version', '2.0.0')
-            
-            # Strukturierte Rückgabe
-            return {
-                'enabled': config.get('enabled', True),
-                'version': BotConfig.VERSION,
-                'features': config.get('features', {}),
-                'bot_behavior': config.get('bot_behavior', {}),
-                'ui': config.get('ui', {}),
-                'security': config.get('security', {}),
-                'performance': config.get('performance', {}),
-                'cogs': config.get('features', {}).get('cogs', {})
-            }
-            
-        except FileNotFoundError:
-            print(f"[{Fore.RED}ERROR{Style.RESET_ALL}] config.yaml nicht gefunden: {self.config_path}")
-            sys.exit(1)
-        except yaml.YAMLError as e:
-            print(f"[{Fore.RED}ERROR{Style.RESET_ALL}] YAML-Parsing-Fehler: {e}")
-            sys.exit(1)
+            with open(config_path, 'r', encoding='utf-8') as f:
+                data = yaml.safe_load(f)
+                cls._data = ConfigDict(data)
+                
+                # Grundlegende Prüfung
+                if not cls._data.get('bot', {}).get('enabled', True):
+                    print(f"[{Fore.YELLOW}INFO{Style.RESET_ALL}] Bot ist in config.yaml deaktiviert. Beende...")
+                    sys.exit(0)
+                
+                return data
         except Exception as e:
-            print(f"[{Fore.RED}ERROR{Style.RESET_ALL}] Fehler beim Laden der config.yaml: {e}")
+            print(f"[{Fore.RED}ERROR{Style.RESET_ALL}] Konfigurationsfehler: {e}")
             sys.exit(1)
+
+    def __getattr__(self, name):
+        return getattr(self._data, name)
+
+    @classproperty
+    def bot(cls): return cls._data.get('bot', ConfigDict())
+    @classproperty
+    def security(cls): return cls._data.get('security', ConfigDict())
+    @classproperty
+    def ui(cls): return cls._data.get('ui', ConfigDict())
+    @classproperty
+    def api(cls): return cls._data.get('api', ConfigDict())
+    @classproperty
+    def leveling(cls): return cls._data.get('leveling', ConfigDict())
+    @classproperty
+    def moderation(cls): return cls._data.get('moderation', ConfigDict())
+    @classproperty
+    def global_chat(cls): return cls._data.get('global_chat', ConfigDict())
+    @classproperty
+    def logging(cls): return cls._data.get('logging', ConfigDict())
+    @classproperty
+    def links(cls): return cls._data.get('links', ConfigDict())
+    @classproperty
+    def intervals(cls): return cls._data.get('intervals', ConfigDict())
+    @classproperty
+    def features(cls): return cls._data.get('features', ConfigDict())
+    @classproperty
+    def translation(cls): return cls._data.get('translation', ConfigDict())
+
+    # --- Legacy Aliases/Shortcuts (Minimale Liste für Pfade) ---
+    @classproperty
+    def VERSION(cls): return cls.bot.get('version', '2.0.0')
+    @classproperty
+    def PREFIX(cls): return cls.bot.get('prefix', '!mx ')
+    @classproperty
+    def LANGUAGE(cls): return cls.bot.get('language', 'de')
+    
+    @classproperty
+    def DATA_PATH(cls): return Path(cls.logging.get('data_path', 'data'))
+    @classproperty
+    def COGS_PATH(cls): return Path(cls.logging.get('cogs_path', 'src/bot/cogs'))
+
+# Alias für ConfigLoader
+class ConfigLoader:
+    def __init__(self, basedir): self.basedir = basedir
+    def load(self): return BotConfig.load(self.basedir)

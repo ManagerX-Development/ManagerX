@@ -8,6 +8,7 @@ Pfad: src/bot/core/bot_setup.py
 
 import discord
 import ezcord
+from .config import BotConfig
 
 class BotSetup:
     """Verwaltet die Bot-Initialisierung"""
@@ -31,22 +32,22 @@ class BotSetup:
         # Bot erstellen
         bot = ezcord.PrefixBot(
             intents=intents,
-            language="de",
-            command_prefix="!mx ",
+            language=BotConfig.LANGUAGE,
+            command_prefix=BotConfig.PREFIX,
             help_command=None
         )
         
         # Ezcord Help Command aktivieren
         embed = discord.Embed(
-            title="Hello, I'm ManagerX!", # Placeholder emoji, will fall back to text if not found
+            title=f"Hello, I'm {BotConfig.NAME}!", 
             description=(
-                "**The ultimate all-in-one Discord solution.**\n\n"
-                "> ManagerX simplifies server management and brings your community "
+                f"**The ultimate all-in-one Discord solution.**\n\n"
+                f"> {BotConfig.NAME} simplifies server management and brings your community "
                 "together with engaging games and reliable tools.\n\n"
                 "✨ **Getting Started**\n"
                 "Use the menu below to explore all commands!"
             ),
-            color=discord.Color.from_rgb(46, 204, 113), # Fresh emerald green
+            color=discord.Color.from_rgb(*BotConfig.EMBED_COLOR),
             timestamp=discord.utils.utcnow()
         )
 
@@ -64,15 +65,15 @@ class BotSetup:
         embed.add_field(
             name="🔗 **Important Links**",
             value=(
-                "🌐 [**Website**](https://managerx-bot.de) • "
-                "🚑 [**Support**](https://discord.gg/9T28DWup3g) • "
-                "💻 [**GitHub**](https://github.com/ManagerX-Development/ManagerX)"
+                f"🌐 [**Website**]({BotConfig.WEBSITE}) • "
+                f"🚑 [**Support**]({BotConfig.SUPPORT}) • "
+                f"💻 [**GitHub**]({BotConfig.GITHUB})"
             ),
             inline=False
         )
         
         # Check if we can set a thumbnail or image (safe fallback)
-        embed.set_footer(text="ManagerX • Empowering your Community", icon_url=None)
+        embed.set_footer(text=BotConfig.FOOTER_TEXT, icon_url=None)
 
         bot.add_help_command(
             embed=embed,

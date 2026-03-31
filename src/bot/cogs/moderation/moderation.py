@@ -128,13 +128,14 @@ class moderation(ezcord.Cog):
     def _create_moderation_embed(self, action: str, moderator: discord.Member, target: discord.Member,
                                 reason: str, duration: str = None, additional_info: str = None) -> discord.Embed:
         """Erstellt ein einheitliches Moderations-Embed"""
+        from src.bot.core.config import BotConfig
         color_map = {
-            "Bann": discord.Color.dark_red(),
-            "Kick": discord.Color.red(),
-            "Timeout": discord.Color.orange(),
-            "Timeout aufgehoben": discord.Color.green(),
-            "Slowmode aktiviert": discord.Color.blue(),
-            "Slowmode deaktiviert": discord.Color.green(),
+            "Bann": discord.Color.from_rgb(*BotConfig.moderation.log_colors.ban),
+            "Kick": discord.Color.from_rgb(*BotConfig.moderation.log_colors.kick),
+            "Timeout": discord.Color.from_rgb(*BotConfig.moderation.log_colors.timeout),
+            "Timeout aufgehoben": discord.Color.from_rgb(*BotConfig.moderation.log_colors.untimeout),
+            "Slowmode aktiviert": discord.Color.from_rgb(*BotConfig.moderation.log_colors.slowmode_on),
+            "Slowmode deaktiviert": discord.Color.from_rgb(*BotConfig.moderation.log_colors.slowmode_off),
         }
         embed = discord.Embed(
             title=f"{emoji_yes} × {action} erfolgreich",

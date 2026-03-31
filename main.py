@@ -28,6 +28,9 @@ from logger import logger
 # =============================================================================
 # SETUP
 # =============================================================================
+# =============================================================================
+# SETUP & CONFIG
+# =============================================================================
 BASEDIR = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=BASEDIR / 'config' / '.env')
 
@@ -39,16 +42,20 @@ from src.bot.core.database import DatabaseManager
 from src.bot.core.dashboard import DashboardTask
 from src.bot.core.utils import print_logo
 
-# API Routes für Dashboard
+# Early config load (must happen before module-level usage)
+config_loader = ConfigLoader(BASEDIR)
+config = config_loader.load()
+
+# API Routes & Translation
 from src.api.dashboard.routes import set_bot_instance, dashboard_main_router, router_public
 from mx_handler import TranslationHandler
 
 colorama_init(autoreset=True)
 
 TranslationHandler.settings(
-    path="translation/messages",
-    default_lang="de",
-    fallback_langs=("en", "de"),
+    path=BotConfig.LANG_PATH,
+    default_lang=BotConfig.DEFAULT_LANG,
+    fallback_langs=BotConfig.FALLBACK_LANGS,
     logging=False,
     colored=False,
     log_level="DEBUG"
@@ -70,7 +77,7 @@ app = FastAPI(
 # CORS aktivieren
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=BotConfig.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -81,11 +88,16 @@ app.include_router(dashboard_main_router)
 app.include_router(router_public)
 
 async def start_webserver():
-    """Startet den FastAPI Webserver auf Port 8040"""
-    config = Config(app=app, host="0.0.0.0", port=8040, log_level="error")
-    server = Server(config)
+    """Startet den FastAPI Webserver"""
+    server_config = Config(
+        app=app, 
+        host=BotConfig.API_HOST, 
+        port=BotConfig.API_PORT, 
+        log_level=BotConfig.API_LOG_LEVEL
+    )
+    server = Server(server_config)
     await server.serve()
-    logger.success("API", "FastAPI-Server läuft auf http://0.0.0.0:8040")
+    logger.success("API", f"FastAPI-Server läuft auf http://{BotConfig.API_HOST}:{BotConfig.API_PORT}")
 
 # =============================================================================
 # MAIN EXECUTION
@@ -94,11 +106,7 @@ if __name__ == '__main__':
     # Logo ausgeben
     print_logo()
     
-    # Konfiguration laden
-    logger.info("BOT", "Lade Konfiguration...")
-    config_loader = ConfigLoader(BASEDIR)
-    config = config_loader.load()
-    logger.success("BOT", "Konfiguration geladen")
+    logger.info("BOT", "Konfiguration bereits geladen (Early Load)")
     
     # Bot erstellen
     logger.info("BOT", "Initialisiere Bot...")
@@ -134,7 +142,7 @@ if __name__ == '__main__':
         dashboard.start()
             
         # Bot-Status
-        if config['features'].get('bot_status', True):
+        if BotConfig.features.get('bot_status', True):
             await bot.change_presence(
                 activity=discord.Activity(
                     type=discord.ActivityType.watching,
@@ -150,6 +158,23 @@ if __name__ == '__main__':
         logger.info("LIMITS", f"EzCord zählt (alle Funktionen): {len(bot.commands)}")
         logger.info("LIMITS", f"Discord-API Slots belegt: {len(root_slots)} / 100")
         # --- LIMIT CHECK ENDE ---
+
+    @bot.before_invoke
+    async def maintenance_check(ctx: discord.ApplicationContext):
+        """Global check for maintenance mode."""
+        if BotConfig.bot.maintenance_mode:
+            # Owners are exempt
+            if ctx.author.id in BotConfig.security.bot_owners:
+                return
+            
+            embed = discord.Embed(
+                title="🔧 Wartungsmodus",
+                description="Der Bot befindet sich aktuell im Wartungsmodus.\nBitte versuche es später erneut.",
+                color=discord.Color.from_rgb(*BotConfig.ui.colors.warning)
+            )
+            embed.add_field(name="Support", value=BotConfig.links.support)
+            await ctx.respond(embed=embed, ephemeral=True)
+            raise commands.CheckFailure("Maintenance Mode Active")
 
     @bot.event
     async def on_application_command_completion(ctx: discord.ApplicationContext):
@@ -174,7 +199,7 @@ if __name__ == '__main__':
     
     # Cogs laden
     logger.info("BOT", "Lade Cogs...")
-    cog_manager = CogManager(config['cogs'])
+    cog_manager = CogManager(BotConfig.features.get('cogs', {}))
     ignored = cog_manager.get_ignored_cogs()
     
     bot.load_cogs(

@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 import ezcord
 from collections import defaultdict
 from discord.ui import Container
+from src.bot.core.config import BotConfig
 
 # Logger konfigurieren
 logger = logging.getLogger(__name__)
@@ -23,34 +24,31 @@ logger = logging.getLogger(__name__)
 
 class GlobalChatConfig:
     """Zentrale Konfiguration für GlobalChat"""
-    RATE_LIMIT_MESSAGES = 15
-    RATE_LIMIT_SECONDS = 60
-    CACHE_DURATION = 180  # 3 Minuten
-    CLEANUP_DAYS = 30
-    MIN_MESSAGE_LENGTH = 0  # Erlaube Nachrichten ohne Text (nur Medien)
-    DEFAULT_MAX_MESSAGE_LENGTH = 1900
-    DEFAULT_EMBED_COLOR = '#5865F2'
+    # Bot Owner IDs
+    BOT_OWNERS = BotConfig.BOT_OWNERS
     
-    # Medien-Limits
-    MAX_FILE_SIZE_MB = 25  # Discord-Standard
+    # Rate Limits
+    RATE_LIMIT_MESSAGES = BotConfig.GC_RATE_LIMIT_MSGS
+    RATE_LIMIT_SECONDS = BotConfig.GC_RATE_LIMIT_SECS
+    CACHE_DURATION = BotConfig.GC_CACHE_DURATION
+    CLEANUP_DAYS = BotConfig.GC_CLEANUP_DAYS
+    DEFAULT_MAX_MESSAGE_LENGTH = BotConfig.GC_MAX_MSG_LEN
+    DEFAULT_EMBED_COLOR = BotConfig.GC_DEFAULT_COLOR
+    MAX_FILE_SIZE_MB = BotConfig.GC_MAX_FILE_SIZE
+    
+    MIN_MESSAGE_LENGTH = 0  # Erlaube Nachrichten ohne Text (nur Medien)
     MAX_ATTACHMENTS = 10
     ALLOWED_IMAGE_FORMATS = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp']
     ALLOWED_VIDEO_FORMATS = ['mp4', 'mov', 'webm', 'avi', 'mkv']
     ALLOWED_AUDIO_FORMATS = ['mp3', 'wav', 'ogg', 'm4a', 'flac']
     ALLOWED_DOCUMENT_FORMATS = ['pdf', 'txt', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'zip', 'rar', '7z']
     
-    # Bot Owner IDs
-    BOT_OWNERS = [1093555256689959005, 1427994077332373554]
-    
     # Content Filter Patterns
     DISCORD_INVITE_PATTERN = r'(?i)\b(discord\.gg|discord\.com/invite|discordapp\.com/invite)/[a-zA-Z0-9]+\b'
     URL_PATTERN = r'(?i)\bhttps?://(?:[a-zA-Z0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F]{2}))+\b'
     
     # NSFW Keywords
-    NSFW_KEYWORDS = [
-        'nsfw', 'porn', 'sex', 'xxx', 'nude', 'hentai', 
-        'dick', 'pussy', 'cock', 'tits', 'ass', 'fuck'
-    ]
+    NSFW_KEYWORDS = BotConfig.GC_NSFW_KEYWORDS
 
 
 class MediaHandler:
@@ -806,6 +804,7 @@ class GlobalChat(ezcord.Cog):
         )
         self._cached_channels = None  # Wird bei der ersten Nachricht geladen
         self.sender = GlobalChatSender(self.bot, self.config, self.embed_builder)
+        self.cleanup_task.change_interval(hours=BotConfig.intervals.global_chat_cleanup_12)
         self.cleanup_task.start()
 
     @tasks.loop(hours=12)

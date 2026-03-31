@@ -1,0 +1,48 @@
+name: Pterodactyl Auto-Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Pterodactyl
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SFTP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.PTERO_HOST }}
+          port: ${{ secrets.PTERO_PORT }}
+          username: ${{ secrets.PTERO_USER }}
+          password: ${{ secrets.PTERO_PASSWORD }}
+          source: "./*"
+          target: "/"
+          # List of files/folders to EXCLUDE from deployment
+          # .env and data/ are never pushed to keep secrets and DB safe
+          rm: false # Set to true if you want to delete files on server that are not in repo (CAUTION: might delete data/ if not careful)
+          strip_components: 0
+          overwrite: true
+          exclude: |
+            .env
+            .env.*
+            .git/
+            .github/
+            data/
+            logs/
+            __pycache__/
+            *.pyc
+            *.sqlite3
+            *.db
+            .idea/
+            .vscode/
+            build/
+            dist/
+            *.log
+            node_modules/
+            DevTools/
+            tests/

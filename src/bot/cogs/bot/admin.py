@@ -2,6 +2,7 @@ import discord
 from discord import SlashCommandGroup, Option
 import ezcord
 from discord.ui import Container, View, Button, Modal, InputText
+from src.bot.core.config import BotConfig
 import sys
 import os
 import psutil
@@ -15,11 +16,10 @@ import json
 from typing import Optional, List
 import time
 
-ALLOWED_IDS = [1427994077332373554]
-
-# Audit Log Storage
-AUDIT_LOG_FILE = Path("data/admin_audit.json")
-BLACKLIST_FILE = Path("data/blacklist.json")
+# Configuration (Centralized)
+ALLOWED_IDS = BotConfig.ALLOWED_IDS
+AUDIT_LOG_FILE = BotConfig.AUDIT_LOG_FILE
+BLACKLIST_FILE = BotConfig.BLACKLIST_FILE
 
 
 
@@ -257,8 +257,8 @@ class admin(ezcord.Cog, hidden=True):
     def __init__(self, bot):
         self.bot = bot
         self.start_time = datetime.now()
-        self.cogs_path = Path("src/bot/cogs")
-        self.data_path = Path("data")
+        self.cogs_path = BotConfig.COGS_PATH
+        self.data_path = BotConfig.DATA_PATH
         self.data_path.mkdir(exist_ok=True)
         
         # Lade Blacklist

@@ -30,14 +30,14 @@ class PrestigeConfirmView(discord.ui.View):
             embed = discord.Embed(
                 title="✨ Prestige erfolgreich!",
                 description=f"{self.user.mention} hat ein Prestige durchgeführt!\nDu startest wieder bei Level 0, aber behältst deinen Prestige-Rang!",
-                color=0xff69b4
+                color=discord.Color.from_rgb(*self.config.ui.colors.prestige)
             )
             embed.set_footer(text="Gratulation zu deinem Prestige!")
         else:
             embed = discord.Embed(
                 title="❌ Prestige fehlgeschlagen",
                 description="Prestige konnte nicht durchgeführt werden. Möglicherweise erfüllst du nicht die Anforderungen.",
-                color=0xff0000
+                color=discord.Color.from_rgb(*self.config.ui.colors.error)
             )
 
         await interaction.response.edit_message(embed=embed, view=None)
@@ -51,7 +51,7 @@ class PrestigeConfirmView(discord.ui.View):
         embed = discord.Embed(
             title="❌ Prestige abgebrochen",
             description="Das Prestige wurde abgebrochen.",
-            color=0x999999
+            color=discord.Color.from_rgb(*self.config.ui.colors.info)
         )
         await interaction.response.edit_message(embed=embed, view=None)
 
@@ -59,10 +59,14 @@ class PrestigeConfirmView(discord.ui.View):
 class LevelSystem(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
+        from src.bot.core.config import BotConfig
+        self.config = BotConfig
         self.db = LevelDatabase()
         self.xp_cooldowns = {}  # User-ID -> Timestamp
         
         # Starte Background Tasks
+        self.cleanup_expired_boosts.change_interval(hours=self.config.INT_LVL_CLEANUP)
+        self.cleanup_temporary_roles.change_interval(hours=self.config.INT_LVL_CLEANUP)
         self.cleanup_expired_boosts.start()
         self.cleanup_temporary_roles.start()
 
@@ -76,7 +80,7 @@ class LevelSystem(ezcord.Cog):
     xpboost = SlashCommandGroup("xpboost", "Verwalte XP-Boosts")
     levelconfig = SlashCommandGroup("levelconfig", "Konfiguriere das Levelsystem")
 
-    @tasks.loop(hours=1)
+    @tasks.loop(hours=1) # Wird über config.py beim Start geladen, statische Definition bleibt
     async def cleanup_expired_boosts(self):
         """Entfernt abgelaufene XP-Boosts"""
         # Hier würde die DB-Cleanup Logik implementiert werden
@@ -90,13 +94,13 @@ class LevelSystem(ezcord.Cog):
 
     def create_level_up_embed(self, user: discord.Member, level: int, is_role_reward: bool = False, role: Optional[discord.Role] = None):
         """Erstellt ein verbessertes Level-Up Embed"""
-        embed = discord.Embed(color=0x00ff00)
+        embed = discord.Embed(color=discord.Color.from_rgb(*self.config.ui.colors.success))
         embed.set_author(name="🎉 Level Up!", icon_url=user.avatar.url if user.avatar else user.default_avatar.url)
         embed.description = f"**{user.mention}** erreichte **Level {level}**!"
         
         if is_role_reward and role:
             embed.add_field(name="🏆 Neue Rolle erhalten", value=f"**{role.name}**", inline=False)
-            embed.color = 0xffff00
+            embed.color = discord.Color.from_rgb(*self.config.ui.colors.warning)
         
         embed.set_thumbnail(url=user.avatar.url if user.avatar else user.default_avatar.url)
         return embed
@@ -124,8 +128,8 @@ class LevelSystem(ezcord.Cog):
         current_time = time.time()
 
         # Guild-Konfiguration holen
-        config = self.db.get_guild_config(guild_id)
-        cooldown = config.get('cooldown', 30)
+        guild_config = self.db.get_guild_config(guild_id)
+        cooldown = guild_config.get('cooldown', self.config.leveling.default_cooldown)
 
         # XP-Cooldown prüfen
         if user_id in self.xp_cooldowns:
@@ -136,8 +140,8 @@ class LevelSystem(ezcord.Cog):
         channel_multiplier = self.db.get_channel_multiplier(guild_id, message.channel.id)
         
         # XP berechnen
-        min_xp = config.get('min_xp', 10)
-        max_xp = config.get('max_xp', 20)
+        min_xp = guild_config.get('min_xp', self.config.leveling.default_min_xp)
+        max_xp = guild_config.get('max_xp', self.config.leveling.default_max_xp)
         base_xp = random.randint(min_xp, max_xp)
         final_xp = int(base_xp * channel_multiplier)
 
@@ -329,7 +333,7 @@ class LevelSystem(ezcord.Cog):
             return
 
         user_stats = self.db.get_user_stats(ctx.author.id, ctx.guild.id)
-        min_level = config.get('prestige_min_level', 50)
+        min_level = config.get('prestige_min_level', self.config.leveling.prestige_min_level)
         
         if not user_stats or user_stats[1] < min_level:
             embed = discord.Embed(

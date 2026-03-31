@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://managerx.bot/sitemap.xml
+Sitemap: https://managerx-bot.de/sitemap.xml

@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 class AutoDelete(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
+        from src.bot.core.config import BotConfig
+        self.delete_task.change_interval(seconds=BotConfig.intervals.autodelete_check_seconds)
         self.delete_task.start()
         self.processing_channels = set()  # Verhindert doppelte Verarbeitung
 

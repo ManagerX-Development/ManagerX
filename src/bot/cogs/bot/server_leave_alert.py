@@ -1,12 +1,13 @@
 import discord
 from discord.ui import Container, DesignerView
 import ezcord
+from src.bot.core.config import BotConfig
 
 class LeaveAlert(ezcord.Cog):
     def __init__(self, bot):
         self.bot = bot
         # Dein Log-Kanal für Abgänge
-        self.log_channel_id = 1429164270435700849 
+        self.log_channel_id = BotConfig.LEAVE_LOG_CHANNEL 
 
     @discord.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):

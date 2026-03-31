@@ -1,6 +1,7 @@
 import discord
 from discord.ui import Container  # Dein ezcord/discord.ui Import
 import ezcord
+from src.bot.core.config import BotConfig
 
 class BotJoinEvents(ezcord.Cog):
     def __init__(self, bot):
@@ -33,7 +34,7 @@ class BotJoinEvents(ezcord.Cog):
             container.add_separator()
 
             container.add_text("### 🔗 Links")
-            container.add_text("🔗 [Website](https://managerx-bot.de) × [Top.gg](https://top.gg/bot/1368201272624287754) × [Support](https://discord.gg/9T28DWup3g) × [GitHub](https://github.com/ManagerX-Development/ManagerX)")
+            container.add_text(f"🔗 [Website]({BotConfig.links.website}) × [Top.gg]({BotConfig.links.topgg}) × [Support]({BotConfig.links.support}) × [GitHub]({BotConfig.links.github})")
             
             # Die DesignerView für den Container erstellen
             view = discord.ui.DesignerView(container, timeout=0)

@@ -33,8 +33,9 @@ class About(ezcord.Cog):
         server_count = len(self.bot.guilds)
         member_count = sum(g.member_count for g in self.bot.guilds)
         
+        from src.bot.core.config import BotConfig
         # Create Container
-        container = discord.ui.Container(color=discord.Color.red())
+        container = discord.ui.Container(color=discord.Color.from_rgb(*BotConfig.ui.colors.info))
         
         # Header
         title = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.title")
@@ -113,12 +114,16 @@ class About(ezcord.Cog):
         # Footer
         footer = await TranslationHandler.get_for_user(self.bot, ctx.author.id, "cog_about.messages.footer",
             year=datetime.now().year,
-            version="2.0.0"
+            version=BotConfig.bot.version
         )
         container.add_text(footer)
         
-        # Send View
+        # Buttons
         view = discord.ui.DesignerView(container, timeout=0)
+        view.add_item(discord.ui.Button(label="Website", url=BotConfig.links.website, style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="Invite", url=BotConfig.links.invite, style=discord.ButtonStyle.link))
+        view.add_item(discord.ui.Button(label="Support", url=BotConfig.links.support, style=discord.ButtonStyle.link))
+        
         await ctx.respond(view=view)
 
 def setup(bot):

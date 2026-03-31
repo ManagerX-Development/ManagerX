@@ -1,6 +1,7 @@
 import discord
 from discord.ui import Container, DesignerView
 import ezcord
+from src.bot.core.config import BotConfig
 
 class JoinAlert(ezcord.Cog):
     def __init__(self, bot):
@@ -28,7 +29,7 @@ class JoinAlert(ezcord.Cog):
         )
 
         # Die Channel-ID von dir
-        log_channel_id = 1429163147687886889  
+        log_channel_id = BotConfig.JOIN_LOG_CHANNEL 
         log_channel = self.bot.get_channel(log_channel_id)
 
         if log_channel:

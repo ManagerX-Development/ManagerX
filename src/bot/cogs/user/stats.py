@@ -25,8 +25,11 @@ class EnhancedStatsCog(ezcord.Cog):
         if not hasattr(bot, "stats_db"):
             bot.stats_db = self.db
         self.level_db = LevelDatabase()
+        
+        from src.bot.core.config import BotConfig
+        self.cleanup_task.change_interval(hours=BotConfig.intervals.stats_update)
         self.cleanup_task.start()
-        self.monthly_reset_task.start()
+        self.monthly_reset_task.start() # Monthly remains monthly, but we could make it configurable too
         logger.info("Enhanced StatsCog initialized")
 
     stats = SlashCommandGroup("stats", "Statistiken")

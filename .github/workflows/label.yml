@@ -1,6 +1,6 @@
 # .github/workflows/label.yml
 
-name: Labeler
+name: Labeling
 on: [pull_request]
 
 jobs:
