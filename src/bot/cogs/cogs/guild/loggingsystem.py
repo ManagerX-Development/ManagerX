@@ -10,7 +10,7 @@ import asyncio
 import logging
 import ezcord
 # Import our separate database class
-from mx_devtools import LoggingDatabase
+from mxmariadb import LoggingDatabase
 
 # Setup logging
 logger = logging.getLogger(__name__)

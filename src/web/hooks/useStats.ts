@@ -11,6 +11,8 @@ interface StatsData {
     database: string;
 }
 
+import { API_URL } from "../lib/api";
+
 export const useStats = () => {
     const [data, setData] = useState<StatsData>({
         uptime: "--",
@@ -28,8 +30,7 @@ export const useStats = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8040";
-                const response = await fetch(`${baseUrl}/v1/managerx/stats`);
+                const response = await fetch(`${API_URL}/v1/managerx/stats`);
                 if (!response.ok) throw new Error("Offline");
 
                 const result = await response.json();

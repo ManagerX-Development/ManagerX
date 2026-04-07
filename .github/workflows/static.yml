@@ -1,5 +1,5 @@
 # Workflow für ManagerX React/TSX Deployment
-name: Deploy static content to Pages
+name: Webseite
 
 on:
   push:

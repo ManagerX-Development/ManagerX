@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import SlashCommandGroup, Option
 import ezcord
-from mx_devtools import EconomyDatabase
+from mxmariadb import EconomyDatabase
 from datetime import datetime, timedelta
 import random
 

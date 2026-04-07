@@ -2,7 +2,7 @@
 # ───────────────────────────────────────────────
 # >> Imports
 # ───────────────────────────────────────────────
-from mx_devtools import WarnDatabase
+from mxmariadb import WarnDatabase
 import discord
 from discord import slash_command, Option
 import os
@@ -48,8 +48,7 @@ class WarnSystem(ezcord.Cog, group="moderation"):
     
     def __init__(self, bot):
         self.bot = bot
-        base_path = os.path.dirname(__file__)
-        self.db = WarnDatabase(base_path)
+        self.db = WarnDatabase()
         # Cache für bessere Performance
         self._warn_cache = {}
 

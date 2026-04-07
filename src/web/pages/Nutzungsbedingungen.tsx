@@ -9,6 +9,7 @@ import {
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { motion } from "framer-motion";
+import { LEGAL_CONFIG } from "../lib/legal";
 
 const SECTIONS = [
   { id: "overview", title: "Overview", icon: Info },
@@ -110,7 +111,7 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             <div className="p-6 rounded-3xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/10 shadow-2xl">
               <h4 className="text-white font-bold mb-2">Need help?</h4>
               <p className="text-xs text-slate-400 mb-4 leading-relaxed">Unser Team steht für rechtliche Fragen zur Verfügung.</p>
-              <a href="mailto:legal@managerx-bot.de" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors">
+              <a href={`mailto:${LEGAL_CONFIG.contact.legalEmail}`} className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors">
                 Contact Legal <ArrowLeft className="w-3 h-3 rotate-180" />
               </a>
             </div>
@@ -131,18 +132,18 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white uppercase italic leading-[0.9] mb-6">
               Nutzungs<span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">bedingungen</span>
             </h1>
-            <p className="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
+            <h2 className="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
               Bitte lesen Sie diese Bedingungen sorgfältig durch, bevor Sie ManagerX nutzen.
               Sie regeln die rechtliche Beziehung zwischen Ihnen und ManagerX Development.
-            </p>
+            </h2>
             <div className="mt-8 flex items-center gap-6 opacity-40">
               <div className="flex flex-col">
-                <span className="text-xs font-bold text-white">March 28, 2026</span>
+                <span className="text-xs font-bold text-white">{LEGAL_CONFIG.lastUpdate}</span>
               </div>
               <div className="w-px h-8 bg-white/20" />
               <div className="flex flex-col">
                 <span className="text-[10px] uppercase font-black tracking-widest mb-1 text-slate-500">Version</span>
-                <span className="text-xs font-bold text-white">2.0.0-beta</span>
+                <span className="text-xs font-bold text-white">{LEGAL_CONFIG.version}-beta</span>
               </div>
             </div>
           </header>
@@ -242,7 +243,7 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
             </Section>
 
             <Section id="disclaimers" title="10. Haftungsausschluss">
-              <h4 className="text-white font-black text-2xl uppercase italic mb-6">Wird "WIE BESEHEN" bereitgestellt.</h4>
+               <h4 className="text-white font-black text-2xl uppercase italic mb-6">Wird "WIE BESEHEN" bereitgestellt.</h4>
               <p>Wir übernehmen keine Garantie für die ständige Verfügbarkeit (Uptime), die absolute Richtigkeit von Statistiken oder die vollständige Fehlerfreiheit des Codes.</p>
             </Section>
 
@@ -262,8 +263,8 @@ export const Nutzungsbedingungen = memo(function Nutzungsbedingungen() {
               <p>Bei rechtlichen Anfragen erreichen Sie uns unter:</p>
               <div className="mt-8 p-10 rounded-[2.5rem] bg-[#111318] border border-primary/20 text-center">
                 <Mail className="w-12 h-12 text-primary mx-auto mb-4" />
-                <a href="mailto:legal@managerx-bot.de" className="text-2xl font-black text-white hover:text-primary transition-colors underline decoration-primary/30">
-                  legal@managerx-bot.de
+                <a href={`mailto:${LEGAL_CONFIG.contact.legalEmail}`} className="text-2xl font-black text-white hover:text-primary transition-colors underline decoration-primary/30">
+                  {LEGAL_CONFIG.contact.legalEmail}
                 </a>
                 <p className="mt-4 text-slate-500 font-bold tracking-widest uppercase text-[10px]">ManagerX Legal Department</p>
               </div>

@@ -1,88 +1,152 @@
-# ManagerX Bot Configuration
-# Diese Datei steuert die Funktionen des Bots
+# ManagerX Configuration
+# ======================
 
-# Ob der Bot überhaupt aktiviert ist
-enabled: true
+# Bot Basics
+bot:
+  enabled: true
+  name: "ManagerX"
+  version: "2.0.0"
+  language: "de"
+  prefix: "!mx "
+  maintenance_mode: false
+  status_text: "ManagerX v{version}"
+  status_type: "watching" # watching, playing, listening, streaming
 
-# Version des Bots (wird in der Presence angezeigt)
-version: "2.0.0"
+# Security & Permissions
+security:
+  allowed_ids: [1427994077332373554]
+  bot_owners: [1093555256689959005, 1427994077332373554]
 
-# Features aktivieren/deaktivieren
+# UI & Branding
+ui:
+  colors:
+    primary: [46, 204, 113]   # Emerald Green
+    success: [46, 204, 113]
+    error: [231, 76, 60]      # Alizarin Red
+    warning: [241, 196, 15]   # Sunflower Yellow
+    info: [52, 152, 219]      # Peter River Blue
+    prestige: [255, 105, 180] # Hot Pink
+  footer_text: "ManagerX • Empowering your Community"
+
+# API & Webserver
+api:
+  host: "0.0.0.0"
+  port: 8040
+  log_level: "error"
+  cors_origins: ["*"]
+
+# Translation Settings
+translation:
+  path: "translation/messages"
+  default_lang: "de"
+  fallback_langs: ["en", "de"]
+
+# Module: Leveling System
+leveling:
+  default_min_xp: 10
+  default_max_xp: 20
+  default_cooldown: 30
+  prestige_min_level: 50
+  cleanup_interval_hours: 1
+  leaderboard_max_users: 50
+
+# Module: Moderation
+moderation:
+  max_warnings: 5
+  mute_role_name: "Muted"
+  antispam_threshold: 5
+  default_timeout_minutes: 5
+  log_colors:
+    ban: [255, 0, 0]
+    kick: [231, 76, 60]
+    timeout: [241, 196, 15]
+    untimeout: [46, 204, 113]
+    slowmode_on: [52, 152, 219]
+    slowmode_off: [46, 204, 113]
+
+# Module: GlobalChat
+global_chat:
+  rate_limit_messages: 15
+  rate_limit_seconds: 60
+  cache_duration: 180
+  cleanup_days: 30
+  max_message_length: 1900
+  default_color: "#5865F2"
+  max_file_size_mb: 25
+  cleanup_interval_hours: 12
+  nsfw_keywords: ['nsfw', 'porn', 'sex', 'xxx', 'nude', 'hentai', 'dick', 'pussy', 'cock', 'tits', 'ass', 'fuck']
+
+# Logging & Storage
+logging:
+  server_leave_channel: 1429164270435700849
+  server_join_channel: 1429163147687886889
+  audit_log_file: "data/admin_audit.json"
+  blacklist_file: "data/blacklist.json"
+  cogs_path: "src/bot/cogs"
+  data_path: "data"
+
+# Links
+links:
+  website: "https://managerx-bot.de"
+  support: "https://discord.gg/9T28DWup3g"
+  invite: "https://discord.gg/9T28DWup3g"
+  github: "https://github.com/ManagerX-Development/ManagerX"
+  topgg: "https://top.gg/bot/1368201272624287754"
+
+# Performance & Cache
+performance:
+  cache_timeout: 300
+  db_cleanup_days: 30
+
+# Database & Backup
+database:
+  backup_enabled: true
+  backup_interval_hours: 24
+  max_retention: 7
+  backup_path: "data/backups"
+
+# Intervals (in hours unless specified)
+intervals:
+  leveling_cleanup: 1
+  global_chat_cleanup: 12
+  stats_update: 24
+  autodelete_check_seconds: 30
+
+# Feature Toggles & Cogs
 features:
-  # Update-Checker aktivieren
-  update_checker: true
-
-  # Bot-Status in Presence anzeigen
   bot_status: true
-
-  # Cogs (Module) aktivieren/deaktivieren
   cogs:
-    # Spaß-Commands
-    fun:
-      gewinnt: true
+    management:
+      autodelete: true
+      autorole: true
+      database_backup: true
+    guild:
+      levelsystem: true
+      welcome: true
+      global_chat: true
+      loggingsystem: true
+      tempvc: true
+      utility: true
       tictactoe: true
       weather: true
-      # Wikipedia-Modul (vollständiges Package mit 8 Submodulen)
-      # Wenn aktiviert: Lädt alle Wikipedia-Features (Suche, Zufall, Multi-Suche, etc.)
-      # Wenn deaktiviert: Wikipedia-Commands sind nicht verfügbar
-      wikipedia: true  # ← Hier auf false setzen zum Deaktivieren
-
-    # Informations-Commands
+      wikipedia: true
     information:
       botstatus: true
       serverinfo: true
       usermanagemt: true
-
-    # Moderations-Features
     moderation:
       antispam: true
       moderation: true
       notes: true
       warningsystem: true
-
-    # Server-Management
     server_management:
       autodelete: true
+      database_backup: true
       globalchat: true
       levelsystem: true
       logging: true
       stats: true
       tempvc: true
       welcome: true
-
-    # Entwickler-Tools
-    dev_tools:
-      logging: true
-      emojis: true
-
-    # Sonstige
     other:
       setlang: true
-
-# Bot-Verhalten und Limits
-bot_behavior:
-  command_prefix: "!"              # Fallback-Prefix für nicht-slash Commands
-  global_cooldown_seconds: 5       # Cooldown zwischen Commands pro User
-  max_messages_per_minute: 10      # Anti-Spam-Limit pro User
-  maintenance_mode: false          # Wartungsmodus (deaktiviert alle Commands)
-
-# UI und Embeds
-ui:
-  embed_color: "#00ff00"            # Hex-Farbe für Embeds (z.B. grün)
-  footer_text: "ManagerX Bot"      # Standard-Footer-Text
-  theme: "dark"                    # dark, light, custom
-  show_timestamps: true            # Timestamps in Embeds anzeigen
-
-# Sicherheit und Permissions
-security:
-  required_permissions: ["manage_messages", "kick_members"]  # Erforderliche Permissions für Moderations-Commands
-  blacklist_servers: []            # Liste verbotener Server-IDs
-  whitelist_users: []              # Erlaubte User-IDs (für private Bots)
-  enable_command_logging: true     # Commands loggen
-
-# Performance und Ressourcen
-performance:
-  max_concurrent_tasks: 10         # Max. gleichzeitige Tasks
-  task_timeout_seconds: 30         # Timeout für langlaufende Tasks
-  memory_limit_mb: 512             # Memory-Limit für den Bot
-  enable_gc_optimization: true     # Garbage Collection optimieren

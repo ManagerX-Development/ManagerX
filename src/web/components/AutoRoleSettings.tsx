@@ -21,6 +21,8 @@ interface AutoRoleSettingsProps {
     roles: any[];
 }
 
+import { API_URL } from "../lib/api";
+
 export default function AutoRoleSettings({ guildId, roles }: AutoRoleSettingsProps) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -37,8 +39,7 @@ export default function AutoRoleSettings({ guildId, roles }: AutoRoleSettingsPro
 
     const fetchSettings = async () => {
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/autorole`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/autorole`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -58,8 +59,7 @@ export default function AutoRoleSettings({ guildId, roles }: AutoRoleSettingsPro
     const handleSave = async () => {
         setSaving(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/autorole`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/autorole`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

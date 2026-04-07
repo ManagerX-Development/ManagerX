@@ -32,6 +32,8 @@ interface TempVCSettingsProps {
     voiceChannels: any[];
 }
 
+import { API_URL } from "../lib/api";
+
 export default function TempVCSettings({ guildId, categories, voiceChannels }: TempVCSettingsProps) {
     const { token } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
@@ -51,8 +53,7 @@ export default function TempVCSettings({ guildId, categories, voiceChannels }: T
             if (!token || !guildId) return;
             setIsLoading(true);
             try {
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-                const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/tempvc`, {
+                const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/tempvc`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
 
@@ -82,8 +83,7 @@ export default function TempVCSettings({ guildId, categories, voiceChannels }: T
         if (!token || !guildId) return;
         setIsSaving(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/tempvc`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/tempvc`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,

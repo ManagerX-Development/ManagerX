@@ -18,12 +18,12 @@ try:
     from src.bot.ui.emojis import emoji_warn
 except ImportError:
     emoji_warn = "⚠️"
-from mx_devtools import (
+from mxmariadb import (
     StatsDB, WarnDatabase, NotesDatabase, LevelDatabase,
     ProfileDB, SettingsDB, AutoDeleteDB,
     AntiSpamDatabase, TempVCDatabase
 )
-from mx_devtools.backend.database.globalchat_db import GlobalChatDatabase, db as global_db
+from mxmariadb import GlobalChatDatabase
 
 class Settings(ezcord.Cog):
     """Cog für Benutzereinstellungen, Sprache und Datenverwaltung."""

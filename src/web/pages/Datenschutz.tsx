@@ -8,6 +8,7 @@ import {
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { motion } from "framer-motion";
+import { LEGAL_CONFIG } from "../lib/legal";
 
 const SECTIONS = [
   { id: "intro", title: "Introduction", icon: Shield },
@@ -109,7 +110,7 @@ export const Datenschutz = memo(function Datenschutz() {
             <div className="p-8 rounded-[2rem] bg-primary/[0.02] border border-primary/20">
               <Lock className="w-8 h-8 text-primary mb-4" />
               <h4 className="text-white font-bold mb-2">GDPR Compliant</h4>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4">Ihre Daten werden nach strengsten EU-Richtlinien in Frankfurt gehostet.</p>
+              <p className="text-xs text-slate-500 leading-relaxed mb-4">Ihre Daten werden nach strengsten EU-Richtlinien in {LEGAL_CONFIG.hosting.location} gehostet.</p>
               <div className="flex gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] uppercase font-black tracking-widest text-slate-500">System Secure</span>
@@ -138,7 +139,7 @@ export const Datenschutz = memo(function Datenschutz() {
             </p>
             <div className="mt-12 p-1 px-6 rounded-full bg-white/5 border border-white/10 w-fit flex items-center gap-4">
               <span className="w-2 h-2 rounded-full bg-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Status: DSGVO / GDPR Standard v2.2 (Aktualisiert am 28. März 2026)</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Status: DSGVO / GDPR Standard v2.2 (Aktualisiert am {LEGAL_CONFIG.lastUpdate})</span>
             </div>
           </header>
 
@@ -151,14 +152,14 @@ export const Datenschutz = memo(function Datenschutz() {
               <div className="p-8 rounded-3xl bg-white/5 border border-white/5 space-y-4">
                 <p className="font-black text-white text-2xl tracking-tight uppercase italic underline decoration-primary/30">ManagerX Development Network</p>
                 <div className="space-y-1 text-base text-slate-400 font-medium">
-                  <p className="text-white font-bold">Lenny Steiger</p>
-                  <p>Eulauer Str. 24</p>
-                  <p>04523 Pegau, Deutschland</p>
+                  <p className="text-white font-bold">{LEGAL_CONFIG.owner.name}</p>
+                  <p>{LEGAL_CONFIG.owner.address.street}</p>
+                  <p>{LEGAL_CONFIG.owner.address.city}, {LEGAL_CONFIG.owner.address.country}</p>
                   <div className="h-px w-12 bg-white/10 my-4" />
                   <p>
                     E-Mail:{" "}
-                    <a href="mailto:contact@managerx-bot.de" className="text-primary hover:underline font-bold">
-                      contact@managerx-bot.de
+                    <a href={`mailto:${LEGAL_CONFIG.contact.email}`} className="text-primary hover:underline font-bold">
+                      {LEGAL_CONFIG.contact.email}
                     </a>
                   </p>
                 </div>
@@ -242,8 +243,8 @@ export const Datenschutz = memo(function Datenschutz() {
             <Section id="hosting" title="7. Hosting & Standort">
               <div className="p-10 rounded-[2.5rem] bg-primary/[0.05] border border-primary/20 flex flex-col items-center text-center">
                 <Server className="w-12 h-12 text-primary mb-6 animate-pulse" />
-                <h4 className="text-3xl font-black text-white uppercase tracking-tighter mb-4 italic">Frankfurt am Main</h4>
-                <p className="text-lg text-slate-400 font-medium">Unsere Server stehen in Deutschland (EU).</p>
+                <h4 className="text-3xl font-black text-white uppercase tracking-tighter mb-4 italic">{LEGAL_CONFIG.hosting.location}</h4>
+                <p className="text-lg text-slate-400 font-medium">{LEGAL_CONFIG.hosting.provider}</p>
                 <div className="mt-6 px-6 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest">Safe EU Data Residency</div>
               </div>
             </Section>
@@ -254,7 +255,7 @@ export const Datenschutz = memo(function Datenschutz() {
 
             <Section id="rights" title="9. Ihre Rechte">
               <p>Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Widerspruch.</p>
-              <p className="mt-8 text-sm italic">Senden Sie uns eine E-Mail an <span className="text-primary font-bold">legal@managerx-bot.de</span>.</p>
+              <p className="mt-8 text-sm italic">Senden Sie uns eine E-Mail an <span className="text-primary font-bold">{LEGAL_CONFIG.contact.legalEmail}</span>.</p>
             </Section>
 
             <Section id="complaints" title="10. Beschwerderecht">
@@ -279,7 +280,7 @@ export const Datenschutz = memo(function Datenschutz() {
             </Section>
 
             <Section id="web-hosting" title="13. Web-Hosting">
-              <p>Diese Website wird über GitHub Pages gehostet.</p>
+              <p>Diese Website wird über {LEGAL_CONFIG.hosting.provider} ({LEGAL_CONFIG.hosting.location}) gehostet.</p>
             </Section>
 
             <Section id="deletion" title="14. Daten löschen">
@@ -309,10 +310,10 @@ export const Datenschutz = memo(function Datenschutz() {
                 <div className="relative z-10">
                   <Mail className="w-16 h-16 text-primary mx-auto mb-6" />
                   <h4 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4">Privacy Support</h4>
-                  <a href="mailto:legal@managerx-bot.de" className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
-                    legal@managerx-bot.de
+                  <a href={`mailto:${LEGAL_CONFIG.contact.legalEmail}`} className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
+                    {LEGAL_CONFIG.contact.legalEmail}
                   </a>
-                  <p className="mt-12 text-[10px] uppercase font-black tracking-[0.5em] text-slate-600">© 2026 ManagerX Development</p>
+                  <p className="mt-12 text-[10px] uppercase font-black tracking-[0.5em] text-slate-600">© {new Date().getFullYear()} ManagerX Development</p>
                 </div>
               </div>
             </Section>

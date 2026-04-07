@@ -1,5 +1,5 @@
 # Copyright (c) 2025 OPPRO.NET Network
-from mx_devtools import TempVCDatabase
+from mxmariadb import TempVCDatabase
 import discord
 from discord import slash_command, option, SlashCommandGroup
 from discord.ext import commands

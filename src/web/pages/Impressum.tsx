@@ -8,6 +8,7 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { SEO } from "../components/SEO";
 import { motion } from "framer-motion";
+import { LEGAL_CONFIG } from "../lib/legal";
 
 const SECTIONS = [
   { id: "verantwortlich", title: "Verantwortlich", icon: User },
@@ -130,16 +131,16 @@ export const Impressum = memo(function Impressum() {
           <article className="space-y-24">
             <Section id="verantwortlich" title="Verantwortlich">
               <div className="p-8 rounded-3xl bg-[#111318] border border-white/5">
-                <p className="text-2xl font-black text-white tracking-tight uppercase italic underline decoration-primary/30">Lenny Steiger</p>
-                <p className="text-sm text-slate-500 mt-2 font-bold uppercase tracking-widest">Gründer & Projektleiter</p>
+                <p className="text-2xl font-black text-white tracking-tight uppercase italic underline decoration-primary/30">{LEGAL_CONFIG.owner.name}</p>
+                <p className="text-sm text-slate-500 mt-2 font-bold uppercase tracking-widest">{LEGAL_CONFIG.owner.role}</p>
               </div>
             </Section>
 
             <Section id="anschrift" title="Anschrift">
               <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-2 font-bold text-white">
-                <p>Eulauer Str. 24</p>
-                <p>04523 Pegau</p>
-                <p className="text-slate-500 font-medium">Deutschland</p>
+                <p>{LEGAL_CONFIG.owner.address.street}</p>
+                <p>{LEGAL_CONFIG.owner.address.city}</p>
+                <p className="text-slate-500 font-medium">{LEGAL_CONFIG.owner.address.country}</p>
               </div>
             </Section>
 
@@ -147,14 +148,14 @@ export const Impressum = memo(function Impressum() {
               <div className="grid gap-6">
                 <div className="p-8 rounded-3xl bg-[#111318] border border-white/5">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">E-Mail</p>
-                  <a href="mailto:contact@managerx-bot.de" className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
-                    contact@managerx-bot.de
+                  <a href={`mailto:${LEGAL_CONFIG.contact.email}`} className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
+                    {LEGAL_CONFIG.contact.email}
                   </a>
                 </div>
                 <div className="p-8 rounded-3xl bg-[#111318] border border-white/5">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Legal Support</p>
-                  <a href="mailto:legal@managerx-bot.de" className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
-                    legal@managerx-bot.de
+                  <a href={`mailto:${LEGAL_CONFIG.contact.legalEmail}`} className="text-xl font-black text-white hover:text-primary transition-all underline decoration-primary/30 underline-offset-4">
+                    {LEGAL_CONFIG.contact.legalEmail}
                   </a>
                 </div>
               </div>
@@ -181,8 +182,8 @@ export const Impressum = memo(function Impressum() {
 
             <Section id="hosting" title="Hosting">
               <div className="p-8 rounded-3xl bg-[#111318] border border-white/5">
-                <p>Bereitgestellt via GitHub Pages:</p>
-                <p className="mt-2 text-sm text-slate-500 italic">GitHub Inc., 88 Colin P. Kelly Jr St, San Francisco, CA 94107, USA.</p>
+                <p>{LEGAL_CONFIG.hosting.provider}</p>
+                <p className="mt-2 text-sm text-slate-500 italic">{LEGAL_CONFIG.hosting.details}</p>
               </div>
             </Section>
 
@@ -196,10 +197,10 @@ export const Impressum = memo(function Impressum() {
               <div className="relative z-10">
                 <Mail className="w-16 h-16 text-primary mx-auto mb-6" />
                 <h4 className="text-4xl font-black text-white uppercase italic tracking-tighter mb-4">Support</h4>
-                <a href="mailto:contact@managerx-bot.de" className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
-                  contact@managerx-bot.de
+                <a href={`mailto:${LEGAL_CONFIG.contact.email}`} className="text-2xl text-slate-400 hover:text-white transition-colors underline underline-offset-8 decoration-primary/40">
+                  {LEGAL_CONFIG.contact.email}
                 </a>
-                <p className="mt-12 text-[10px] uppercase font-black tracking-[0.5em] text-slate-600">Stand: Februar 2026 • © ManagerX Development</p>
+                <p className="mt-12 text-[10px] uppercase font-black tracking-[0.5em] text-slate-600">Stand: {LEGAL_CONFIG.lastUpdate} • © ManagerX Development</p>
               </div>
             </div>
           </article>
@@ -211,4 +212,4 @@ export const Impressum = memo(function Impressum() {
   );
 });
 
-export default Impressum;
+export default Impressum;

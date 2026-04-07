@@ -21,6 +21,8 @@ interface Channel {
     name: string;
 }
 
+import { API_URL } from "../lib/api";
+
 export default function GlobalChatSettings({ guildId }: { guildId: string }) {
     const { token } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
@@ -36,10 +38,8 @@ export default function GlobalChatSettings({ guildId }: { guildId: string }) {
         const fetchData = async () => {
             if (!token || !guildId) return;
             try {
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-
                 // Fetch Channels
-                const channelRes = await fetch(`${baseUrl}/dashboard/guilds/${guildId}/channels`, {
+                const channelRes = await fetch(`${API_URL}/dashboard/guilds/${guildId}/channels`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (channelRes.ok) {
@@ -48,7 +48,7 @@ export default function GlobalChatSettings({ guildId }: { guildId: string }) {
                 }
 
                 // Fetch GlobalChat Settings
-                const settingsRes = await fetch(`${baseUrl}/dashboard/settings/${guildId}/globalchat`, {
+                const settingsRes = await fetch(`${API_URL}/dashboard/settings/${guildId}/globalchat`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (settingsRes.ok) {
@@ -71,7 +71,6 @@ export default function GlobalChatSettings({ guildId }: { guildId: string }) {
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
             const payload = {
                 channel_id: channelId,
                 filter_enabled: filterEnabled,
@@ -79,7 +78,7 @@ export default function GlobalChatSettings({ guildId }: { guildId: string }) {
                 embed_color: embedColor
             };
 
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/globalchat`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/globalchat`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,

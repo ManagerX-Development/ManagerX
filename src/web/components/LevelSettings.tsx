@@ -25,6 +25,8 @@ interface LevelSettingsProps {
     channels: any[];
 }
 
+import { API_URL } from "../lib/api";
+
 export default function LevelSettings({ guildId, channels }: LevelSettingsProps) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -43,8 +45,7 @@ export default function LevelSettings({ guildId, channels }: LevelSettingsProps)
 
     const fetchSettings = async () => {
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/levels`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/levels`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -64,8 +65,7 @@ export default function LevelSettings({ guildId, channels }: LevelSettingsProps)
     const handleSave = async () => {
         setSaving(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/levels`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/levels`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

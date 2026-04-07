@@ -6,7 +6,7 @@ import discord
 from discord import SlashCommandGroup
 import datetime
 import ezcord
-from mx_devtools import NotesDatabase
+from mxmariadb import NotesDatabase
 
 notes = SlashCommandGroup("notes")
 # ───────────────────────────────────────────────
@@ -16,7 +16,7 @@ class NotesCog(ezcord.Cog, group="moderation"):
 
     def __init__(self, bot):
         self.bot = bot
-        self.db = NotesDatabase("data")
+        self.db = NotesDatabase()
 
     @notes.command(name="add", description="📝 Speichere eine Notiz für einen User")
     async def add(

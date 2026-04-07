@@ -4,7 +4,7 @@ from discord import SlashCommandGroup, Option
 from discord.ext import commands, tasks
 import time
 import random
-from mx_devtools import LevelDatabase
+from mxmariadb import LevelDatabase
 import asyncio
 import io
 import csv

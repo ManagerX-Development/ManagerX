@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 from discord import SlashCommandGroup
 import logging
 from typing import Optional
-from mx_devtools import StatsDB, LevelDatabase
+from mxmariadb import StatsDB, LevelDatabase
 import asyncio
 import ezcord
 from datetime import datetime, timedelta
@@ -21,10 +21,17 @@ class EnhancedStatsCog(ezcord.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.db = getattr(bot, "stats_db", None) or StatsDB()
+        
+        # 1. StatsDB initialisieren (Keine Argumente in die Klammern!)
+        self.db = StatsDB() 
+        
+        # 2. LevelDatabase initialisieren (Ebenfalls leer lassen)
+        self.level_db = LevelDatabase()
+        
+        # Optional: Die DB am Bot-Objekt registrieren, falls andere Cogs sie brauchen
         if not hasattr(bot, "stats_db"):
             bot.stats_db = self.db
-        self.level_db = LevelDatabase()
+
         self.cleanup_task.start()
         self.monthly_reset_task.start()
         logger.info("Enhanced StatsCog initialized")

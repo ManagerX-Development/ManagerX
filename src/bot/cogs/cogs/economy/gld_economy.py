@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from discord import slash_command, Option
 import ezcord
-from mx_devtools import EconomyDatabase
+from mxmariadb import EconomyDatabase
 
 class GuildEconomy(ezcord.Cog):
     def __init__(self, bot):

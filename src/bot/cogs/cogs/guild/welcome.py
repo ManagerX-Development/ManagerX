@@ -8,7 +8,7 @@ DM-Nachrichten und Statistiken.
 
 import discord
 from discord.ext import commands
-from mx_devtools import WelcomeDatabase
+from mxmariadb import WelcomeDatabase
 import asyncio
 import json
 import io
@@ -616,7 +616,7 @@ class WelcomeSystem(ezcord.Cog):
                     container.add_separator()
                     container.add_text(
                         "## 👀 Vorschau (mit deinen Daten)\n\n"
-                        f"{preview[:500] + ("..." if len(preview) > 500 else "")}\n\n"
+                        f"{preview[:500] + ('...' if len(preview) > 500 else '')}\n\n"
                         "-# 💡 Tipp: Verwende `/welcome test` für eine vollständige Vorschau oder `/welcome placeholders` für alle verfügbaren Optionen."
                     )
                     view = discord.ui.DesignerView(container, timeout=None)

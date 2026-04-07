@@ -17,11 +17,14 @@ import {
     Search
 } from "lucide-react";
 import { SearchableSelect } from "./ui/SearchableSelect";
+import { toast } from "sonner";
 
 interface LoggingSettingsProps {
     guildId: string;
     channels: any[];
 }
+
+import { API_URL } from "../lib/api";
 
 export default function LoggingSettings({ guildId, channels }: LoggingSettingsProps) {
     const [loading, setLoading] = useState(true);
@@ -41,8 +44,7 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
 
     const fetchSettings = async () => {
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/logging`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/logging`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -62,8 +64,7 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
     const handleSave = async () => {
         setSaving(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/logging`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/logging`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

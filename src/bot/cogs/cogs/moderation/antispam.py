@@ -8,7 +8,7 @@ import datetime
 from datetime import timedelta
 
 
-from mx_devtools import AntiSpamDatabase as SpamDB
+from mxmariadb import AntiSpamDatabase as SpamDB
 
 antispam = SlashCommandGroup("antispam")
 class AntiSpam(ezcord.Cog):
@@ -29,7 +29,7 @@ class AntiSpam(ezcord.Cog):
             return
 
         # Check if user is whitelisted
-        if self.is_whitelisted(message.guild.id, message.author.id):
+        if await self.is_whitelisted(message.guild.id, message.author.id):
             return
 
         # Get spam settings for this guild
