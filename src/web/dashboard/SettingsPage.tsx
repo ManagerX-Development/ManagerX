@@ -48,6 +48,8 @@ const CategoryHeader = ({ children }: { children: React.ReactNode }) => (
     <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 px-4 mt-6 mb-2">{children}</h3>
 );
 
+import { API_URL } from "../lib/api";
+
 export default function SettingsPage() {
     const { token, selectedGuildId } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
@@ -78,10 +80,8 @@ export default function SettingsPage() {
             if (!token || !guildId) return;
             setIsLoading(true);
             try {
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-
                 // Fetch EVERYTHING in ONE call
-                const res = await fetch(`${baseUrl}/dashboard/guilds/${guildId}/mega-data`, {
+                const res = await fetch(`${API_URL}/dashboard/guilds/${guildId}/mega-data`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 
@@ -123,8 +123,7 @@ export default function SettingsPage() {
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const apiUrl = `${baseUrl}/dashboard/settings/${guildId}`;
+            const apiUrl = `${API_URL}/dashboard/settings/${guildId}`;
 
             const payload = { prefix, autoMod, welcomeMessage, language, user_role_id: userRoleId, team_role_id: teamRoleId };
 

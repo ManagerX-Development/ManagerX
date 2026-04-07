@@ -32,22 +32,22 @@ class BotSetup:
         # Bot erstellen
         bot = ezcord.PrefixBot(
             intents=intents,
-            language=BotConfig.LANGUAGE,
-            command_prefix=BotConfig.PREFIX,
+            language=BotConfig.bot.language,
+            command_prefix=BotConfig.bot.prefix,
             help_command=None
         )
         
         # Ezcord Help Command aktivieren
         embed = discord.Embed(
-            title=f"Hello, I'm {BotConfig.NAME}!", 
+            title=f"Hello, I'm {BotConfig.bot.name}!", 
             description=(
                 f"**The ultimate all-in-one Discord solution.**\n\n"
-                f"> {BotConfig.NAME} simplifies server management and brings your community "
+                f"> {BotConfig.bot.name} simplifies server management and brings your community "
                 "together with engaging games and reliable tools.\n\n"
                 "✨ **Getting Started**\n"
                 "Use the menu below to explore all commands!"
             ),
-            color=discord.Color.from_rgb(*BotConfig.EMBED_COLOR),
+            color=discord.Color.from_rgb(*BotConfig.ui.colors.primary),
             timestamp=discord.utils.utcnow()
         )
 
@@ -65,15 +65,15 @@ class BotSetup:
         embed.add_field(
             name="🔗 **Important Links**",
             value=(
-                f"🌐 [**Website**]({BotConfig.WEBSITE}) • "
-                f"🚑 [**Support**]({BotConfig.SUPPORT}) • "
-                f"💻 [**GitHub**]({BotConfig.GITHUB})"
+                f"🌐 [**Website**]({BotConfig.links.website}) • "
+                f"🚑 [**Support**]({BotConfig.links.support}) • "
+                f"💻 [**GitHub**]({BotConfig.links.github})"
             ),
             inline=False
         )
         
         # Check if we can set a thumbnail or image (safe fallback)
-        embed.set_footer(text=BotConfig.FOOTER_TEXT, icon_url=None)
+        embed.set_footer(text=BotConfig.ui.footer_text, icon_url=None)
 
         bot.add_help_command(
             embed=embed,

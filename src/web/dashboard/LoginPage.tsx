@@ -28,11 +28,12 @@ const FeatureItem = ({ icon: Icon, title, description }: { icon: any, title: str
     </div>
 );
 
+import { API_URL } from "../lib/api";
+
 export default function LoginPage() {
     const handleLogin = async () => {
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const apiUrl = `${baseUrl}/dashboard/auth/login`;
+            const apiUrl = `${API_URL}/dashboard/auth/login`;
 
             const res = await fetch(apiUrl);
             if (!res.ok) throw new Error("Could not fetch login URL");

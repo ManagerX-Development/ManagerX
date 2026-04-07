@@ -13,6 +13,8 @@ interface OverviewSettingsProps {
     settings?: any;
 }
 
+import { API_URL } from "../lib/api";
+
 export default function OverviewSettings({ guildId, initialStats, settings }: OverviewSettingsProps) {
     const [stats, setStats] = useState<any>(initialStats || null);
     const [loading, setLoading] = useState(!initialStats);
@@ -28,7 +30,7 @@ export default function OverviewSettings({ guildId, initialStats, settings }: Ov
             if (!guildId) return;
             const token = localStorage.getItem("token");
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard/guilds/${guildId}/stats`, {
+                const response = await fetch(`${API_URL}/dashboard/guilds/${guildId}/stats`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (response.ok) {
@@ -142,7 +144,7 @@ export default function OverviewSettings({ guildId, initialStats, settings }: Ov
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                              <div className="space-y-6">
                                  <div className="p-5 rounded-3xl bg-white/5 border border-white/10">
-                                     <OverviewCharts data={messageData} type="messages" color="#DC2626" height={180} />
+                                     <OverviewCharts data={messageData} type="messages" color="#DC2626" />
                                      <p className="text-center text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-4">Nachrichten Volumen (7 Tage)</p>
                                  </div>
                              </div>

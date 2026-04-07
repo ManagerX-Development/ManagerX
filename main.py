@@ -18,8 +18,9 @@ from colorama import Fore, Style, init as colorama_init
 from dotenv import load_dotenv
 import ezcord
 from ezcord import CogLog
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
 from uvicorn import Server, Config
 
 # Logger (muss existieren!)
@@ -52,10 +53,13 @@ from mx_handler import TranslationHandler
 
 colorama_init(autoreset=True)
 
+print(f"[{Fore.BLUE}DEBUG{Style.RESET_ALL}] Translation Config: {BotConfig.translation}")
+print(f"[{Fore.BLUE}DEBUG{Style.RESET_ALL}] Translation Path: {BotConfig.translation.path} (Type: {type(BotConfig.translation.path)})")
+
 TranslationHandler.settings(
-    path=BotConfig.LANG_PATH,
-    default_lang=BotConfig.DEFAULT_LANG,
-    fallback_langs=BotConfig.FALLBACK_LANGS,
+    path=str(BotConfig.translation.path) if BotConfig.translation.path else "translation/messages",
+    default_lang=BotConfig.translation.default_lang,
+    fallback_langs=tuple(BotConfig.translation.fallback_langs),
     logging=False,
     colored=False,
     log_level="DEBUG"
@@ -77,7 +81,7 @@ app = FastAPI(
 # CORS aktivieren
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=BotConfig.CORS_ORIGINS,
+    allow_origins=BotConfig.api.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -87,17 +91,22 @@ app.add_middleware(
 app.include_router(dashboard_main_router)
 app.include_router(router_public)
 
+@app.get("/robots.txt", response_class=PlainTextResponse)
+async def robots():
+    """Disallow all crawlers for the API."""
+    return "User-agent: *\nDisallow: /"
+
 async def start_webserver():
     """Startet den FastAPI Webserver"""
     server_config = Config(
         app=app, 
-        host=BotConfig.API_HOST, 
-        port=BotConfig.API_PORT, 
-        log_level=BotConfig.API_LOG_LEVEL
+        host=BotConfig.api.host, 
+        port=BotConfig.api.port, 
+        log_level=BotConfig.api.log_level
     )
     server = Server(server_config)
     await server.serve()
-    logger.success("API", f"FastAPI-Server läuft auf http://{BotConfig.API_HOST}:{BotConfig.API_PORT}")
+    logger.success("API", f"FastAPI-Server läuft auf http://{BotConfig.api.host}:{BotConfig.api.port}")
 
 # =============================================================================
 # MAIN EXECUTION

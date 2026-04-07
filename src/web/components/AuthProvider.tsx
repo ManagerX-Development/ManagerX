@@ -13,6 +13,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+import { API_URL } from "../lib/api";
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
     const [user, setUser] = useState<any | null>(JSON.parse(localStorage.getItem("user") || "null"));
@@ -42,9 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const path = params.get("p");
 
         if (code && (window.location.pathname.includes("auth/callback") || path?.includes("/auth/callback"))) {
-            const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
-            
-            fetch(`${baseUrl}/dashboard/auth/callback`, {
+            fetch(`${API_URL}/dashboard/auth/callback`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code })
@@ -61,8 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // --- USER & GUILDS LADEN ---
     useEffect(() => {
         if (token) {
-            const baseUrl = import.meta.env.VITE_API_URL || 'https://api.managerx-bot.de';
-            fetch(`${baseUrl}/dashboard/auth/me`, {
+            fetch(`${API_URL}/dashboard/auth/me`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "X-Discord-Token": localStorage.getItem("discord_token") || ""

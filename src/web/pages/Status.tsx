@@ -8,6 +8,10 @@ import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { SEO } from "../components/SEO";
 import { motion } from "framer-motion";
+import { LEGAL_CONFIG } from "../lib/legal";
+
+import { API_URL } from "../lib/api";
+
 const Status = memo(function Status() {
   // State für die Live-Daten vom Bot
   const [data, setData] = useState({
@@ -24,8 +28,7 @@ const Status = memo(function Status() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8040";
-        const response = await fetch(`${baseUrl}/v1/managerx/stats`);
+        const response = await fetch(`${API_URL}/v1/managerx/stats`);
         if (!response.ok) throw new Error("Offline");
 
         const result = await response.json();
@@ -182,7 +185,7 @@ const Status = memo(function Status() {
               <p>Überprüfung erfolgt alle 15 Sekunden via FastAPI-Endpoint.</p>
             </div>
             <div className="flex gap-3">
-              <a href="mailto:support@managerx-bot.de" className="p-3 glass rounded-xl hover:text-primary transition-colors border border-white/5" title="Email">
+              <a href={`mailto:${LEGAL_CONFIG.contact.supportEmail}`} className="p-3 glass rounded-xl hover:text-primary transition-colors border border-white/5" title="Email">
                 <Mail className="w-5 h-5" />
               </a>
               <a href="https://github.com/ManagerX-Development" className="p-3 glass rounded-xl hover:text-primary transition-colors border border-white/5" title="GitHub">

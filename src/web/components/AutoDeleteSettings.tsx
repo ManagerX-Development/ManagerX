@@ -26,6 +26,8 @@ interface ChannelConfig {
     delay: number;
 }
 
+import { API_URL } from "../lib/api";
+
 export default function AutoDeleteSettings({ guildId, channels }: AutoDeleteSettingsProps) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -37,8 +39,7 @@ export default function AutoDeleteSettings({ guildId, channels }: AutoDeleteSett
 
     const fetchSettings = async () => {
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/autodelete`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/autodelete`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -58,8 +59,7 @@ export default function AutoDeleteSettings({ guildId, channels }: AutoDeleteSett
     const handleSave = async () => {
         setSaving(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/autodelete`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/autodelete`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

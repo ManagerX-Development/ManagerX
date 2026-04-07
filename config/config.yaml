@@ -116,8 +116,17 @@ intervals:
 features:
   bot_status: true
   cogs:
-    fun:
-      gewinnt: true
+    management:
+      autodelete: true
+      autorole: true
+      database_backup: true
+    guild:
+      levelsystem: true
+      welcome: true
+      global_chat: true
+      loggingsystem: true
+      tempvc: true
+      utility: true
       tictactoe: true
       weather: true
       wikipedia: true

@@ -25,7 +25,7 @@ def print_logo():
     for line in logo_lines:
         print(line)
     print(f"{'=' * 91}")
-    print(f" ManagerX Discord Bot v{BotConfig.VERSION}")
+    print(f" ManagerX Discord Bot v{BotConfig.bot.version}")
     print(f"{'=' * 91}{Style.RESET_ALL}\n")
 
 

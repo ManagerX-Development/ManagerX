@@ -17,6 +17,8 @@ interface LeaderboardUser {
     voice_minutes: number;
 }
 
+import { API_URL } from "../lib/api";
+
 export const LeaderboardPage = memo(function LeaderboardPage() {
     const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
     const [loading, setLoading] = useState(true);
@@ -25,8 +27,7 @@ export const LeaderboardPage = memo(function LeaderboardPage() {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8040";
-                const response = await fetch(`${baseUrl}/v1/managerx/leaderboard`);
+                const response = await fetch(`${API_URL}/v1/managerx/leaderboard`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success) {

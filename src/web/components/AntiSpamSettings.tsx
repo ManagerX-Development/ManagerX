@@ -21,6 +21,8 @@ interface Channel {
     name: string;
 }
 
+import { API_URL } from "../lib/api";
+
 export default function AntiSpamSettings({ guildId }: { guildId: string }) {
     const { token } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
@@ -35,10 +37,8 @@ export default function AntiSpamSettings({ guildId }: { guildId: string }) {
         const fetchData = async () => {
             if (!token || !guildId) return;
             try {
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-
                 // Fetch Channels
-                const channelRes = await fetch(`${baseUrl}/dashboard/guilds/${guildId}/channels`, {
+                const channelRes = await fetch(`${API_URL}/dashboard/guilds/${guildId}/channels`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (channelRes.ok) {
@@ -47,7 +47,7 @@ export default function AntiSpamSettings({ guildId }: { guildId: string }) {
                 }
 
                 // Fetch AntiSpam Settings
-                const settingsRes = await fetch(`${baseUrl}/dashboard/settings/${guildId}/antispam`, {
+                const settingsRes = await fetch(`${API_URL}/dashboard/settings/${guildId}/antispam`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (settingsRes.ok) {
@@ -69,14 +69,13 @@ export default function AntiSpamSettings({ guildId }: { guildId: string }) {
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
             const payload = {
                 max_messages: maxMessages,
                 time_frame: timeFrame,
                 log_channel_id: logChannelId
             };
 
-            const res = await fetch(`${baseUrl}/dashboard/settings/${guildId}/antispam`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/antispam`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,

@@ -37,6 +37,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Toaster, toast } from "sonner";
 import { cn } from "../lib/utils";
 
+import { API_URL } from "../lib/api";
+
 export default function UserSettingsPage() {
     const { token, user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
@@ -58,8 +60,7 @@ export default function UserSettingsPage() {
             if (!token) return;
             setIsLoading(true);
             try {
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-                const res = await fetch(`${baseUrl}/dashboard/user/settings`, {
+                const res = await fetch(`${API_URL}/dashboard/user/settings`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
 
@@ -91,8 +92,7 @@ export default function UserSettingsPage() {
         if (!token) return;
         setIsSaving(true);
         try {
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-            const res = await fetch(`${baseUrl}/dashboard/user/settings`, {
+            const res = await fetch(`${API_URL}/dashboard/user/settings`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,

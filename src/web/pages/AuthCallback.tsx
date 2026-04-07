@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../components/AuthProvider";
 import { toast } from "sonner";
+import { API_URL } from "../lib/api";
 
 export default function AuthCallback() {
     const [searchParams] = useSearchParams();
@@ -21,8 +22,7 @@ export default function AuthCallback() {
         const handleAuth = async () => {
             try {
                 // Adjust to your actual backend domain/port, 8040 is what the python API uses
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8040';
-                const apiUrl = `${baseUrl}/dashboard/auth/callback`;
+                const apiUrl = `${API_URL}/dashboard/auth/callback`;
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
