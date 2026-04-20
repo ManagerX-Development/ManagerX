@@ -47,6 +47,12 @@ class LevelDatabase(MariaConnector):
         self.level_roles_cache: Dict[int, Dict[int, int]] = {}
         self.enabled_guilds_cache: set = set()
         self.guild_configs_cache: Dict[int, Dict] = {}
+        self._initialized = False
+
+    async def _ensure_initialized(self):
+        """Lazy init: create tables on first use if not already done."""
+        if not self._initialized:
+            await self.init_db()
 
     async def init_db(self):
         """Create tables and load caches."""
@@ -132,6 +138,7 @@ class LevelDatabase(MariaConnector):
                     )
                 ''')
             await conn.commit()
+        self._initialized = True
         await self.load_caches()
         logger.info("MariaDB levelsystem tables initialized")
 
@@ -158,6 +165,7 @@ class LevelDatabase(MariaConnector):
 
     async def add_xp(self, user_id: int, guild_id: int, xp_amount: int,
                      message_content: str = "") -> Tuple[bool, int]:
+        await self._ensure_initialized()
         current_time = time.time()
         if self.anti_spam.is_spam(user_id, current_time):
             return False, 0
@@ -198,6 +206,7 @@ class LevelDatabase(MariaConnector):
         return level_up, new_level
 
     async def get_user_stats(self, user_id: int, guild_id: int):
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
@@ -212,6 +221,7 @@ class LevelDatabase(MariaConnector):
                 return None
 
     async def get_leaderboard(self, guild_id: int, limit: int = 10) -> List[Tuple]:
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
@@ -222,6 +232,7 @@ class LevelDatabase(MariaConnector):
                 return await cur.fetchall()
 
     async def get_user_rank(self, user_id: int, guild_id: int) -> int:
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
@@ -242,6 +253,7 @@ class LevelDatabase(MariaConnector):
                 return (await cur.fetchone())[0]
 
     async def get_active_xp_multiplier(self, guild_id: int, user_id: int) -> float:
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 ct = time.time()
@@ -257,6 +269,7 @@ class LevelDatabase(MariaConnector):
     # --- Config ---
 
     async def set_guild_config(self, guild_id: int, **config):
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 keys = list(config.keys()) + ['guild_id']
@@ -274,6 +287,7 @@ class LevelDatabase(MariaConnector):
         self.guild_configs_cache[guild_id].update(config)
 
     async def get_guild_config(self, guild_id: int) -> Dict[str, Any]:
+        await self._ensure_initialized()
         if guild_id in self.guild_configs_cache:
             return self.guild_configs_cache[guild_id]
         async with self.pool.acquire() as conn:
@@ -299,6 +313,7 @@ class LevelDatabase(MariaConnector):
 
     async def add_level_role(self, guild_id: int, level: int, role_id: int,
                              is_temporary: bool = False, duration_hours: int = 0):
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute('''
@@ -313,6 +328,7 @@ class LevelDatabase(MariaConnector):
         self.level_roles_cache[guild_id][level] = role_id
 
     async def remove_level_role(self, guild_id: int, level: int):
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
@@ -323,6 +339,7 @@ class LevelDatabase(MariaConnector):
             del self.level_roles_cache[guild_id][level]
 
     async def get_level_roles(self, guild_id: int) -> List[Tuple]:
+        await self._ensure_initialized()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute(
@@ -338,6 +355,7 @@ class LevelDatabase(MariaConnector):
         return None
 
     async def set_levelsystem_enabled(self, guild_id: int, enabled: bool):
+        await self._ensure_initialized()
         await self.set_guild_config(guild_id, levelsystem_enabled=enabled)
         if enabled:
             self.enabled_guilds_cache.add(guild_id)
@@ -365,6 +383,7 @@ class LevelDatabase(MariaConnector):
     # --- Maintenance ---
 
     async def delete_user_data(self, user_id: int) -> bool:
+        await self._ensure_initialized()
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cur:
@@ -378,6 +397,7 @@ class LevelDatabase(MariaConnector):
             return False
 
     async def cleanup_old_data(self, days: int = 30) -> int:
+        await self._ensure_initialized()
         cutoff = time.time() - (days * 86400)
         try:
             async with self.pool.acquire() as conn:

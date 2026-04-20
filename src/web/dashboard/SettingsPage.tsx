@@ -26,23 +26,25 @@ import {
 } from "lucide-react";
 import { useAuth } from "../components/AuthProvider";
 import { Button } from "../components/ui/button";
-import AutoRoleSettings from "../components/AutoRoleSettings";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Switch } from "../components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Toaster, toast } from "sonner";
-import { cn } from "../lib/utils";
-import WelcomeSettings from "../components/WelcomeSettings";
-import AntiSpamSettings from "../components/AntiSpamSettings";
-import GlobalChatSettings from "../components/GlobalChatSettings";
-import LevelSettings from "../components/LevelSettings";
-import LoggingSettings from "../components/LoggingSettings";
-import AutoDeleteSettings from "../components/AutoDeleteSettings";
-import TempVCSettings from "../components/TempVCSettings";
-import GuildSelector from "../components/GuildSelector";
-import OverviewSettings from "../components/OverviewSettings";
+import { lazy, Suspense } from "react";
+const AutoRoleSettings = lazy(() => import("../components/AutoRoleSettings"));
+const WelcomeSettings = lazy(() => import("../components/WelcomeSettings"));
+const AntiSpamSettings = lazy(() => import("../components/AntiSpamSettings"));
+const GlobalChatSettings = lazy(() => import("../components/GlobalChatSettings"));
+const LevelSettings = lazy(() => import("../components/LevelSettings"));
+const LoggingSettings = lazy(() => import("../components/LoggingSettings"));
+const AutoDeleteSettings = lazy(() => import("../components/AutoDeleteSettings"));
+const TempVCSettings = lazy(() => import("../components/TempVCSettings"));
+const OverviewSettings = lazy(() => import("../components/OverviewSettings"));
+
+const TabLoader = () => (
+    <div className="w-full flex items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-4">
+            <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+            <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">Lade Modul...</p>
+        </div>
+    </div>
+);
 
 const CategoryHeader = ({ children }: { children: React.ReactNode }) => (
     <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 px-4 mt-6 mb-2">{children}</h3>
@@ -253,153 +255,155 @@ export default function SettingsPage() {
                                     exit={{ opacity: 0, x: -20 }}
                                     transition={{ duration: 0.3, ease: "easeOut" }}
                                 >
-                                    <TabsContent value="overview" className="mt-0 outline-none">
-                                        {guildId ? <OverviewSettings guildId={guildId} initialStats={stats} settings={{ auto_mod: autoMod, welcome_message: welcomeMessage }} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
+                                    <Suspense fallback={<TabLoader />}>
+                                        <TabsContent value="overview" className="mt-0 outline-none">
+                                            {guildId ? <OverviewSettings guildId={guildId} initialStats={stats} settings={{ auto_mod: autoMod, welcome_message: welcomeMessage }} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
 
-                                    <TabsContent value="general" className="mt-0 outline-none">
-                                        <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -mr-32 -mt-32 pointer-events-none" />
-                                            <CardHeader className="pb-8 pt-10 px-10">
-                                                <CardTitle className="text-3xl font-bold tracking-tight">Bot-Zentrale</CardTitle>
-                                                <CardDescription className="text-base text-muted-foreground/70">Wichtige Kern-Identität deiner Bot-Instanz.</CardDescription>
-                                            </CardHeader>
-                                            <CardContent className="space-y-10 px-10 pb-10">
-                                                <div className="space-y-4">
-                                                    <Label htmlFor="bot-name" className="text-sm font-bold uppercase tracking-widest text-primary">Branding Name</Label>
-                                                    <div className="relative group">
-                                                        <Input
-                                                            id="bot-name"
-                                                            value={botName}
-                                                            onChange={(e) => setBotName(e.target.value)}
-                                                            className="bg-white/5 border-white/10 focus:border-primary/50 h-14 rounded-2xl text-lg pl-6 transition-all"
-                                                            placeholder="ManagerX"
-                                                        />
-                                                        <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-4">
-                                                    <Label htmlFor="prefix" className="text-sm font-bold uppercase tracking-widest text-primary">Command Prefix</Label>
-                                                    <div className="flex gap-4">
+                                        <TabsContent value="general" className="mt-0 outline-none">
+                                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+                                                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -mr-32 -mt-32 pointer-events-none" />
+                                                <CardHeader className="pb-8 pt-10 px-10">
+                                                    <CardTitle className="text-3xl font-bold tracking-tight">Bot-Zentrale</CardTitle>
+                                                    <CardDescription className="text-base text-muted-foreground/70">Wichtige Kern-Identität deiner Bot-Instanz.</CardDescription>
+                                                </CardHeader>
+                                                <CardContent className="space-y-10 px-10 pb-10">
+                                                    <div className="space-y-4">
+                                                        <Label htmlFor="bot-name" className="text-sm font-bold uppercase tracking-widest text-primary">Branding Name</Label>
                                                         <div className="relative group">
                                                             <Input
-                                                                id="prefix"
-                                                                value={prefix}
-                                                                onChange={(e) => setPrefix(e.target.value)}
-                                                                className="bg-white/5 border-white/10 focus:border-primary/50 h-14 w-28 text-center font-mono text-2xl rounded-2xl transition-all"
-                                                                maxLength={3}
+                                                                id="bot-name"
+                                                                value={botName}
+                                                                onChange={(e) => setBotName(e.target.value)}
+                                                                className="bg-white/5 border-white/10 focus:border-primary/50 h-14 rounded-2xl text-lg pl-6 transition-all"
+                                                                placeholder="ManagerX"
                                                             />
                                                             <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                                                         </div>
-                                                        <div className="flex-1 flex items-center px-6 rounded-2xl border border-white/10 bg-white/5 text-sm md:text-base font-medium text-muted-foreground">
-                                                            Beispiel: <span className="text-white font-mono ml-2 font-bold">{prefix}help</span>
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        <Label htmlFor="prefix" className="text-sm font-bold uppercase tracking-widest text-primary">Command Prefix</Label>
+                                                        <div className="flex gap-4">
+                                                            <div className="relative group">
+                                                                <Input
+                                                                    id="prefix"
+                                                                    value={prefix}
+                                                                    onChange={(e) => setPrefix(e.target.value)}
+                                                                    className="bg-white/5 border-white/10 focus:border-primary/50 h-14 w-28 text-center font-mono text-2xl rounded-2xl transition-all"
+                                                                    maxLength={3}
+                                                                />
+                                                                <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                                                            </div>
+                                                            <div className="flex-1 flex items-center px-6 rounded-2xl border border-white/10 bg-white/5 text-sm md:text-base font-medium text-muted-foreground">
+                                                                Beispiel: <span className="text-white font-mono ml-2 font-bold">{prefix}help</span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                                                    <div className="space-y-4">
-                                                        <Label className="text-sm font-bold uppercase tracking-widest text-primary">Team Rolle</Label>
-                                                        <select 
-                                                            value={teamRoleId || ""} 
-                                                            onChange={(e) => setTeamRoleId(e.target.value || null)}
-                                                            className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
-                                                        >
-                                                            <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
-                                                            {guildData.roles.map(role => (
-                                                                <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
-                                                            ))}
-                                                        </select>
-                                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Mitglieder mit dieser Rolle werden als Staff im Dashboard angezeigt.</p>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                                                        <div className="space-y-4">
+                                                            <Label className="text-sm font-bold uppercase tracking-widest text-primary">Team Rolle</Label>
+                                                            <select 
+                                                                value={teamRoleId || ""} 
+                                                                onChange={(e) => setTeamRoleId(e.target.value || null)}
+                                                                className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
+                                                            >
+                                                                <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
+                                                                {guildData.roles.map(role => (
+                                                                    <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
+                                                                ))}
+                                                            </select>
+                                                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Mitglieder mit dieser Rolle werden als Staff im Dashboard angezeigt.</p>
+                                                        </div>
+
+                                                        <div className="space-y-4">
+                                                            <Label className="text-sm font-bold uppercase tracking-widest text-primary">User Rolle</Label>
+                                                            <select 
+                                                                value={userRoleId || ""} 
+                                                                onChange={(e) => setUserRoleId(e.target.value || null)}
+                                                                className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
+                                                            >
+                                                                <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
+                                                                {guildData.roles.map(role => (
+                                                                    <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
+                                                                ))}
+                                                            </select>
+                                                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Benutzer mit dieser Rolle werden im User-Quick-View angezeigt.</p>
+                                                        </div>
                                                     </div>
+                                                </CardContent>
+                                            </Card>
+                                        </TabsContent>
 
-                                                    <div className="space-y-4">
-                                                        <Label className="text-sm font-bold uppercase tracking-widest text-primary">User Rolle</Label>
-                                                        <select 
-                                                            value={userRoleId || ""} 
-                                                            onChange={(e) => setUserRoleId(e.target.value || null)}
-                                                            className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
-                                                        >
-                                                            <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
-                                                            {guildData.roles.map(role => (
-                                                                <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
-                                                            ))}
-                                                        </select>
-                                                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Benutzer mit dieser Rolle werden im User-Quick-View angezeigt.</p>
+                                        <TabsContent value="appearance" className="mt-0 outline-none">
+                                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+                                                <CardHeader className="pb-8 pt-10 px-10">
+                                                    <CardTitle className="text-3xl font-bold tracking-tight">Interface Design</CardTitle>
+                                                    <CardDescription className="text-base">Passe das Dashboard deinem Geschmack an.</CardDescription>
+                                                </CardHeader>
+                                                <CardContent className="px-10 pb-10">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                        <ThemeCard title="Light" active={theme === 'light'} onClick={() => setTheme("light")} icon={Sun} />
+                                                        <ThemeCard title="Dark" active={theme === 'dark'} onClick={() => setTheme("dark")} icon={Moon} />
+                                                        <ThemeCard title="System" active={theme === 'system'} onClick={() => setTheme("system")} icon={Monitor} />
                                                     </div>
+                                                </CardContent>
+                                            </Card>
+                                        </TabsContent>
+
+                                        <TabsContent value="levels" className="mt-0 outline-none">
+                                            {guildId ? <LevelSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="welcome" className="mt-0 outline-none">
+                                            {guildId ? <WelcomeSettings guildId={guildId} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="antispam" className="mt-0 outline-none">
+                                            {guildId ? <AntiSpamSettings guildId={guildId} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="logging" className="mt-0 outline-none">
+                                            {guildId ? <LoggingSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="globalchat" className="mt-0 outline-none">
+                                            {guildId ? <GlobalChatSettings guildId={guildId} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="autorole" className="mt-0 outline-none">
+                                            {guildId ? <AutoRoleSettings guildId={guildId} roles={guildData.roles} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="autodelete" className="mt-0 outline-none">
+                                            {guildId ? <AutoDeleteSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="tempvc" className="mt-0 outline-none">
+                                            {guildId ? (
+                                                <TempVCSettings
+                                                    guildId={guildId}
+                                                    categories={guildData.categories}
+                                                    voiceChannels={guildData.voiceChannels}
+                                                />
+                                            ) : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="notifications" className="mt-0 outline-none">
+                                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
+                                                <div className="flex flex-col items-center justify-center py-24 text-center px-10">
+                                                    <div className="w-24 h-24 rounded-[2rem] bg-primary/10 flex items-center justify-center mb-8 border border-primary/20 shadow-2xl">
+                                                        <Lock className="w-10 h-10 text-primary animate-pulse" />
+                                                    </div>
+                                                    <h3 className="text-2xl font-bold text-white mb-3">Enterprise Feature</h3>
+                                                    <p className="text-muted-foreground opacity-70 max-w-sm leading-relaxed">
+                                                        Coming Soon: Webhooks, Email-Alerts und Mobile Push Notifications für maximale Sicherheit.
+                                                    </p>
                                                 </div>
-                                            </CardContent>
-                                        </Card>
-                                    </TabsContent>
-
-                                    <TabsContent value="appearance" className="mt-0 outline-none">
-                                        <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                                            <CardHeader className="pb-8 pt-10 px-10">
-                                                <CardTitle className="text-3xl font-bold tracking-tight">Interface Design</CardTitle>
-                                                <CardDescription className="text-base">Passe das Dashboard deinem Geschmack an.</CardDescription>
-                                            </CardHeader>
-                                            <CardContent className="px-10 pb-10">
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                    <ThemeCard title="Light" active={theme === 'light'} onClick={() => setTheme("light")} icon={Sun} />
-                                                    <ThemeCard title="Dark" active={theme === 'dark'} onClick={() => setTheme("dark")} icon={Moon} />
-                                                    <ThemeCard title="System" active={theme === 'system'} onClick={() => setTheme("system")} icon={Monitor} />
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </TabsContent>
-
-                                    <TabsContent value="levels" className="mt-0 outline-none">
-                                        {guildId ? <LevelSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="welcome" className="mt-0 outline-none">
-                                        {guildId ? <WelcomeSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="antispam" className="mt-0 outline-none">
-                                        {guildId ? <AntiSpamSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="logging" className="mt-0 outline-none">
-                                        {guildId ? <LoggingSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="globalchat" className="mt-0 outline-none">
-                                        {guildId ? <GlobalChatSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="autorole" className="mt-0 outline-none">
-                                        {guildId ? <AutoRoleSettings guildId={guildId} roles={guildData.roles} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="autodelete" className="mt-0 outline-none">
-                                        {guildId ? <AutoDeleteSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="tempvc" className="mt-0 outline-none">
-                                        {guildId ? (
-                                            <TempVCSettings
-                                                guildId={guildId}
-                                                categories={guildData.categories}
-                                                voiceChannels={guildData.voiceChannels}
-                                            />
-                                        ) : <NoGuildPlaceholder />}
-                                    </TabsContent>
-
-                                    <TabsContent value="notifications" className="mt-0 outline-none">
-                                        <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                                            <div className="flex flex-col items-center justify-center py-24 text-center px-10">
-                                                <div className="w-24 h-24 rounded-[2rem] bg-primary/10 flex items-center justify-center mb-8 border border-primary/20 shadow-2xl">
-                                                    <Lock className="w-10 h-10 text-primary animate-pulse" />
-                                                </div>
-                                                <h3 className="text-2xl font-bold text-white mb-3">Enterprise Feature</h3>
-                                                <p className="text-muted-foreground opacity-70 max-w-sm leading-relaxed">
-                                                    Coming Soon: Webhooks, Email-Alerts und Mobile Push Notifications für maximale Sicherheit.
-                                                </p>
-                                            </div>
-                                        </Card>
-                                    </TabsContent>
+                                            </Card>
+                                        </TabsContent>
+                                    </Suspense>
                                 </motion.div>
                             </AnimatePresence>
                         </div>

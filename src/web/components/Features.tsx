@@ -66,47 +66,47 @@ const featureCategories = [
 
 export const Features = memo(function Features() {
   return (
-    <section id="features" className="py-32 relative overflow-hidden">
-      {/* Premium Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-accent/5" />
-      <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-primary/10 blur-[150px] rounded-full" />
-      <div className="absolute bottom-1/4 right-0 w-[700px] h-[700px] bg-accent/10 blur-[150px] rounded-full" />
+    <section id="features" className="py-40 relative overflow-hidden bg-[#080a0c]">
+      {/* Ultra-Premium Background */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.03)_0%,transparent_70%)]" />
+      <div className="absolute top-1/4 -left-48 w-[800px] h-[800px] bg-primary/10 blur-[180px] rounded-full opacity-30" />
+      <div className="absolute bottom-1/4 -right-48 w-[900px] h-[900px] bg-accent/10 blur-[180px] rounded-full opacity-30" />
 
       <div className="container mx-auto relative z-10 px-4">
-        {/* Section Header */}
-        <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-20">
+        {/* Elite Section Header */}
+        <div className="flex flex-col items-center text-center max-w-5xl mx-auto mb-28">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 mb-8"
+            className="inline-flex items-center gap-3 px-6 py-2 rounded-full glass-strong border border-white/10 mb-10 shadow-xl"
           >
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-foreground/70">Leistungsstarke Features</span>
+            <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+            <span className="text-[12px] font-black uppercase tracking-[0.4em] text-white/70">Next-Gen Architecture</span>
           </motion.div>
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-5xl md:text-7xl font-bold mb-8 tracking-tighter leading-tight"
+            className="text-6xl md:text-9xl font-black mb-10 tracking-tighter leading-[0.8] uppercase italic"
           >
-            Alles für dein <br className="md:hidden" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Discord Universum</span>
+            Dominanz durch <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary animate-gradient drop-shadow-[0_0_40px_rgba(220,38,38,0.3)]">Technologie</span>
           </motion.h2>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl font-medium leading-relaxed"
+            className="text-xl md:text-2xl text-slate-400 max-w-3xl font-medium leading-relaxed"
           >
-            Von moderner Server-Sicherheit bis hin zu interaktiven Community-Tools – wir haben alles an Bord.
+            Von hochperformanter Datenbank-Migration bis hin zu KI-gestützter Moderation – wir setzen neue Maßstäbe für deinen Discord-Server.
           </motion.p>
         </div>
 
-        {/* Feature Cards Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Feature Cards Elite Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {featureCategories.map((category, index) => (
             <FeatureCard
               key={category.title}
@@ -114,7 +114,7 @@ export const Features = memo(function Features() {
               title={category.title}
               features={category.features}
               category={category.category}
-              delay={index * 0.05} // Reduced from 0.1 for faster animations
+              delay={index * 0.08}
             />
           ))}
         </div>

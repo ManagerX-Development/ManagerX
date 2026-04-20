@@ -88,7 +88,7 @@ ManagerX basiert auf einem modernen und erweiterbaren Tech-Stack:
 - **Core**: Python 3.10+ & [Pycord](https://pycord.dev)
 - **Framework**: [Ezcord](https://github.com/ezcord-dev/ezcord) für schnelles Cog-Management
 - **UI Components**: Discord Container & DesignerView (v2)
-- **Database**: SQLite3 mit optimierter Index-Struktur
+- **Database**: MariaDB (MxMariaDB) für hohe Skalierbarkeit und Performance
 - **API/Dashboard**: FastAPI & React/Vite (TailwindCSS)
 
 <br>

@@ -11,10 +11,10 @@ const socialLinks = [
 export const Footer = memo(function Footer() {
   return (
     <footer className="relative py-32 bg-background overflow-hidden border-t border-white/5">
-      {/* Premium Hintergrund-Effekte */}
+      {/* Premium Hintergrund-Effekte - Optimized */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-      <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-primary/10 blur-[150px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/10 blur-[150px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-0 w-[400px] h-[400px] bg-primary/10 blur-[80px] rounded-full pointer-events-none will-change-transform" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/10 blur-[90px] rounded-full pointer-events-none will-change-transform" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,0,0,0.05),transparent)]" />
 
       <div className="container mx-auto relative z-10 px-4">

@@ -71,10 +71,10 @@ const Status = memo(function Status() {
       icon: Globe,
     },
     {
-      name: "Database Connection",
+      name: "MxMariaDB High-Performance",
       status: data.database === "connected" ? "online" : "offline",
-      latency: data.database,
-      description: "SQLite Settings Database für alle Guild-Konfigurationen",
+      latency: data.database === "connected" ? "Active" : "Disconnected",
+      description: "Skalierbare MariaDB Infrastruktur für Gilden-Daten",
       icon: Layers,
     }
   ];

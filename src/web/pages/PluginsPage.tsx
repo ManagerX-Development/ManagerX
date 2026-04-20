@@ -126,20 +126,23 @@ export const PluginsPage = memo(function PluginsPage() {
 
         {/* Content Area */}
         <div className="flex-grow max-w-3xl">
-          <header className="mb-20">
+          <header className="mb-24">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-4 text-primary mb-6"
+              className="flex items-center gap-4 text-primary mb-8"
             >
-              <Puzzle className="w-6 h-6" />
-              <span className="text-xs font-black uppercase tracking-[0.4em]">Features & Modules</span>
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-glow shadow-primary/20">
+                <Puzzle className="w-5 h-5" />
+              </div>
+              <span className="text-sm font-black uppercase tracking-[0.5em] text-primary-foreground/60 italic">Core Modules</span>
             </motion.div>
-            <h1 className="text-6xl md:text-8xl font-black tracking-tighter text-white uppercase italic leading-[0.9] mb-6">
-              Built-in <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary animate-gradient">Modules</span>
+            <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter text-white uppercase italic leading-[0.8] mb-10">
+              Elite <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary animate-gradient">Powerhouse</span>
             </h1>
-            <p className="text-xl text-slate-400 font-medium max-w-2xl leading-relaxed">
-              ManagerX ist kein einfacher Bot, sondern ein modulares Ökosystem. Entdecke die Power unserer nativen Plugins.
+            <p className="text-2xl text-slate-400 font-medium max-w-3xl leading-relaxed tracking-tight">
+              ManagerX ist weit mehr als ein einfacher Bot. Es ist ein modulares Hochleistungs-Ökosystem, designed für Titanen.
             </p>
           </header>
 

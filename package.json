@@ -1,13 +1,13 @@
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "lint": "eslint .",
+    "lint": "eslint src/web",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -73,7 +73,7 @@
     "@types/node": "24.12.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react-swc": "4.3.0",
+    "@vitejs/plugin-react-swc": "4.2.3",
     "autoprefixer": "10.4.27",
     "eslint": "10.0.3",
     "eslint-plugin-react-hooks": "7.0.1",
@@ -84,7 +84,7 @@
     "tailwindcss": "4.2.1",
     "typescript": "5.9.3",
     "typescript-eslint": "8.57.0",
-    "vite": "8.0.0",
-    "vitest": "4.1.0"
+    "vite": "7.3.1",
+    "vitest": "4.0.18"
   }
 }
