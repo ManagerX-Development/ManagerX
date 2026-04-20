@@ -1,5 +1,41 @@
 @import "tailwindcss";
 
+/* Inter */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Space Grotesk */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 @theme {
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
@@ -151,7 +187,7 @@
     --gradient-start: 0 84% 55%;
     --gradient-end: 340 100% 65%;
 
-    /* Feature category colors */
+    /* Feature category colors - Revitalized */
     --moderation: 0 84% 55%;
     --community: 15 90% 60%;
     --social: 340 90% 65%;
@@ -159,9 +195,9 @@
     --utility: 0 60% 45%;
 
     /* Efficiency variables */
-    --glass-blur: 16px;
-    --glass-opacity: 0.45;
-    --glass-border-opacity: 0.2;
+    --glass-blur: 24px;
+    --glass-opacity: 0.4;
+    --glass-border-opacity: 0.15;
   }
 
   .dark {
@@ -318,25 +354,19 @@
     radial-gradient(ellipse at 80% 30%, hsl(var(--accent) / 0.1) 0%, transparent 50%);
 }
 
-/* Glow Effects */
+/* Glow Effects - Simplified for performance */
 @utility glow-primary {
   box-shadow:
-    0 0 30px -5px hsl(var(--primary) / 0.8),
-    0 0 60px -10px hsl(var(--primary) / 0.6),
-    0 0 100px -20px hsl(var(--accent) / 0.4),
-    inset 0 0 40px -20px hsl(var(--primary) / 0.15);
+    0 0 40px -10px hsl(var(--primary) / 0.6),
+    0 0 80px -20px hsl(var(--accent) / 0.3);
 }
 
 @utility glow-accent {
-  box-shadow:
-    0 0 30px -5px hsl(var(--accent) / 0.7),
-    0 0 60px -10px hsl(var(--accent) / 0.5);
+  box-shadow: 0 0 45px -10px hsl(var(--accent) / 0.5);
 }
 
 @utility glow-subtle {
-  box-shadow:
-    0 0 40px -10px hsl(var(--primary) / 0.4),
-    0 0 80px -20px hsl(var(--accent) / 0.2);
+  box-shadow: 0 0 30px -15px hsl(var(--primary) / 0.4);
 }
 
 @utility glow-hover {
@@ -349,29 +379,61 @@
   }
 }
 
-/* Glass Morphism - Optimized for performance */
+/* Glass Morphism - Highly optimized */
 @utility glass {
-  background: hsl(var(--card) / calc(var(--glass-opacity) + 0.15));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid hsl(var(--border) / var(--glass-border-opacity));
-  border-top-color: hsl(var(--border) / calc(var(--glass-border-opacity) + 0.3));
+  background: hsl(var(--card) / 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid hsl(var(--border) / 0.1);
 }
 
 @utility glass-strong {
-  background: hsl(var(--card) / 0.85);
-  /* Higher opacity for less reliance on blur */
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border: 1px solid hsl(var(--border) / 0.5);
-  border-top-color: hsl(var(--border) / 0.8);
+  background: hsl(var(--card) / 0.88);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.3);
 }
 
 @utility glass-light {
   background: hsl(var(--background) / 0.4);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
-  border: 1px solid hsl(var(--border) / 0.3);
+  border: 1px solid hsl(var(--border) / 0.2);
+}
+
+/* Performance Utilities */
+@utility will-change-transform {
+  will-change: transform;
+}
+
+@utility will-change-opacity {
+  will-change: opacity;
+}
+
+/* GPU Accelerated Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.15); opacity: 0.5; }
+}
+
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+}
+
+.animate-float-slow {
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 /* Feature Card Styles */

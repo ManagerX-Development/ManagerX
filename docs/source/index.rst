@@ -184,10 +184,19 @@ We welcome contributions from the community! Whether it's bug reports, feature r
 
 .. toctree::
    :maxdepth: 2
-   :caption: User Guide:
+   :caption: 👥 User Guide:
 
    user_guide/index
-   :maxdepth: 2
-   :caption: Developer Guide:
+   user_guide/getting_started
+   user_guide/moderation
+   user_guide/levels
+   user_guide/management
+   user_guide/dashboard
 
-   Developer Guide <dev_guide/index>
+.. toctree::
+   :maxdepth: 2
+   :caption: 👨‍💻 Developer Guide:
+
+   dev_guide/index
+   dev_guide/architecture
+   dev_guide/installation

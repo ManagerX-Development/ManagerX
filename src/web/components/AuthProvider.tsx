@@ -16,17 +16,42 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 import { API_URL } from "../lib/api";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
-    const [user, setUser] = useState<any | null>(JSON.parse(localStorage.getItem("user") || "null"));
+    const getSafeItem = (key: string) => {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.warn(`Error reading ${key} from localStorage:`, e);
+            return null;
+        }
+    };
+
+    const getSafeJSON = (key: string) => {
+        const item = getSafeItem(key);
+        if (!item) return null;
+        try {
+            return JSON.parse(item);
+        } catch (e) {
+            console.error(`Error parsing ${key} from localStorage:`, e);
+            localStorage.removeItem(key); // Clear corrupted data
+            return null;
+        }
+    };
+
+    const [token, setToken] = useState<string | null>(getSafeItem("token"));
+    const [user, setUser] = useState<any | null>(getSafeJSON("user"));
     const [guilds, setGuilds] = useState<any[]>([]);
-    const [selectedGuildId, setSelectedGuildId] = useState<string | null>(localStorage.getItem("selectedGuildId"));
+    const [selectedGuildId, setSelectedGuildId] = useState<string | null>(getSafeItem("selectedGuildId"));
 
     const login = (newToken: string, newUser: any, newDiscordToken?: string) => {
         setToken(newToken);
         setUser(newUser);
-        localStorage.setItem("token", newToken);
-        localStorage.setItem("user", JSON.stringify(newUser));
-        if (newDiscordToken) localStorage.setItem("discord_token", newDiscordToken);
+        try {
+            localStorage.setItem("token", newToken);
+            localStorage.setItem("user", JSON.stringify(newUser));
+            if (newDiscordToken) localStorage.setItem("discord_token", newDiscordToken);
+        } catch (e) {
+            console.error("Error saving to localStorage:", e);
+        }
     };
 
     const logout = () => {
@@ -34,7 +59,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setGuilds([]);
         setSelectedGuildId(null);
-        localStorage.clear();
+        try {
+            localStorage.clear();
+        } catch (e) {
+            console.error("Error clearing localStorage:", e);
+        }
     };
 
     // --- AUTOMATISCHER CALLBACK-HANDLER ---
@@ -92,7 +121,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             isAuthenticated: !!token,
             login, logout, setSelectedGuildId: (id) => {
                 setSelectedGuildId(id);
-                localStorage.setItem("selectedGuildId", id);
+                try {
+                    localStorage.setItem("selectedGuildId", id);
+                } catch (e) {
+                    console.error("Error saving selectedGuildId to localStorage:", e);
+                }
             }
         }}>
             {children}

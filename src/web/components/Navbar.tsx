@@ -109,28 +109,29 @@ export function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
-        isScrolled ? "py-3" : "py-6"
+        isScrolled ? "py-4" : "py-8"
       )}
     >
       <div className="container mx-auto px-4 flex justify-center">
         <nav className={cn(
-          "flex items-center justify-between gap-8 md:gap-12 px-6 py-3 rounded-[2rem] transition-all duration-500 border border-transparent w-full max-w-7xl",
-          isScrolled ? "glass-strong shadow-2xl border-white/10" : "bg-transparent"
+          "flex items-center justify-between gap-8 md:gap-12 px-8 py-4 rounded-[2.5rem] transition-all duration-500 border border-transparent w-full max-w-7xl",
+          isScrolled ? "glass-strong shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-white/10" : "bg-transparent"
         )}>
           {/* Left: Logo */}
           <div className="flex-1 flex justify-start">
-            <Link to="/" className="flex items-center gap-2 group shrink-0">
+            <Link to="/" className="flex items-center gap-4 group shrink-0">
               <motion.div
-                className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20 text-white relative overflow-hidden"
+                className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-2xl shadow-primary/30 text-white relative overflow-hidden border border-white/10"
                 whileHover={{ scale: 1.1, rotate: -5 }}
               >
-                <Shield className="w-4.5 h-4.5 drop-shadow-glow" />
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Shield className="w-5.5 h-5.5 drop-shadow-glow" />
               </motion.div>
               <div className="flex flex-col">
-                <span className="text-lg font-black tracking-tighter text-white leading-none">
+                <span className="text-xl font-black tracking-tighter text-white leading-none uppercase italic">
                   Manager<span className="text-primary">X</span>
                 </span>
-                <span className="text-[8px] text-muted-foreground font-bold uppercase tracking-[0.2em] mt-1 opacity-40">v2.0 Stable</span>
+                <span className="text-[9px] text-primary/60 font-black uppercase tracking-[0.3em] mt-1.5 opacity-80">Elite v2.0.0</span>
               </div>
             </Link>
           </div>

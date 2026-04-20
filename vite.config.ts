@@ -40,6 +40,18 @@ export default defineConfig(({ mode }) => ({
         impressum: path.resolve(__dirname, "src/web/impressum.html"),
         agb: path.resolve(__dirname, "src/web/agb.html"),
       },
+      output: {
+        manualChunks: {
+          "vendor-react": ["react", "react-dom", "react-router-dom", "react-helmet-async"],
+          "vendor-framer": ["framer-motion"],
+          "vendor-ui": [
+            "@radix-ui/react-accordion", 
+            "@radix-ui/react-dialog", 
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-tabs"
+          ],
+        }
+      }
     },
   },
 }));
