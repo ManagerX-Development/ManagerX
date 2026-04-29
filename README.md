@@ -105,7 +105,7 @@ ManagerX basiert auf einem modernen und erweiterbaren Tech-Stack:
 ### 📦 Schnellstart (Linux/macOS)
 ```bash
 # Repository klonen
-git clone https://github.com/Oppro-net-Development/ManagerX.git
+git clone https://github.com/ManagerX-Development/ManagerX.git
 cd ManagerX
 
 # Setup & Start
@@ -118,7 +118,7 @@ python main.py
 ### 🪟 Schnellstart (Windows)
 ```powershell
 # Repository klonen
-git clone https://github.com/Oppro-net-Development/ManagerX.git
+git clone https://github.com/ManagerX-Development/ManagerX.git
 cd ManagerX
 
 # Setup & Start
