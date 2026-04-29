@@ -1,11 +1,11 @@
-import { Navbar } from "../components/Navbar";
-import { Hero } from "../components/Hero";
-import { Features } from "../components/Features";
-import { Testimonials } from "../components/Testimonials";
-import { FAQ } from "../components/FAQ";
-import { CTA } from "../components/CTA";
-import { Footer } from "../components/Footer";
-import { SEO } from "../components/SEO";
+import { Navbar } from "../components/layout/Navbar";
+import { Hero } from "../components/landing/Hero";
+import { Features } from "../components/landing/Features";
+import { Testimonials } from "../components/landing/Testimonials";
+import { FAQ } from "../components/landing/FAQ";
+import { CTA } from "../components/landing/CTA";
+import { Footer } from "../components/layout/Footer";
+import { SEO } from "../components/layout/SEO";
 
 const Index = () => {
   return (

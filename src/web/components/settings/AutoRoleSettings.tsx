@@ -1,41 +1,36 @@
 /// <reference types="vite/client" />
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import {
-    ClipboardList,
-    Save,
-    MessageSquare,
-    Hash,
     UserPlus,
-    UserMinus,
-    ShieldAlert,
-    History,
+    Save,
+    ShieldCheck,
+    AtSign,
+    UserCog,
     Search
 } from "lucide-react";
-import { SearchableSelect } from "./ui/SearchableSelect";
 import { toast } from "sonner";
+import { SearchableSelect } from "../ui/SearchableSelect";
 
-interface LoggingSettingsProps {
+interface AutoRoleSettingsProps {
     guildId: string;
-    channels: any[];
+    roles: any[];
 }
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
-export default function LoggingSettings({ guildId, channels }: LoggingSettingsProps) {
+export default function AutoRoleSettings({ guildId, roles }: AutoRoleSettingsProps) {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState({
         enabled: false,
-        channel_id: "",
-        log_messages: true,
-        log_members: true,
-        log_mod: true,
-        log_server: true
+        role_id: "",
+        apply_on_join: true,
+        notify_user: false
     });
 
     useEffect(() => {
@@ -44,7 +39,7 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
 
     const fetchSettings = async () => {
         try {
-            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/logging`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/autorole`, {
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                 }
@@ -54,8 +49,8 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
                 setSettings(prev => ({ ...prev, ...data.data }));
             }
         } catch (error) {
-            console.error("Failed to fetch logging settings:", error);
-            toast.error("Fehler beim Laden der Log-Einstellungen.");
+            console.error("Failed to fetch autorole settings:", error);
+            toast.error("Fehler beim Laden der Auto-Rollen Einstellungen.");
         } finally {
             setLoading(false);
         }
@@ -64,7 +59,7 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
     const handleSave = async () => {
         setSaving(true);
         try {
-            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/logging`, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}/autorole`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -74,10 +69,10 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
             });
             const data = await res.json();
             if (data.success) {
-                toast.success("Log-Einstellungen gespeichert! 📜");
+                toast.success("Auto-Rollen Einstellungen gespeichert! 🛡️");
             }
         } catch (error) {
-            console.error("Failed to save logging settings:", error);
+            console.error("Failed to save autorole settings:", error);
             toast.error("Fehler beim Speichern der Einstellungen.");
         } finally {
             setSaving(false);
@@ -100,18 +95,18 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
                         <div className="space-y-1">
                             <div className="flex items-center gap-3">
                                 <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
-                                    <ClipboardList className="w-6 h-6" />
+                                    <ShieldCheck className="w-6 h-6" />
                                 </div>
-                                <CardTitle className="text-2xl font-bold tracking-tight text-white">Server-Logging</CardTitle>
+                                <CardTitle className="text-2xl font-bold tracking-tight text-white">Auto-Roles</CardTitle>
                             </div>
                             <CardDescription className="text-muted-foreground font-medium ml-12">
-                                Protokolliere alle wichtigen Ereignisse auf deinem Server.
+                                Weist neuen Mitgliedern automatisch eine Rolle zu.
                             </CardDescription>
                         </div>
                         <div className="flex items-center gap-3 bg-white/5 p-1.5 rounded-2xl border border-white/5">
-                            <Label htmlFor="log-enabled" className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-2">Status</Label>
+                            <Label htmlFor="autorole-enabled" className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-2">Status</Label>
                             <Switch
-                                id="log-enabled"
+                                id="autorole-enabled"
                                 checked={settings.enabled}
                                 onCheckedChange={(checked) => setSettings({ ...settings, enabled: checked })}
                                 className="data-[state=checked]:bg-primary"
@@ -121,78 +116,47 @@ export default function LoggingSettings({ guildId, channels }: LoggingSettingsPr
                 </CardHeader>
 
                 <CardContent className="pt-8 space-y-8 px-8 pb-8">
-                    {/* Log Channel */}
+                    {/* Role ID */}
                     <div className="space-y-3">
                         <Label className="text-white/90 font-semibold flex items-center gap-2">
-                            <Hash className="w-4 h-4 text-primary" /> Log-Kanal
+                            <AtSign className="w-4 h-4 text-primary" /> Ziel-Rolle
                         </Label>
                         <SearchableSelect
-                            options={channels}
-                            value={settings.channel_id}
-                            onChange={(val) => setSettings({ ...settings, channel_id: val })}
-                            placeholder="Log-Kanal auswählen..."
-                            type="channel"
+                            options={roles}
+                            value={settings.role_id}
+                            onChange={(val) => setSettings({ ...settings, role_id: val })}
+                            placeholder="Ziel-Rolle auswählen..."
+                            type="role"
                         />
+                        <p className="text-[11px] text-muted-foreground italic">Stelle sicher, dass die Bot-Rolle über der Ziel-Rolle steht!</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Message Logs */}
-                        <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <MessageSquare className="w-5 h-5 text-primary/70" />
-                                <div>
-                                    <p className="text-sm font-semibold text-white">Nachrichten</p>
-                                    <p className="text-[10px] text-muted-foreground">Gelöschte & bearbeitete Nachrichten</p>
-                                </div>
-                            </div>
-                            <Switch
-                                checked={settings.log_messages}
-                                onCheckedChange={(checked) => setSettings({ ...settings, log_messages: checked })}
-                            />
-                        </div>
-
-                        {/* Member Logs */}
                         <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
                             <div className="flex items-center gap-3">
                                 <UserPlus className="w-5 h-5 text-primary/70" />
                                 <div>
-                                    <p className="text-sm font-semibold text-white">Mitglieder</p>
-                                    <p className="text-[10px] text-muted-foreground">Beitritte, Verlassen, Namensänderungen</p>
+                                    <p className="text-sm font-semibold text-white">Bei Beitritt</p>
+                                    <p className="text-[10px] text-muted-foreground">Sofort beim Serverbeitritt zuweisen</p>
                                 </div>
                             </div>
                             <Switch
-                                checked={settings.log_members}
-                                onCheckedChange={(checked) => setSettings({ ...settings, log_members: checked })}
+                                checked={settings.apply_on_join}
+                                onCheckedChange={(checked) => setSettings({ ...settings, apply_on_join: checked })}
                             />
                         </div>
 
-                        {/* Moderation Logs */}
                         <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
                             <div className="flex items-center gap-3">
-                                <ShieldAlert className="w-5 h-5 text-primary/70" />
+                                <UserCog className="w-5 h-5 text-primary/70" />
                                 <div>
-                                    <p className="text-sm font-semibold text-white">Moderation</p>
-                                    <p className="text-[10px] text-muted-foreground">Banns, Kicks, Timeouts</p>
+                                    <p className="text-sm font-semibold text-white">Nutzer benachrichtigen</p>
+                                    <p className="text-[10px] text-muted-foreground">Sende eine DM nach der Zuweisung</p>
                                 </div>
                             </div>
                             <Switch
-                                checked={settings.log_mod}
-                                onCheckedChange={(checked) => setSettings({ ...settings, log_mod: checked })}
-                            />
-                        </div>
-
-                        {/* Server Logs */}
-                        <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-                            <div className="flex items-center gap-3">
-                                <History className="w-5 h-5 text-primary/70" />
-                                <div>
-                                    <p className="text-sm font-semibold text-white">Server-Updates</p>
-                                    <p className="text-[10px] text-muted-foreground">Kanal- & Rollenänderungen</p>
-                                </div>
-                            </div>
-                            <Switch
-                                checked={settings.log_server}
-                                onCheckedChange={(checked) => setSettings({ ...settings, log_server: checked })}
+                                checked={settings.notify_user}
+                                onCheckedChange={(checked) => setSettings({ ...settings, notify_user: checked })}
                             />
                         </div>
                     </div>

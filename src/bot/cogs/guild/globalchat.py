@@ -429,6 +429,36 @@ class GlobalChatSender:
             self._cached_channels = await self._fetch_all_channels()
         return self._cached_channels
 
+class GlobalChatReportView(discord.ui.View):
+    def __init__(self, message_id: int, author_id: int, guild_id: int):
+        super().__init__(timeout=None)
+        self.message_id = message_id
+        self.author_id = author_id
+        self.guild_id = guild_id
+
+    @discord.ui.button(label="Melden", style=discord.ButtonStyle.secondary, emoji="🚩", custom_id="gc_report")
+    async def report_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+        # Notify staff (owners)
+        owners = [1093555256689959005, 1427994077332373554]
+        embed = discord.Embed(
+            title="⚠️ GlobalChat Meldung",
+            description=f"Eine Nachricht wurde gemeldet.\n"
+                        f"**Sender ID:** `{self.author_id}`\n"
+                        f"**Nachricht ID:** `{self.message_id}`\n"
+                        f"**Server ID:** `{self.guild_id}`",
+            color=discord.Color.orange(),
+            timestamp=discord.utils.utcnow()
+        )
+        embed.set_footer(text=f"Gemeldet von: {interaction.user} ({interaction.user.id})")
+        
+        for owner_id in owners:
+            try:
+                owner = await interaction.client.fetch_user(owner_id)
+                await owner.send(embed=embed)
+            except: pass
+            
+        await interaction.response.send_message("✅ Danke! Die Nachricht wurde an das Moderations-Team weitergeleitet.", ephemeral=True)
+
     async def _fetch_all_channels(self) -> List[int]:
         try:
             # ✅ await hinzugefügt
@@ -437,7 +467,7 @@ class GlobalChatSender:
             logger.error(f"❌ Fehler beim Abrufen aller Channel-IDs: {e}", exc_info=True)
             return []
 
-    async def _send_to_channel(self, channel_id: int, embed: discord.Embed, attachment_bytes: List[Tuple[str, bytes]]) -> bool:
+    async def _send_to_channel(self, channel_id: int, embed: discord.Embed, attachment_bytes: List[Tuple[str, bytes]], view: discord.ui.View = None) -> bool:
         try:
             channel = self.bot.get_channel(channel_id)
             if not channel:
@@ -465,9 +495,9 @@ class GlobalChatSender:
             for attempt in range(max_retries):
                 try:
                     if files:
-                        await channel.send(embed=embed, files=files)
+                        await channel.send(embed=embed, files=files, view=view)
                     else:
-                        await channel.send(embed=embed)
+                        await channel.send(embed=embed, view=view)
                     return True
                 except (ConnectionResetError, aiohttp.ClientConnectorError, asyncio.TimeoutError) as e:
                     logger.warning(f"❌ Sendefehler (Retry {attempt+1}/{max_retries}) in {channel_id}: {e}")
@@ -488,22 +518,28 @@ class GlobalChatSender:
             return False
 
     async def send_global_message(self, message: discord.Message, attachment_data: List[Tuple[str, bytes, str]] = None) -> Tuple[int, int]:
-        # ✅ await hinzugefügt
         settings = await db.get_guild_settings(message.guild.id)
         embed, files_to_upload = await self.embed_builder.create_message_embed(message, settings, attachment_data)
         active_channels = await self._get_all_active_channels()
         successful_sends, failed_sends = 0, 0
 
-        task_list = [self._send_to_channel(channel_id, embed, files_to_upload) for channel_id in active_channels]
-        results = await asyncio.gather(*task_list, return_exceptions=True)
+        # Reporting View
+        view = GlobalChatReportView(message.id, message.author.id, message.guild.id)
 
-        for result in results:
-            if result is True:
-                successful_sends += 1
-            else:
-                failed_sends += 1
-                if isinstance(result, Exception):
-                    logger.error(f"❌ Task-Fehler beim Senden: {result}")
+        # Batching (split into groups of 10 to reduce lag)
+        batch_size = 10
+        for i in range(0, len(active_channels), batch_size):
+            current_batch = active_channels[i:i + batch_size]
+            task_list = [self._send_to_channel(channel_id, embed, files_to_upload, view) for channel_id in current_batch]
+            results = await asyncio.gather(*task_list, return_exceptions=True)
+            
+            for result in results:
+                if result is True:
+                    successful_sends += 1
+                else:
+                    failed_sends += 1
+            
+            await asyncio.sleep(0.1) # Prevents hitting rate limits too hard
 
         return successful_sends, failed_sends
 

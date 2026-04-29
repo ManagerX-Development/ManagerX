@@ -8,20 +8,20 @@ import {
     Palette,
     Eye
 } from "lucide-react";
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "../core/AuthProvider";
 import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 
 interface Channel {
     id: string;
     name: string;
 }
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
 export default function GlobalChatSettings({ guildId }: { guildId: string }) {
     const { token } = useAuth();

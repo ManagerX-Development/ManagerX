@@ -1,10 +1,10 @@
 /// <reference types="vite/client" />
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { Users, MessageSquare, Zap, Activity, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { motion } from "framer-motion";
 import OverviewCharts from "./OverviewCharts";
-import { Badge } from "./ui/badge";
+import { Badge } from "../ui/badge";
 import { CheckCircle, XCircle } from "lucide-react";
 
 interface OverviewSettingsProps {
@@ -13,7 +13,7 @@ interface OverviewSettingsProps {
     settings?: any;
 }
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
 export default function OverviewSettings({ guildId, initialStats, settings }: OverviewSettingsProps) {
     const [stats, setStats] = useState<any>(initialStats || null);

@@ -11,6 +11,7 @@ import time
 from .auth_routes import router as auth_router
 from .settings_routes import router as settings_router
 from .user_routes import router as user_router
+from .management_routes import router as management_router
 
 # Wir erstellen einen Router, den wir später in die Haupt-App einbinden
 router_public = APIRouter(
@@ -457,6 +458,29 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
         except:
             logging_active = False
 
+        # Check Management Modules
+        from mxmariadb import ManagementDatabase
+        db_m = ManagementDatabase()
+        await db_m.ensure_connection()
+
+        # Check Auto-Responder
+        try:
+            ar_data = await db_m.get_auto_responses(guild_id)
+            autoresponder_active = len(ar_data) > 0
+        except: autoresponder_active = False
+
+        # Check Applications
+        try:
+            app_data = await db_m.get_questions(guild_id)
+            applications_active = len(app_data) > 0
+        except: applications_active = False
+
+        # Check NewsSync
+        try:
+            sync_data = await db_m.get_sync_channels()
+            newssync_active = any(c['guild_id'] == guild_id for c in sync_data)
+        except: newssync_active = False
+
         guild_lang = "de"
 
         # 3. Fetch Metadata
@@ -482,6 +506,9 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
                     "anti_spam": antispam_active,
                     "global_network": global_active,
                     "logging": logging_active,
+                    "auto_responder": autoresponder_active,
+                    "applications": applications_active,
+                    "news_sync": newssync_active,
                     "economy": False
                 },
                 "stats": stats,
@@ -499,5 +526,6 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
 dashboard_main_router.include_router(auth_router)
 dashboard_main_router.include_router(settings_router)
 dashboard_main_router.include_router(user_router)
+dashboard_main_router.include_router(management_router)
 # dashboard_main_router.include_router(router_public) # Move to main.py for root access
 

@@ -2,7 +2,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Shield, Users, MessageCircle, Sparkles, Zap, Activity, ArrowRight } from "lucide-react";
-import { useStats } from "../hooks/useStats";
+import { useStats } from "../../hooks/useStats";
 
 export const Hero = memo(function Hero() {
   const { data, isLoading } = useStats();

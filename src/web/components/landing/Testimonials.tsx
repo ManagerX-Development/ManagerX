@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
 import { Star, Users, TrendingUp } from "lucide-react";
-import { useStats } from "../hooks/useStats";
+import { useStats } from "../../hooks/useStats";
 
 const testimonials = [
   {

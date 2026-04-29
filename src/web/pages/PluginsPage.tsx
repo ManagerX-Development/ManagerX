@@ -6,9 +6,9 @@ import {
   Github, ChevronRight, CheckCircle2, Bot, Cpu,
   MessagesSquare, Trophy, BellRing, UserPlus, ShieldAlert
 } from "lucide-react";
-import { Navbar } from "../components/Navbar";
-import { Footer } from "../components/Footer";
-import { SEO } from "../components/SEO";
+import { Navbar } from "../components/layout/Navbar";
+import { Footer } from "../components/layout/Footer";
+import { SEO } from "../components/layout/SEO";
 import { motion } from "framer-motion";
 
 const SECTIONS = [

@@ -2,6 +2,8 @@ import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { AuthProvider } from "./components/core/AuthProvider";
+import { ErrorBoundary } from "./components/core/ErrorBoundary";
 
 // Lazy load all route components for better performance
 const Index = lazy(() => import("./pages/Index"));
@@ -135,8 +137,6 @@ const AppContent = () => {
   return <MainRoutes />;
 };
 
-import { AuthProvider } from "./components/AuthProvider";
-import { ErrorBoundary } from "./components/ErrorBoundary";
 
 const App = () => (
   <ErrorBoundary>

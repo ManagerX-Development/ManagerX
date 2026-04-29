@@ -4,9 +4,9 @@ import {
   ArrowLeft, Activity, Globe, Cpu, Layers,
   CheckCircle2, XCircle, Mail, Github
 } from "lucide-react";
-import { Navbar } from "../components/Navbar";
-import { Footer } from "../components/Footer";
-import { SEO } from "../components/SEO";
+import { Navbar } from "../components/layout/Navbar";
+import { Footer } from "../components/layout/Footer";
+import { SEO } from "../components/layout/SEO";
 import { motion } from "framer-motion";
 import { LEGAL_CONFIG } from "../lib/legal";
 
