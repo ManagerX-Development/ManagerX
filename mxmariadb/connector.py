@@ -29,31 +29,30 @@ class MariaConnector:
         return MariaConnector._pool
 
     async def connect(self):
-        async with MariaConnector._lock:
-            if MariaConnector._pool is None:
-                if not self.user or not self.database:
-                    logger.error(f"DB-Credentials fehlen in {env_path}")
-                    raise RuntimeError("Datenbankzugangsdaten fehlen.")
+        if MariaConnector._pool is None:
+            if not self.user or not self.database:
+                logger.error(f"DB-Credentials fehlen in {env_path}")
+                raise RuntimeError("Datenbankzugangsdaten fehlen.")
 
-                try:
-                    logger.info(f"[DB] Verbinde zu {self.host}:{self.port} DB='{self.database}' als '{self.user}'...")
-                    MariaConnector._pool = await aiomysql.create_pool(
-                        host=self.host,
-                        user=self.user,
-                        password=self.password,
-                        db=self.database,
-                        port=self.port,
-                        autocommit=False,
-                        minsize=2,
-                        maxsize=15,
-                        echo=False,
-                        pool_recycle=1800,        # Connections nach 30 Min recyclen
-                        connect_timeout=10,       # Verbindungs-Timeout
-                    )
-                    logger.info("✅ MariaDB Pool erstellt.")
-                except Exception as e:
-                    logger.critical(f"❌ Pool-Erstellung fehlgeschlagen: {e}")
-                    raise
+            try:
+                logger.info(f"[DB] Verbinde zu {self.host}:{self.port} DB='{self.database}' als '{self.user}'...")
+                MariaConnector._pool = await aiomysql.create_pool(
+                    host=self.host,
+                    user=self.user,
+                    password=self.password,
+                    db=self.database,
+                    port=self.port,
+                    autocommit=False,
+                    minsize=2,
+                    maxsize=15,
+                    echo=False,
+                    pool_recycle=1800,        # Connections nach 30 Min recyclen
+                    connect_timeout=10,       # Verbindungs-Timeout
+                )
+                logger.info("✅ MariaDB Pool erstellt.")
+            except Exception as e:
+                logger.critical(f"❌ Pool-Erstellung fehlgeschlagen: {e}")
+                raise
 
         cls_name = type(self).__name__
         if cls_name not in MariaConnector._initialized:

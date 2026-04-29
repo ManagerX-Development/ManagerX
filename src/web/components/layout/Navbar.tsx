@@ -5,8 +5,8 @@ import {
   Shield, Menu, X, Sparkles, Puzzle, Activity, Terminal,
   Newspaper, Users, Milestone, ChevronDown, LayoutDashboard, User, Trophy // Added Trophy
 } from "lucide-react";
-import { cn } from "../lib/utils";
-import { useAuth } from "./AuthProvider";
+import { cn } from "../../lib/utils";
+import { useAuth } from "../core/AuthProvider";
 
 const mainLinks = [
   { label: "Features", href: "/#features", icon: Sparkles },

@@ -4,25 +4,30 @@
 # ───────────────────────────────────────────────
 import asyncio
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, List
 import logging
 
 import discord
 import ezcord
 from discord import slash_command, option
-import timedelta
-from discord.ui import Container
 from discord import SlashCommandGroup
 
+from src.bot.core.config import BotConfig
+
+# Permission Constants
+BAN = "ban_members"
+KICK = "kick_members"
+MODERATE = "moderate_members"
+
 # Importiere zentrale Konstanten
-# Branding & Colors (Local Fallbacks)
-SUCCESS_COLOR = 0x2ecc71
-ERROR_COLOR = 0xe74c3c
-WARN_COLOR = 0xf39c12
-INFO_COLOR = 0x3498db
-AUTHOR = "ManagerX"
-FLOOTER = "ManagerX Bot"
+# Branding & Colors (Synced from BotConfig)
+SUCCESS_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.success)
+ERROR_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.error)
+WARN_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.warning)
+INFO_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.info)
+AUTHOR = BotConfig.bot.name
+FLOOTER = BotConfig.ui.footer_text
 
 # Emojis directly from UI module
 try:

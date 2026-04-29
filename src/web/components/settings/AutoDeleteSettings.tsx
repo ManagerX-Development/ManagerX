@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import {
     Trash2,
     Save,
@@ -14,7 +14,7 @@ import {
     Search
 } from "lucide-react";
 import { toast } from "sonner";
-import { SearchableSelect } from "./ui/SearchableSelect";
+import { SearchableSelect } from "../ui/SearchableSelect";
 
 interface AutoDeleteSettingsProps {
     guildId: string;
@@ -26,7 +26,7 @@ interface ChannelConfig {
     delay: number;
 }
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
 export default function AutoDeleteSettings({ guildId, channels }: AutoDeleteSettingsProps) {
     const [loading, setLoading] = useState(true);

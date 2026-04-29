@@ -1,10 +1,10 @@
 /// <reference types="vite/client" />
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import {
     Trophy,
     Save,
@@ -17,15 +17,15 @@ import {
     Search
 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "../lib/utils";
-import { SearchableSelect } from "./ui/SearchableSelect";
+import { cn } from "@/lib/utils";
+import { SearchableSelect } from "../ui/SearchableSelect";
 
 interface LevelSettingsProps {
     guildId: string;
     channels: any[];
 }
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
 export default function LevelSettings({ guildId, channels }: LevelSettingsProps) {
     const [loading, setLoading] = useState(true);

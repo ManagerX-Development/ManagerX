@@ -13,7 +13,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const getSafeItem = (key: string) => {
@@ -65,27 +65,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             console.error("Error clearing localStorage:", e);
         }
     };
-
-    // --- AUTOMATISCHER CALLBACK-HANDLER ---
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get("code");
-        const path = params.get("p");
-
-        if (code && (window.location.pathname.includes("auth/callback") || path?.includes("/auth/callback"))) {
-            fetch(`${API_URL}/dashboard/auth/callback`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code })
-            })
-            .then(res => res.ok ? res.json() : Promise.reject(res))
-            .then(data => {
-                login(data.access_token, data.user, data.discord_token);
-                window.history.replaceState({}, document.title, "/");
-            })
-            .catch(err => console.error("Login Error:", err));
-        }
-    }, []);
 
     // --- USER & GUILDS LADEN ---
     useEffect(() => {

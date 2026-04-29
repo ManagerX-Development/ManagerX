@@ -28,7 +28,7 @@ import {
     Activity,
     History
 } from "lucide-react";
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "../components/core/AuthProvider";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";

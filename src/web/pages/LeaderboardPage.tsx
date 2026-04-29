@@ -1,9 +1,9 @@
 /// <reference types="vite/client" />
 import { memo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Navbar } from "../components/Navbar";
-import { Footer } from "../components/Footer";
-import { SEO } from "../components/SEO";
+import { Navbar } from "../components/layout/Navbar";
+import { Footer } from "../components/layout/Footer";
+import { SEO } from "../components/layout/SEO";
 import { Trophy, Medal, Crown, MessageSquare, Mic, Zap, TrendingUp, Search } from "lucide-react";
 import { cn } from "../lib/utils";
 

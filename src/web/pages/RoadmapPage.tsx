@@ -1,14 +1,14 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Navbar } from "../components/Navbar";
-import { Footer } from "../components/Footer";
+import { Navbar } from "../components/layout/Navbar";
+import { Footer } from "../components/layout/Footer";
 import {
     Rocket, CheckCircle2, CircleDashed, Clock, Sparkles,
     MessageSquare, ShieldAlert, Zap, Globe, Cpu
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { ROADMAP_ITEMS } from "../data/roadmap";
-import { SEO } from "../components/SEO";
+import { SEO } from "../components/layout/SEO";
 
 const StatusBadge = ({ status }: { status: string }) => {
     const configs: { [key: string]: { label: string, color: string, icon: any } } = {

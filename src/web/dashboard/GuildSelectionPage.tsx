@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "../components/core/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { 
     LayoutDashboard, 

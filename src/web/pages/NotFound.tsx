@@ -1,5 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Shield, Home, Terminal, Sparkles, AlertTriangle } from "lucide-react";
 
@@ -11,13 +11,13 @@ const NotFound = () => {
   }, [location.pathname]);
 
   // Floating particles animation - reduced from 20 to 8 for better performance
-  const particles = Array.from({ length: 8 }, (_, i) => ({
+  const [particles] = useState(() => Array.from({ length: 8 }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
     delay: Math.random() * 2,
     duration: 3 + Math.random() * 2,
-  }));
+  })));
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background">

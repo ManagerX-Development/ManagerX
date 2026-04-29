@@ -17,14 +17,14 @@ import {
     Eye,
     EyeOff
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Label } from "./ui/label";
-import { Switch } from "./ui/switch";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { toast } from "sonner";
-import { SearchableSelect } from "./ui/SearchableSelect";
-import { useAuth } from "../components/AuthProvider";
+import { SearchableSelect } from "../ui/SearchableSelect";
+import { useAuth } from "../core/AuthProvider";
 
 interface TempVCSettingsProps {
     guildId: string;
@@ -32,7 +32,7 @@ interface TempVCSettingsProps {
     voiceChannels: any[];
 }
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
 export default function TempVCSettings({ guildId, categories, voiceChannels }: TempVCSettingsProps) {
     const { token } = useAuth();

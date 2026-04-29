@@ -4,9 +4,9 @@ import {
   ArrowLeft, ShieldCheck, User, MapPin, Mail,
   Info, Scale, ExternalLink, Globe, ChevronRight, Gavel
 } from "lucide-react";
-import { Navbar } from "../components/Navbar";
-import { Footer } from "../components/Footer";
-import { SEO } from "../components/SEO";
+import { Navbar } from "../components/layout/Navbar";
+import { Footer } from "../components/layout/Footer";
+import { SEO } from "../components/layout/SEO";
 import { motion } from "framer-motion";
 import { LEGAL_CONFIG } from "../lib/legal";
 
@@ -212,4 +212,4 @@ export const Impressum = memo(function Impressum() {
   );
 });
 
-export default Impressum;
+export default Impressum;

@@ -105,6 +105,12 @@ class StatsDB(MariaConnector):
                             start_time DATETIME DEFAULT CURRENT_TIMESTAMP
                         )
                     ''')
+
+                    # Migration: Sicherstellen, dass guild_id in messages existiert
+                    try:
+                        await cur.execute("ALTER TABLE messages ADD COLUMN IF NOT EXISTS guild_id BIGINT NOT NULL AFTER user_id")
+                        await cur.execute("CREATE INDEX IF NOT EXISTS idx_guild_ts ON messages (guild_id, timestamp)")
+                    except: pass
                 await conn.commit()
             logger.info("StatsDB: Tabellen initialisiert.")
         except Exception as e:

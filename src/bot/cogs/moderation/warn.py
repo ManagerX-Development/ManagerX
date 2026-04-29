@@ -6,20 +6,21 @@ from mxmariadb import WarnDatabase
 import discord
 from discord import slash_command, Option
 import os
-import datetime
-import datetime
+from datetime import datetime, timezone, timedelta
 import ezcord
 import asyncio
 from typing import Optional
 
+from src.bot.core.config import BotConfig
+
 # Importiere zentrale Konstanten
-# Branding & Colors (Local Fallbacks)
-SUCCESS_COLOR = 0x2ecc71
-ERROR_COLOR = 0xe74c3c
-WARN_COLOR = 0xf39c12
-INFO_COLOR = 0x3498db
-AUTHOR = "ManagerX"
-FLOOTER = "ManagerX Bot"
+# Branding & Colors (Synced from BotConfig)
+SUCCESS_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.success)
+ERROR_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.error)
+WARN_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.warning)
+INFO_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.info)
+AUTHOR = BotConfig.bot.name
+FLOOTER = BotConfig.ui.footer_text
 
 # Emojis directly from UI module
 try:
@@ -125,7 +126,7 @@ class WarnSystem(ezcord.Cog, group="moderation"):
 
     def _create_error_embed(self, title: str, message: str) -> discord.Embed:
         """Erstellt ein einheitliches Error-Embed"""
-        embed = discord.Embed(title=title, color=ERROR_COLOR, timestamp=datetime.datetime.now(datetime.timezone.utc))
+        embed = discord.Embed(title=title, color=ERROR_COLOR, timestamp=datetime.now(timezone.utc))
         embed.set_author(name=AUTHOR)
         embed.add_field(name=f"{emoji_no} {title}", value=message, inline=False)
         embed.set_footer(text=FLOOTER)

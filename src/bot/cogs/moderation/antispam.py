@@ -4,9 +4,34 @@ import asyncio
 import discord
 from discord import SlashCommandGroup
 import ezcord
-import datetime
-from datetime import timedelta
+from datetime import datetime, timezone, timedelta
+from src.bot.core.config import BotConfig
 
+# Branding & Colors (Synced from BotConfig)
+SUCCESS_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.success)
+ERROR_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.error)
+WARN_COLOR = discord.Color.from_rgb(*BotConfig.ui.colors.warning)
+
+# Emojis directly from UI module
+try:
+    from src.bot.ui.emojis import (
+        emoji_yes, emoji_no, emoji_warn, emoji_member, emoji_staff,
+        emoji_statistics, emoji_channel, emoji_moderator, emoji_forbidden,
+        emoji_owner, emoji_delete, emoji_error
+    )
+except ImportError:
+    emoji_yes = "✅"
+    emoji_no = "❌"
+    emoji_warn = "⚠️"
+    emoji_member = "👤"
+    emoji_staff = "🛡️"
+    emoji_statistics = "📊"
+    emoji_channel = "#️⃣"
+    emoji_moderator = "👮"
+    emoji_forbidden = "🚫"
+    emoji_owner = "👑"
+    emoji_delete = "🗑️"
+    emoji_error = "❌"
 
 from mxmariadb import AntiSpamDatabase as SpamDB
 
@@ -33,7 +58,7 @@ class AntiSpam(ezcord.Cog):
             return
 
         # Get spam settings for this guild
-        settings = self.db.get_spam_settings(message.guild.id)
+        settings = await self.db.get_spam_settings(message.guild.id)
         if not settings:
             # If no settings are configured, don't process spam detection
             return
@@ -45,7 +70,7 @@ class AntiSpam(ezcord.Cog):
         # Record this message timestamp
         user_id = message.author.id
         guild_id = message.guild.id
-        current_time = datetime.now()
+        current_time = datetime.now(timezone.utc)
 
         # Add current message to tracking
         self.user_messages[guild_id][user_id].append(current_time)
@@ -133,7 +158,7 @@ class AntiSpam(ezcord.Cog):
             embed = discord.Embed(
                 title=f"{emoji_warn} × Anti-Spam Verstoß",
                 color=discord.Color.red(),
-                timestamp=datetime.now()
+                timestamp=datetime.now(timezone.utc)
             )
             embed.add_field(
                 name=f"{emoji_member} × Benutzer",

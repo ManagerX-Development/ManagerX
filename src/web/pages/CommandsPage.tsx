@@ -2,14 +2,14 @@ import { memo, useState, useMemo } from "react";
 import {
     Search, ChevronRight, Terminal, Info, Filter, Sparkles
 } from "lucide-react";
-import { Navbar } from "../components/Navbar";
-import { Footer } from "../components/Footer";
+import { Navbar } from "../components/layout/Navbar";
+import { Footer } from "../components/layout/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
 import { cn } from "../lib/utils";
 import { CATEGORIES, COMMANDS, Command } from "../data/commands";
-import { SEO } from "../components/SEO";
+import { SEO } from "../components/layout/SEO";
 
 import { useRef } from "react";
 import { useInView } from "framer-motion";

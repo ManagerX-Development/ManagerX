@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "../components/core/AuthProvider";
 import { toast } from "sonner";
 import { API_URL } from "../lib/api";
 
@@ -39,8 +39,13 @@ export default function AuthCallback() {
                 // data should contain access_token and user object
                 login(data.access_token, data.user, data.discord_token);
 
-                toast.success(`Willkommen zurück, ${data.user.username}!`);
-                navigate("/dash/guilds"); // Redirect to server hub
+                const username = data.user?.username || "User";
+                toast.success(`Willkommen zurück, ${username}!`);
+                
+                // Kurze Verzögerung für den Toast-Effekt vor dem Redirect
+                setTimeout(() => {
+                    navigate("/dash/guilds");
+                }, 1000);
             } catch (err: any) {
                 console.error("Auth Error:", err);
                 setError(err.message || "Es gab ein Problem beim Anmelden.");

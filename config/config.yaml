@@ -93,6 +93,13 @@ links:
   github: "https://github.com/ManagerX-Development/ManagerX"
   topgg: "https://top.gg/bot/1368201272624287754"
 
+# Module: Uptime Kuma Discord Status
+uptime_kuma:
+  enabled: true
+  base_url: "https://status.oppro-network.de"
+  slug: "default"
+  update_interval: 60 # in seconds
+
 # Performance & Cache
 performance:
   cache_timeout: 300
@@ -149,4 +156,5 @@ features:
       tempvc: true
       welcome: true
     other:
+      setlang: true
       setlang: true

@@ -1,10 +1,10 @@
 import { memo } from "react";
 import { motion } from "framer-motion";
-import { Navbar } from "../components/Navbar";
-import { Footer } from "../components/Footer";
+import { Navbar } from "../components/layout/Navbar";
+import { Footer } from "../components/layout/Footer";
 import { Github, Twitter, Globe, Heart, Shield, Code2, Sparkles, Coffee, Youtube, Instagram } from "lucide-react";
 import { TEAM_MEMBERS } from "../data/team";
-import { SEO } from "../components/SEO";
+import { SEO } from "../components/layout/SEO";
 
 export const TeamPage = memo(function TeamPage() {
     return (

@@ -22,20 +22,30 @@ import {
     Heart,
     Lock,
     Search,
-    Mic
+    Mic,
+    Brain,
+    Radio
 } from "lucide-react";
-import { useAuth } from "../components/AuthProvider";
+import { useAuth } from "../components/core/AuthProvider";
 import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { cn } from "../lib/utils";
 import { lazy, Suspense } from "react";
-const AutoRoleSettings = lazy(() => import("../components/AutoRoleSettings"));
-const WelcomeSettings = lazy(() => import("../components/WelcomeSettings"));
-const AntiSpamSettings = lazy(() => import("../components/AntiSpamSettings"));
-const GlobalChatSettings = lazy(() => import("../components/GlobalChatSettings"));
-const LevelSettings = lazy(() => import("../components/LevelSettings"));
-const LoggingSettings = lazy(() => import("../components/LoggingSettings"));
-const AutoDeleteSettings = lazy(() => import("../components/AutoDeleteSettings"));
-const TempVCSettings = lazy(() => import("../components/TempVCSettings"));
-const OverviewSettings = lazy(() => import("../components/OverviewSettings"));
+import GuildSelector from "../components/layout/GuildSelector";
+const AutoRoleSettings = lazy(() => import("../components/settings/AutoRoleSettings"));
+const WelcomeSettings = lazy(() => import("../components/settings/WelcomeSettings"));
+const AntiSpamSettings = lazy(() => import("../components/settings/AntiSpamSettings"));
+const GlobalChatSettings = lazy(() => import("../components/settings/GlobalChatSettings"));
+const LevelSettings = lazy(() => import("../components/settings/LevelSettings"));
+const LoggingSettings = lazy(() => import("../components/settings/LoggingSettings"));
+const AutoDeleteSettings = lazy(() => import("../components/settings/AutoDeleteSettings"));
+const TempVCSettings = lazy(() => import("../components/settings/TempVCSettings"));
+const OverviewSettings = lazy(() => import("../components/settings/OverviewSettings"));
+const AutoResponderSettings = lazy(() => import("../components/settings/AutoResponderSettings"));
+const NewsSyncSettings = lazy(() => import("../components/settings/NewsSyncSettings"));
+const ApplicationSettings = lazy(() => import("../components/settings/ApplicationSettings"));
 
 const TabLoader = () => (
     <div className="w-full flex items-center justify-center py-20">
@@ -51,6 +61,8 @@ const CategoryHeader = ({ children }: { children: React.ReactNode }) => (
 );
 
 import { API_URL } from "../lib/api";
+import { toast, Toaster } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 
 export default function SettingsPage() {
     const { token, selectedGuildId } = useAuth();
@@ -241,6 +253,14 @@ export default function SettingsPage() {
                                     <TabItem value="autorole" icon={ShieldCheck} label="Auto-Roles" />
                                     <TabItem value="autodelete" icon={Trash2} label="Auto-Delete" />
                                     <TabItem value="tempvc" icon={Mic} label="TempVC Suite" />
+
+                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Management</span>
+                                    </div>
+                                    <TabItem value="autoresponder" icon={Brain} label="Auto-Responder" />
+                                    <TabItem value="newssync" icon={Radio} label="News-Network" />
+                                    <TabItem value="applications" icon={ClipboardList} label="Bewerbungen" />
                                 </TabsList>
                             </div>
                         </aside>
@@ -388,6 +408,18 @@ export default function SettingsPage() {
                                                     voiceChannels={guildData.voiceChannels}
                                                 />
                                             ) : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="autoresponder" className="mt-0 outline-none">
+                                            {guildId ? <AutoResponderSettings guildId={guildId} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="newssync" className="mt-0 outline-none">
+                                            {guildId ? <NewsSyncSettings guildId={guildId} /> : <NoGuildPlaceholder />}
+                                        </TabsContent>
+
+                                        <TabsContent value="applications" className="mt-0 outline-none">
+                                            {guildId ? <ApplicationSettings guildId={guildId} /> : <NoGuildPlaceholder />}
                                         </TabsContent>
 
                                         <TabsContent value="notifications" className="mt-0 outline-none">

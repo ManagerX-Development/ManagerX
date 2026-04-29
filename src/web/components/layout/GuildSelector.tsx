@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "./AuthProvider";
+import { useAuth } from "../core/AuthProvider";
 import { ChevronDown, Server } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
