@@ -187,7 +187,7 @@ class EmbedBuilder:
         embed = discord.Embed(description=description, color=embed_color, timestamp=message.created_at)
         author_text, badges = self._build_author_info(message.author)
 
-        from mx_devtools import EconomyDatabase
+        from mxmariadb import EconomyDatabase
         eco_db = EconomyDatabase()
         overrides = eco_db.get_equipped_overrides(message.author.id)
         if 'color' in overrides:
@@ -429,39 +429,8 @@ class GlobalChatSender:
             self._cached_channels = await self._fetch_all_channels()
         return self._cached_channels
 
-class GlobalChatReportView(discord.ui.View):
-    def __init__(self, message_id: int, author_id: int, guild_id: int):
-        super().__init__(timeout=None)
-        self.message_id = message_id
-        self.author_id = author_id
-        self.guild_id = guild_id
-
-    @discord.ui.button(label="Melden", style=discord.ButtonStyle.secondary, emoji="🚩", custom_id="gc_report")
-    async def report_button(self, button: discord.ui.Button, interaction: discord.Interaction):
-        # Notify staff (owners)
-        owners = [1093555256689959005, 1427994077332373554]
-        embed = discord.Embed(
-            title="⚠️ GlobalChat Meldung",
-            description=f"Eine Nachricht wurde gemeldet.\n"
-                        f"**Sender ID:** `{self.author_id}`\n"
-                        f"**Nachricht ID:** `{self.message_id}`\n"
-                        f"**Server ID:** `{self.guild_id}`",
-            color=discord.Color.orange(),
-            timestamp=discord.utils.utcnow()
-        )
-        embed.set_footer(text=f"Gemeldet von: {interaction.user} ({interaction.user.id})")
-        
-        for owner_id in owners:
-            try:
-                owner = await interaction.client.fetch_user(owner_id)
-                await owner.send(embed=embed)
-            except: pass
-            
-        await interaction.response.send_message("✅ Danke! Die Nachricht wurde an das Moderations-Team weitergeleitet.", ephemeral=True)
-
     async def _fetch_all_channels(self) -> List[int]:
         try:
-            # ✅ await hinzugefügt
             return await db.get_all_channels()
         except Exception as e:
             logger.error(f"❌ Fehler beim Abrufen aller Channel-IDs: {e}", exc_info=True)
@@ -516,6 +485,36 @@ class GlobalChatReportView(discord.ui.View):
         except Exception as e:
             logger.error(f"❌ Generischer Fehler im _send_to_channel: {e}", exc_info=True)
             return False
+
+class GlobalChatReportView(discord.ui.View):
+    def __init__(self, message_id: int, author_id: int, guild_id: int):
+        super().__init__(timeout=None)
+        self.message_id = message_id
+        self.author_id = author_id
+        self.guild_id = guild_id
+
+    @discord.ui.button(label="Melden", style=discord.ButtonStyle.secondary, emoji="🚩", custom_id="gc_report")
+    async def report_button(self, button: discord.ui.Button, interaction: discord.Interaction):
+        # Notify staff (owners)
+        owners = [1093555256689959005, 1427994077332373554]
+        embed = discord.Embed(
+            title="⚠️ GlobalChat Meldung",
+            description=f"Eine Nachricht wurde gemeldet.\n"
+                        f"**Sender ID:** `{self.author_id}`\n"
+                        f"**Nachricht ID:** `{self.message_id}`\n"
+                        f"**Server ID:** `{self.guild_id}`",
+            color=discord.Color.orange(),
+            timestamp=discord.utils.utcnow()
+        )
+        embed.set_footer(text=f"Gemeldet von: {interaction.user} ({interaction.user.id})")
+        
+        for owner_id in owners:
+            try:
+                owner = await interaction.client.fetch_user(owner_id)
+                await owner.send(embed=embed)
+            except: pass
+            
+        await interaction.response.send_message("✅ Danke! Die Nachricht wurde an das Moderations-Team weitergeleitet.", ephemeral=True)
 
     async def send_global_message(self, message: discord.Message, attachment_data: List[Tuple[str, bytes, str]] = None) -> Tuple[int, int]:
         settings = await db.get_guild_settings(message.guild.id)
@@ -612,7 +611,7 @@ class GlobalChat(ezcord.Cog):
                     pass
             return
 
-        from mx_devtools import EconomyDatabase
+        from mxmariadb import EconomyDatabase
         eco_db = EconomyDatabase()
         user_info = eco_db.get_user_economy_info(message.author.id)
         last_msg_raw = user_info.get('last_message_at')

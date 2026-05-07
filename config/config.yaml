@@ -34,6 +34,7 @@ api:
   port: 8040
   log_level: "error"
   cors_origins: ["*"]
+  localhost_bypass: true # set on true for localhost testing, on false for production (will need token).
 
 # Translation Settings
 translation:

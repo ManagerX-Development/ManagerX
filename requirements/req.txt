@@ -12,6 +12,7 @@ starlette>=0.52.1
 PyJWT>=2.10.1
 
 # --- Async & Performance ---
+aiofiles>=23.2.1
 aiocache>=0.12.3
 aiohappyeyeballs>=2.6.1
 aiohttp>=3.13.3
@@ -44,6 +45,7 @@ certifi>=2026.2.25
 charset-normalizer>=3.4.5
 idna>=3.11
 rfc3986>=1.5.0
+python-multipart>=0.0.27
 
 # --- UI, Imaging & Logging ---
 beautifulsoup4>=4.14.3

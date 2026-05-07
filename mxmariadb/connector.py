@@ -6,7 +6,9 @@ import logging
 from dotenv import load_dotenv
 from pathlib import Path
 
-env_path = Path(__file__).parent.parent / 'config' / '.env'
+env_path = (Path(__file__).parent.parent / 'config' / '.env').resolve()
+if not env_path.exists():
+    print(f"[CRITICAL] .env file not found at {env_path}")
 load_dotenv(dotenv_path=env_path)
 
 logger = logging.getLogger(__name__)
