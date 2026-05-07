@@ -1,6 +1,7 @@
 # Copyright (c) 2025 OPPRO.NET Network
 import aiomysql
 import logging
+from typing import List, Dict, Any, Optional
 from mxmariadb.connector import MariaConnector
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,17 @@ class CMSDatabase(MariaConnector):
                         await cur.execute(col_def)
                     except Exception:
                         pass  # Column already exists or unsupported syntax
+
+                # Tags table
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS cms_tags (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(50) UNIQUE NOT NULL,
+                        slug VARCHAR(60) UNIQUE NOT NULL,
+                        color VARCHAR(20) DEFAULT '#3498db',
+                        emoji VARCHAR(10) DEFAULT ''
+                    )
+                """)
 
                 # Media/uploads table
                 await cur.execute("""
@@ -265,3 +277,68 @@ class CMSDatabase(MariaConnector):
                     LIMIT %s
                 """, (limit,))
                 return await cur.fetchall()
+
+    # ─────────────────────────────────────────
+    # TAGS
+    # ─────────────────────────────────────────
+
+    async def get_tags(self) -> List[Dict[str, Any]]:
+        await self.ensure_connection()
+        try:
+            async with self.pool.acquire() as conn:
+                async with conn.cursor(aiomysql.DictCursor) as cur:
+                    await cur.execute("SELECT * FROM cms_tags ORDER BY name")
+                    return await cur.fetchall()
+        except Exception as e:
+            logger.error(f"Error fetching tags: {e}")
+            return []
+
+    async def create_tag(self, name: str, slug: str, color: str = "#3498db", emoji: str = ""):
+        await self.ensure_connection()
+        try:
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(
+                        "INSERT INTO cms_tags (name, slug, color, emoji) VALUES (%s, %s, %s, %s)",
+                        (name, slug, color, emoji)
+                    )
+                    await conn.commit()
+                    return True
+        except Exception as e:
+            logger.error(f"Error creating tag: {e}")
+            return False
+
+    async def update_tag(self, tag_id: int, **kwargs):
+        await self.ensure_connection()
+        if not kwargs: return False
+        
+        fields = []
+        values = []
+        for k, v in kwargs.items():
+            fields.append(f"{k} = %s")
+            values.append(v)
+        
+        values.append(tag_id)
+        query = f"UPDATE cms_tags SET {', '.join(fields)} WHERE id = %s"
+        
+        try:
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute(query, tuple(values))
+                    await conn.commit()
+                    return True
+        except Exception as e:
+            logger.error(f"Error updating tag: {e}")
+            return False
+
+    async def delete_tag(self, tag_id: int):
+        await self.ensure_connection()
+        try:
+            async with self.pool.acquire() as conn:
+                async with conn.cursor() as cur:
+                    await cur.execute("DELETE FROM cms_tags WHERE id = %s", (tag_id,))
+                    await conn.commit()
+                    return True
+        except Exception as e:
+            logger.error(f"Error deleting tag: {e}")
+            return False

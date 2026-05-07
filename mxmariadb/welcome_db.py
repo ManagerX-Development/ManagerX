@@ -72,6 +72,7 @@ class WelcomeDatabase(MariaConnector):
     # --- Core CRUD ---
 
     async def update_welcome_settings(self, guild_id: int, **kwargs) -> bool:
+        await self.ensure_connection()
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cur:
@@ -114,6 +115,7 @@ class WelcomeDatabase(MariaConnector):
             return False
 
     async def get_welcome_settings(self, guild_id: int) -> Optional[Dict[str, Any]]:
+        await self.ensure_connection()
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cur:
@@ -127,6 +129,7 @@ class WelcomeDatabase(MariaConnector):
             return None
 
     async def delete_welcome_settings(self, guild_id: int) -> bool:
+        await self.ensure_connection()
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor() as cur:
@@ -155,6 +158,7 @@ class WelcomeDatabase(MariaConnector):
 
     async def update_welcome_stats(self, guild_id: int,
                                    joins: int = 0, leaves: int = 0):
+        await self.ensure_connection()
         try:
             date = datetime.now().strftime('%Y-%m-%d')
             async with self.pool.acquire() as conn:
@@ -171,6 +175,7 @@ class WelcomeDatabase(MariaConnector):
             logger.error(f"Stats update error: {e}")
 
     async def get_weekly_stats(self, guild_id: int) -> List[Dict]:
+        await self.ensure_connection()
         try:
             async with self.pool.acquire() as conn:
                 async with conn.cursor(aiomysql.DictCursor) as cur:

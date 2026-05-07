@@ -125,6 +125,7 @@ async def get_welcome_settings(guild_id: int, user: dict = Depends(get_current_u
     """Fetch welcome-specific settings."""
     db = WelcomeDatabase()
     try:
+        await db.init_db() # Sicherstellen dass Tabellen existieren
         settings = await db.get_welcome_settings(guild_id)
         if settings and "channel_id" in settings and settings["channel_id"]:
             settings["channel_id"] = str(settings["channel_id"])
@@ -147,17 +148,16 @@ async def update_welcome_settings(guild_id: int, request: Request, user: dict = 
         data["auto_role_id"] = int(data["auto_role_id"])
 
     try:
+        await db.init_db()
         success = await db.update_welcome_settings(guild_id, **data)
         if success:
             user_name = user.get("username", "Unbekannter User")
-            # Invalidate cache if possible
             from src.api.dashboard.routes import bot_instance
             if bot_instance:
                 cog = bot_instance.get_cog("WelcomeSystem")
                 if cog and hasattr(cog, 'invalidate_cache'):
                     cog.invalidate_cache(guild_id)
             
-            # Send notification to the welcome channel if configured
             channel_id = data.get("channel_id")
             await send_dashboard_notification(guild_id, "Welcome System", user_name, channel_id)
             
@@ -172,7 +172,8 @@ async def get_antispam_settings(guild_id: int, user: dict = Depends(get_current_
     """Fetch AntiSpam-specific settings."""
     db = AntiSpamDatabase()
     try:
-        settings = db.get_spam_settings(guild_id)
+        await db.init_db()
+        settings = await db.get_spam_settings(guild_id)
         if settings and "log_channel_id" in settings and settings["log_channel_id"]:
             settings["log_channel_id"] = str(settings["log_channel_id"])
         return {"success": True, "data": settings or {}}
@@ -189,8 +190,8 @@ async def update_antispam_settings(guild_id: int, request: Request, user: dict =
         data["log_channel_id"] = int(data["log_channel_id"])
 
     try:
-        # Use set_spam_settings with direct kwargs if possible, or mapping
-        success = db.set_spam_settings(
+        await db.init_db()
+        success = await db.set_spam_settings(
             guild_id, 
             max_messages=data.get("max_messages", 5),
             time_frame=data.get("time_frame", 10),
@@ -198,11 +199,6 @@ async def update_antispam_settings(guild_id: int, request: Request, user: dict =
         )
         if success:
             user_name = user.get("username", "Unbekannter User")
-            from src.api.dashboard.routes import bot_instance
-            if bot_instance:
-                cog = bot_instance.get_cog("AntiSpam")
-                # Add cache invalidation if AntiSpam cog supports it
-                
             await send_dashboard_notification(guild_id, "Anti-Spam", user_name, data.get("log_channel_id"))
             
         return {"success": success}
@@ -216,8 +212,9 @@ async def get_globalchat_settings(guild_id: int, user: dict = Depends(get_curren
     """Fetch GlobalChat-specific settings."""
     db = GlobalChatDatabase()
     try:
-        settings = db.get_guild_settings(guild_id)
-        channel_id = db.get_globalchat_channel(guild_id)
+        await db.init_db()
+        settings = await db.get_guild_settings(guild_id)
+        channel_id = await db.get_globalchat_channel(guild_id)
         settings["channel_id"] = str(channel_id) if channel_id else None
         return {"success": True, "data": settings or {}}
     except Exception as e:
@@ -230,18 +227,17 @@ async def update_globalchat_settings(guild_id: int, request: Request, user: dict
     db = GlobalChatDatabase()
     
     try:
+        await db.init_db()
         success = True
         user_name = user.get("username", "Unbekannter User")
         
-        # Handle channel_id separately
         new_channel_id = data.get("channel_id")
         if new_channel_id:
-            success = db.set_globalchat_channel(guild_id, int(new_channel_id))
+            success = await db.set_globalchat_channel(guild_id, int(new_channel_id))
         
-        # Update other settings
         for key in ["filter_enabled", "nsfw_filter", "embed_color"]:
             if key in data:
-                db.update_guild_setting(guild_id, key, data[key])
+                await db.update_guild_setting(guild_id, key, data[key])
         
         if success:
             await send_dashboard_notification(guild_id, "Global Chat", user_name, int(new_channel_id) if new_channel_id else None)
@@ -257,7 +253,9 @@ async def get_level_settings(guild_id: int, user: dict = Depends(get_current_use
     """Fetch LevelSystem settings."""
     db = LevelDatabase()
     try:
-        settings = db.get_guild_settings(guild_id)
+        await db.init_db()
+        # Hinweis: LevelDatabase verwendet get_guild_config statt get_guild_settings
+        settings = await db.get_guild_config(guild_id)
         return {"success": True, "data": settings or {}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
@@ -268,11 +266,12 @@ async def update_level_settings(guild_id: int, request: Request, user: dict = De
     data = await request.json()
     db = LevelDatabase()
     try:
-        success = db.update_guild_settings(guild_id, **data)
-        if success:
-            user_name = user.get("username", "Unbekannter User")
-            await send_dashboard_notification(guild_id, "Level-System", user_name)
-        return {"success": success}
+        await db.init_db()
+        # Hinweis: LevelDatabase verwendet set_guild_config statt update_guild_settings
+        await db.set_guild_config(guild_id, **data)
+        user_name = user.get("username", "Unbekannter User")
+        await send_dashboard_notification(guild_id, "Level-System", user_name)
+        return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save level settings: {e}")
 
@@ -283,10 +282,11 @@ async def get_logging_settings(guild_id: int, user: dict = Depends(get_current_u
     """Fetch Logging settings."""
     db = LoggingDatabase()
     try:
-        settings = db.get_guild_settings(guild_id)
-        if settings and "channel_id" in settings and settings["channel_id"]:
-            settings["channel_id"] = str(settings["channel_id"])
-        return {"success": True, "data": settings or {}}
+        await db.init_db()
+        # LoggingDatabase liefert ein Dict von Typ -> ChannelID
+        channels = await db.get_all_log_channels(guild_id)
+        settings = {"channel_id": str(channels.get("general")) if channels.get("general") else None}
+        return {"success": True, "data": settings}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
@@ -296,15 +296,14 @@ async def update_logging_settings(guild_id: int, request: Request, user: dict = 
     data = await request.json()
     db = LoggingDatabase()
     
-    if "channel_id" in data and data["channel_id"]:
-        data["channel_id"] = int(data["channel_id"])
-
     try:
-        success = db.update_guild_settings(guild_id, **data)
-        if success:
-            user_name = user.get("username", "Unbekannter User")
-            await send_dashboard_notification(guild_id, "Server-Log", user_name, data.get("channel_id"))
-        return {"success": success}
+        await db.init_db()
+        if "channel_id" in data and data["channel_id"]:
+            await db.set_log_channel(guild_id, int(data["channel_id"]))
+            
+        user_name = user.get("username", "Unbekannter User")
+        await send_dashboard_notification(guild_id, "Server-Log", user_name, int(data["channel_id"]) if data.get("channel_id") else None)
+        return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save logging settings: {e}")
 
@@ -315,10 +314,15 @@ async def get_autorole_settings(guild_id: int, user: dict = Depends(get_current_
     """Fetch AutoRole settings."""
     db = AutoRoleDatabase()
     try:
-        settings = db.get_guild_settings(guild_id)
-        if settings and "role_id" in settings and settings["role_id"]:
-            settings["role_id"] = str(settings["role_id"])
-        return {"success": True, "data": settings or {}}
+        await db.init_db()
+        # AutoRole liefert eine Liste von Rollen
+        roles = await db.get_all_autoroles(guild_id)
+        settings = {}
+        if roles:
+            settings["role_id"] = str(roles[0]["role_id"])
+            settings["enabled"] = roles[0]["enabled"]
+            
+        return {"success": True, "data": settings}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
@@ -328,15 +332,18 @@ async def update_autorole_settings(guild_id: int, request: Request, user: dict =
     data = await request.json()
     db = AutoRoleDatabase()
     
-    if "role_id" in data and data["role_id"]:
-        data["role_id"] = int(data["role_id"])
-
     try:
-        success = db.update_guild_settings(guild_id, **data)
-        if success:
-            user_name = user.get("username", "Unbekannter User")
-            await send_dashboard_notification(guild_id, "Auto-Role", user_name)
-        return {"success": success}
+        await db.init_db()
+        if "role_id" in data and data["role_id"]:
+            # Existierende entfernen und neu setzen (vereinfacht für Dashboard)
+            roles = await db.get_all_autoroles(guild_id)
+            for r in roles:
+                await db.remove_autorole(r["autorole_id"])
+            await db.add_autorole(guild_id, int(data["role_id"]))
+
+        user_name = user.get("username", "Unbekannter User")
+        await send_dashboard_notification(guild_id, "Auto-Role", user_name)
+        return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save autorole settings: {e}")
 
@@ -347,7 +354,9 @@ async def get_autodelete_settings(guild_id: int, user: dict = Depends(get_curren
     """Fetch AutoDelete settings."""
     db = AutoDeleteDB()
     try:
-        settings = db.get_guild_settings(guild_id)
+        await db.init_db()
+        settings = await db.get_all()
+        # Filter für die aktuelle Guild (Note: autodelete table might need guild_id for better filtering)
         return {"success": True, "data": settings or []}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
@@ -358,14 +367,23 @@ async def update_autodelete_settings(guild_id: int, request: Request, user: dict
     data = await request.json()
     db = AutoDeleteDB()
     try:
-        # Assuming db.update_guild_settings(guild_id, data) where data is a list of channel configs
-        success = db.update_guild_settings(guild_id, data)
-        if success:
-            user_name = user.get("username", "Unbekannter User")
-            await send_dashboard_notification(guild_id, "Auto-Delete", user_name)
-        return {"success": success}
+        await db.init_db()
+        # In MariaDB Version heißt es add_autodelete
+        for item in data:
+            if "channel_id" in item and "duration" in item:
+                await db.add_autodelete(
+                    int(item["channel_id"]), 
+                    int(item["duration"]),
+                    item.get("exclude_pinned", True),
+                    item.get("exclude_bots", False)
+                )
+        
+        user_name = user.get("username", "Unbekannter User")
+        await send_dashboard_notification(guild_id, "Auto-Delete", user_name)
+        return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save autodelete settings: {e}")
+
 # --- TempVC Module Routes ---
 
 @router.get("/{guild_id}/tempvc")
@@ -373,9 +391,9 @@ async def get_tempvc_settings(guild_id: int, user: dict = Depends(get_current_us
     """Fetch TempVC-specific settings."""
     db = TempVCDatabase()
     try:
-        settings = db.get_tempvc_settings(guild_id)
+        await db.init_db()
+        settings = await db.get_tempvc_settings(guild_id)
         if settings:
-            # result is tuple: (creator_channel_id, category_id, auto_delete_time)
             data = {
                 "creator_channel_id": str(settings[0]),
                 "category_id": str(settings[1]),
@@ -384,8 +402,7 @@ async def get_tempvc_settings(guild_id: int, user: dict = Depends(get_current_us
         else:
             data = {}
             
-        # Get UI settings
-        ui_settings = db.get_ui_settings(guild_id)
+        ui_settings = await db.get_ui_settings(guild_id)
         if ui_settings:
             data["ui_enabled"] = bool(ui_settings[0])
             data["ui_prefix"] = ui_settings[1]
@@ -404,18 +421,17 @@ async def update_tempvc_settings(guild_id: int, request: Request, user: dict = D
     db = TempVCDatabase()
     
     try:
-        # Update main settings
+        await db.init_db()
         creator_channel_id = int(data.get("creator_channel_id")) if data.get("creator_channel_id") else 0
         category_id = int(data.get("category_id")) if data.get("category_id") else 0
         auto_delete_time = int(data.get("auto_delete_time", 0))
         
         if creator_channel_id and category_id:
-            db.set_tempvc_settings(guild_id, creator_channel_id, category_id, auto_delete_time)
+            await db.set_tempvc_settings(guild_id, creator_channel_id, category_id, auto_delete_time)
         
-        # Update UI settings
         ui_enabled = bool(data.get("ui_enabled", False))
         ui_prefix = data.get("ui_prefix", "🔧")
-        db.set_ui_settings(guild_id, ui_enabled, ui_prefix)
+        await db.set_ui_settings(guild_id, ui_enabled, ui_prefix)
         
         user_name = user.get("username", "Unbekannter User")
         await send_dashboard_notification(guild_id, "TempVC System", user_name, creator_channel_id or None)

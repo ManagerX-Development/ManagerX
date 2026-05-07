@@ -9,17 +9,17 @@ import { cn } from "../../lib/utils";
 import { useAuth } from "../core/AuthProvider";
 
 const mainLinks = [
-  { label: "Features", href: "/#features", icon: Sparkles },
   { label: "Commands", href: "/commands", icon: Terminal },
+  { label: "Blog", href: "/blog", icon: Newspaper },
   { label: "Leaderboard", href: "/leaderboard", icon: Trophy },
 ];
 
 const dropdownLinks = [
-  { label: "Roadmap", href: "/roadmap", icon: Milestone },
-  { label: "Team", href: "/team", icon: Users },
+  { label: "Features", href: "/#features", icon: Sparkles },
   { label: "Plugins", href: "/plugins", icon: Puzzle },
   { label: "Status", href: "/status", icon: Activity },
-  { label: "Blog", href: "/blog", icon: Newspaper },
+  { label: "Roadmap", href: "/roadmap", icon: Milestone },
+  { label: "Team", href: "/team", icon: Users },
 ];
 
 function NavDropdown({ label, links, location }: { label: string, links: any[], location: any }) {
@@ -94,7 +94,7 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -155,7 +155,7 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <NavDropdown label="Netzwerk" links={dropdownLinks} location={location} />
+              <NavDropdown label="Mehr" links={dropdownLinks} location={location} />
             </div>
           </div>
 
@@ -170,6 +170,15 @@ export function Navbar() {
                   >
                     <User className="w-4 h-4" />
                   </Link>
+                  {user?.isAdmin && (
+                    <Link
+                      to="/dash/admin"
+                      className="p-2 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all group"
+                      title="Admin Zentrale"
+                    >
+                      <Shield className="w-4 h-4" />
+                    </Link>
+                  )}
                   <Link
                     to="/dash/guilds"
                     className="btn-primary inline-flex items-center gap-2 !px-4 !py-2 !text-[13px] group"

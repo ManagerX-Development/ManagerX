@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Globe, Settings2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Globe, Settings2, Tag } from "lucide-react";
 import { toast } from "sonner";
-import { API_URL } from "../lib/api";
-import { useAuth } from "../components/core/AuthProvider";
-import { cn } from "../lib/utils";
+import { API_URL } from "../../lib/api";
+import { useAuth } from "../../components/core/AuthProvider";
+import { cn } from "../../lib/utils";
 import { Post, getPostType } from "./cmsTypes";
 import CMSPostEditor from "./CMSPostEditor";
 
@@ -13,6 +13,21 @@ export default function CMSPostsTab() {
   const [loading, setLoading] = useState(true);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Partial<Post> | null>(null);
+  const [availableTags, setAvailableTags] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
+  const fetchTags = async () => {
+    try {
+      const res = await fetch(`${API_URL}/dashboard/cms/tags`);
+      const json = await res.json();
+      if (json.success) setAvailableTags(json.data);
+    } catch (err) {
+      console.error("Failed to fetch tags");
+    }
+  };
 
   const fetchAdminPosts = async () => {
     try {
@@ -58,6 +73,10 @@ export default function CMSPostsTab() {
   };
 
   const togglePublish = async (post: Post) => {
+    // Optimistic Update: Sofort im UI ändern
+    const oldPosts = [...posts];
+    setPosts(posts.map(p => p.id === post.id ? { ...p, is_published: !p.is_published } : p));
+
     try {
       const res = await fetch(`${API_URL}/dashboard/cms/posts/${post.id}`, {
         method: "PUT",
@@ -68,11 +87,17 @@ export default function CMSPostsTab() {
         },
         body: JSON.stringify({ is_published: !post.is_published })
       });
-      if (res.ok) {
+      if (!res.ok) {
+        // Rollback bei Fehler
+        setPosts(oldPosts);
+        toast.error("Fehler beim Umschalten");
+      } else {
         toast.success(post.is_published ? "Beitrag versteckt" : "Beitrag veröffentlicht");
+        // Optional: Nochmal echt laden zur Sicherheit
         fetchAdminPosts();
       }
     } catch (err) {
+      setPosts(oldPosts);
       toast.error("Fehler beim Umschalten");
     }
   };
@@ -124,12 +149,34 @@ export default function CMSPostsTab() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-bold text-sm text-white/90 group-hover:text-primary transition-colors">{post.title}</div>
-                      <div className="text-[10px] text-muted-foreground font-medium flex items-center gap-2 mt-1">
-                        <span>/{post.slug}</span>
-                        <span>•</span>
-                        <span>Von {post.author_name}</span>
-                        <span>•</span>
-                        <span>{post.view_count || 0} Aufrufe</span>
+                      <div className="text-[10px] text-muted-foreground font-medium flex flex-col gap-1.5 mt-1">
+                        <div className="flex items-center gap-2">
+                          <span>/{post.slug}</span>
+                          <span>•</span>
+                          <span>Von {post.author_name}</span>
+                          <span>•</span>
+                          <span>{post.view_count || 0} Aufrufe</span>
+                        </div>
+                        {post.tags && (
+                          <div className="flex flex-wrap gap-1.5 mt-0.5">
+                            {post.tags.split(',').filter(Boolean).map(t => {
+                              const tagData = availableTags.find(tag => tag.name === t.trim());
+                              return (
+                                <span 
+                                  key={t} 
+                                  className="px-1.5 py-0.5 rounded-md text-[8px] font-bold flex items-center gap-1 border border-white/5"
+                                  style={{ 
+                                    backgroundColor: (tagData?.color || '#3b82f6') + '15',
+                                    color: tagData?.color || '#3b82f6',
+                                    borderColor: (tagData?.color || '#3b82f6') + '30'
+                                  }}
+                                >
+                                  {tagData?.emoji} {t.trim()}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-4">

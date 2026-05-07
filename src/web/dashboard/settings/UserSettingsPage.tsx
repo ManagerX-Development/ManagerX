@@ -28,16 +28,16 @@ import {
     Activity,
     History
 } from "lucide-react";
-import { useAuth } from "../components/core/AuthProvider";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Switch } from "../components/ui/switch";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { useAuth } from "../../components/core/AuthProvider";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Switch } from "../../components/ui/switch";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Toaster, toast } from "sonner";
-import { cn } from "../lib/utils";
+import { cn } from "../../lib/utils";
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 
 export default function UserSettingsPage() {
     const { token, user } = useAuth();

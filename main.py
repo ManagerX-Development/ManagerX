@@ -3,7 +3,7 @@ ManagerX Discord Bot - Main Entry Point
 ========================================
 
 Copyright (c) 2025 OPPRO.NET Network
-Version: 2.0.0
+Version: 2.1.0
 """
 
 # =============================================================================
@@ -50,7 +50,7 @@ config = config_loader.load()
 
 # API Routes & Translation
 from src.api.dashboard.routes import set_bot_instance, dashboard_main_router, router_public
-from mx_handler import TranslationHandler
+from mxmariadb import TranslationHandler, BlacklistDatabase
 
 colorama_init(autoreset=True)
 
@@ -111,8 +111,8 @@ async def start_webserver():
         log_level=BotConfig.api.log_level
     )
     server = Server(server_config)
-    await server.serve()
     logger.success("API", f"FastAPI-Server läuft auf http://{BotConfig.api.host}:{BotConfig.api.port}")
+    await server.serve()
 
 # =============================================================================
 # MAIN EXECUTION
@@ -146,16 +146,18 @@ if __name__ == '__main__':
     dashboard = DashboardTask(bot, BASEDIR)
     dashboard.register()
     
+    # Dashboard starten
+    dashboard.start()
+    
+    # --- NEU: Webserver direkt beim Start in den Loop hängen ---
+    # Wir starten den Webserver, bevor der Bot den Loop blockiert
+    bot.loop.create_task(start_webserver())
+    logger.info("API", "Webserver-Task im Hintergrund gestartet")
+    
     @bot.event
     async def on_ready():
         logger.success("BOT", f"Logged in as {bot.user.name}")
         
-        # --- NEU: Status API & Webserver starten ---
-        bot.loop.create_task(start_webserver())
-            
-        # Dashboard starten
-        dashboard.start()
-            
         # Bot-Status
         if BotConfig.features.get('bot_status', True):
             await bot.change_presence(
@@ -173,6 +175,37 @@ if __name__ == '__main__':
         logger.info("LIMITS", f"EzCord zählt (alle Funktionen): {len(bot.commands)}")
         logger.info("LIMITS", f"Discord-API Slots belegt: {len(root_slots)} / 100")
         # --- LIMIT CHECK ENDE ---
+
+    @bot.check
+    async def global_blacklist_check(ctx: discord.ApplicationContext):
+        """Checks if the user is on the global blacklist."""
+        # Bot owners are always exempt
+        if ctx.author.id in BotConfig.security.bot_owners:
+            return True
+            
+        try:
+            db = BlacklistDatabase()
+            await db.ensure_connection()
+            ban_info = await db.is_blacklisted(str(ctx.author.id))
+            
+            if ban_info:
+                embed = discord.Embed(
+                    title="🚫 Globaler Ausschluss",
+                    description=(
+                        f"Du wurdest von der Nutzung von **{bot.user.name}** ausgeschlossen.\n\n"
+                        f"**Grund:** `{ban_info['reason']}`\n"
+                        f"**Datum:** `{ban_info['created_at'].strftime('%d.%m.%Y')}`\n\n"
+                        "Solltest du glauben, dass dies ein Fehler ist, wende dich bitte an unseren Support."
+                    ),
+                    color=discord.Color.from_rgb(244, 63, 94) # Rose-500
+                )
+                embed.set_footer(text="System: Global Blacklist")
+                await ctx.respond(embed=embed, ephemeral=True)
+                return False
+        except Exception as e:
+            logger.error("BLACKLIST", f"Fehler beim Blacklist-Check: {e}")
+            
+        return True
 
     @bot.before_invoke
     async def maintenance_check(ctx: discord.ApplicationContext):

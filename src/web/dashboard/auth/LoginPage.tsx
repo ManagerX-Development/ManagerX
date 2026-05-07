@@ -1,20 +1,23 @@
-import React from "react";
-import { motion } from "framer-motion";
-import {
-    Shield,
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { 
+    Mail, 
+    Lock, 
+    LayoutDashboard, 
+    ShieldCheck, 
+    Zap, 
+    ArrowRight, 
+    MessageSquare, 
+    Globe, 
+    Settings,
     Sparkles,
-    Lock,
-    LayoutDashboard,
-    ShieldCheck,
-    Zap,
-    ArrowRight,
-    MessageSquare,
-    Globe,
-    Settings
+    Shield
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { cn } from "../lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "../../lib/utils";
 import { toast } from "sonner";
+import { useAuth } from "../../components/core/AuthProvider";
+import { API_URL } from "../../lib/api";
 
 const FeatureItem = ({ icon: Icon, title, description }: { icon: any, title: string, description: string }) => (
     <div className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors group">
@@ -28,9 +31,22 @@ const FeatureItem = ({ icon: Icon, title, description }: { icon: any, title: str
     </div>
 );
 
-import { API_URL } from "../lib/api";
-
 export default function LoginPage() {
+    const [showAdminLogin, setShowAdminLogin] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        if (params.get("admin") === "true") {
+            setShowAdminLogin(true);
+        }
+    }, [location]);
+
     const handleLogin = async () => {
         try {
             const apiUrl = `${API_URL}/dashboard/auth/login`;
@@ -46,6 +62,30 @@ export default function LoginPage() {
         } catch (e) {
             console.error(e);
             toast.error("Fehler beim Verbinden mit dem Authentifizierungs-Server.");
+        }
+    };
+
+    const handleEmailLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/dashboard/auth/login/email`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (data.access_token) {
+                login(data.access_token, data.user, undefined, true); // true = session only
+                toast.success("Admin-Session gestartet!");
+                navigate("/dash/admin");
+            } else {
+                toast.error(data.detail || "Login fehlgeschlagen");
+            }
+        } catch (e) {
+            toast.error("Verbindungsfehler");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -159,6 +199,57 @@ export default function LoginPage() {
                                         Logge dich über Discord ein
                                         <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                                     </motion.button>
+
+                                    <div className="relative flex items-center py-2">
+                                        <div className="flex-grow border-t border-white/5"></div>
+                                        <span className="flex-shrink mx-4 text-[10px] uppercase tracking-widest text-muted-foreground font-bold opacity-30">ODER</span>
+                                        <div className="flex-grow border-t border-white/5"></div>
+                                    </div>
+
+                                    {showAdminLogin && (
+                                        <motion.form 
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: "auto" }}
+                                            onSubmit={handleEmailLogin} 
+                                            className="space-y-4 pt-4 border-t border-white/5"
+                                        >
+                                            <div className="space-y-2">
+                                                <div className="relative">
+                                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                    <input 
+                                                        type="email" 
+                                                        placeholder="Admin E-Mail" 
+                                                        value={email}
+                                                        onChange={(e) => setEmail(e.target.value)}
+                                                        required
+                                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <div className="relative">
+                                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                    <input 
+                                                        type="password" 
+                                                        placeholder="Passwort" 
+                                                        value={password}
+                                                        onChange={(e) => setPassword(e.target.value)}
+                                                        required
+                                                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <motion.button
+                                                type="submit"
+                                                disabled={loading}
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-primary/20 hover:bg-primary/30 border border-primary/30 text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-xl"
+                                            >
+                                                {loading ? "Wird geprüft..." : "Admin Login"}
+                                            </motion.button>
+                                        </motion.form>
+                                    )}
 
                                     <div className="relative flex items-center py-2">
                                         <div className="flex-grow border-t border-white/5"></div>

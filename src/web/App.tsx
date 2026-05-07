@@ -18,13 +18,14 @@ const TeamPage = lazy(() => import("./pages/TeamPage"));
 const RoadmapPage = lazy(() => import("./pages/RoadmapPage"));
 const LeaderboardPage = lazy(() => import("./pages/LeaderboardPage"));
 const License = lazy(() => import("./pages/License").then(module => ({ default: module.License })));
-const LoginPage = lazy(() => import("./dashboard/LoginPage"));
-const SettingsPage = lazy(() => import("./dashboard/SettingsPage"));
-const UserSettingsPage = lazy(() => import("./dashboard/UserSettingsPage"));
-const GuildSelectionPage = lazy(() => import("./dashboard/GuildSelectionPage"));
+const LoginPage = lazy(() => import("./dashboard/auth/LoginPage"));
+const SettingsPage = lazy(() => import("./dashboard/settings/SettingsPage"));
+const UserSettingsPage = lazy(() => import("./dashboard/settings/UserSettingsPage"));
+const GuildSelectionPage = lazy(() => import("./dashboard/settings/GuildSelectionPage"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const BlogPage = lazy(() => import("./pages/BlogPage"));
-const CMSPage = lazy(() => import("./dashboard/CMSPage"));
+const CMSPage = lazy(() => import("./dashboard/cms/CMSPage"));
+const AdminPage = lazy(() => import("./dashboard/admin/AdminPage"));
 
 const queryClient = new QueryClient();
 
@@ -69,11 +70,9 @@ const DashboardRoutes = () => {
             <Route path="/dash/login" element={<LoginPage />} />
             <Route path="/dash/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/dash/admin" element={<AdminPage />} />
+            <Route path="/dash/admin/cms" element={<CMSPage />} />
             <Route path="/dash/guilds" element={<GuildSelectionPage />} />
-            <Route path="/dash/settings" element={<SettingsPage />} />
-            <Route path="/dash" element={<LoginPage />} />
-            <Route path="/" element={<LoginPage />} />
-            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </motion.div>
@@ -114,7 +113,8 @@ const MainRoutes = () => {
             <Route path="/leaderboard" element={<LeaderboardPage />} />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/tutorials" element={<BlogPage />} />
-            <Route path="/dash/cms" element={<CMSPage />} />
+            <Route path="/dash/admin" element={<AdminPage />} />
+            <Route path="/dash/admin/cms" element={<CMSPage />} />
             <Route path="/dash/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dash/guilds" element={<GuildSelectionPage />} />

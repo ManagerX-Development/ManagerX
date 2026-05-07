@@ -53,26 +53,45 @@ def is_admin(request: Request, user: dict = None) -> bool:
     if bypass_enabled and client_ip in ["127.0.0.1", "localhost"]:
         x_user_id = request.headers.get("X-User-ID")
         if x_user_id:
-            user_id = int(x_user_id)
-            owners = getattr(BotConfig.security, 'bot_owners', [])
-            if user_id in owners:
-                print(f"[DEBUG] CMS Access granted via Localhost Bypass for ID {user_id}")
+            if x_user_id == "cms_admin":
                 return True
+            try:
+                user_id = int(x_user_id)
+                owners = getattr(BotConfig.security, 'bot_owners', [])
+                if user_id in owners:
+                    print(f"[DEBUG] CMS Access granted via Localhost Bypass for ID {user_id}")
+                    return True
+            except (ValueError, TypeError):
+                pass
 
     if not user:
         return False
 
-    user_id = int(user["id"])
-    owners = getattr(BotConfig.security, 'bot_owners', [])
-    cms_admins = getattr(BotConfig, 'cms', {}).get('admins', []) if hasattr(BotConfig, 'cms') else []
-    return user_id in owners or user_id in cms_admins
+    uid = user["id"]
+    if uid == "cms_admin":
+        return True
+
+    try:
+        user_id = int(uid)
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        return user_id in owners
+    except (ValueError, TypeError):
+        return False
 
 def get_requester_info(request: Request, user: dict) -> tuple[int, str]:
     """Returns (user_id, username) from JWT or fallback header."""
     if user:
-        return int(user["id"]), user.get("username", "Unknown")
+        try:
+            return int(user["id"]), user.get("username", "Unknown")
+        except (ValueError, TypeError):
+            # Special case for non-numeric IDs like 'cms_admin'
+            return 0, user.get("username", "Unknown")
+    
     x_user_id = request.headers.get("X-User-ID")
-    return int(x_user_id) if x_user_id else 0, "Admin"
+    try:
+        return int(x_user_id) if x_user_id else 0, "Admin"
+    except (ValueError, TypeError):
+        return 0, "Admin"
 
 async def get_cms_db() -> CMSDatabase:
     db = CMSDatabase()
@@ -344,3 +363,59 @@ async def delete_media(media_id: int, request: Request, user: dict = Depends(get
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ─────────────────────────────────────────
+# ADMIN – TAGS
+# ─────────────────────────────────────────
+
+@router.get("/tags")
+async def list_tags(db: CMSDatabase = Depends(get_cms_db)):
+    """Public/Admin: list all tags."""
+    try:
+        tags = await db.get_tags()
+        return {"success": True, "data": tags}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/tags")
+async def create_tag(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: create a new tag."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    name = data.get("name")
+    if not name:
+        raise HTTPException(status_code=400, detail="Name is required")
+        
+    slug = data.get("slug") or slugify(name)
+    color = data.get("color", "#3498db")
+    emoji = data.get("emoji", "")
+    
+    success = await db.create_tag(name=name, slug=slug, color=color, emoji=emoji)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to create tag")
+    return {"success": True}
+
+@router.put("/tags/{tag_id}")
+async def update_tag(tag_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: update an existing tag."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.update_tag(tag_id, **data)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update tag")
+    return {"success": True}
+
+@router.delete("/tags/{tag_id}")
+async def delete_tag(tag_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: delete a tag."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    success = await db.delete_tag(tag_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete tag")
+    return {"success": True}
