@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useAuth } from "../components/core/AuthProvider";
+import { useAuth } from "../../components/core/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { 
     LayoutDashboard, 
@@ -13,10 +13,10 @@ import {
     Settings,
     Server
 } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Card, CardContent } from "../components/ui/card";
-import { cn } from "../lib/utils";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Card, CardContent } from "../../components/ui/card";
+import { cn } from "../../lib/utils";
 
 export default function GuildSelectionPage() {
     const { guilds, setSelectedGuildId, user } = useAuth();

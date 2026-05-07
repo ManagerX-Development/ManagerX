@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { X, Save, Globe, Eye, History, Image as ImageIcon, Sparkles, Hash, Clock, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { API_URL } from "../lib/api";
-import { useAuth } from "../components/core/AuthProvider";
-import { cn } from "../lib/utils";
+import { API_URL } from "../../lib/api";
+import { useAuth } from "../../components/core/AuthProvider";
+import { cn } from "../../lib/utils";
 import { Post, POST_TYPES, slugify, Revision } from "./cmsTypes";
 import ReactMarkdown from "react-markdown";
 
@@ -20,12 +20,28 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave }: CM
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [saving, setSaving] = useState(false);
   const [loadingRevisions, setLoadingRevisions] = useState(false);
+  
+  // Tag Selection State
+  const [availableTags, setAvailableTags] = useState<any[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
 
   useEffect(() => {
+    fetchTags();
     if (initialPost.id) {
       fetchRevisions();
     }
   }, [initialPost.id]);
+
+  const fetchTags = async () => {
+    try {
+      const res = await fetch(`${API_URL}/dashboard/cms/tags`);
+      const json = await res.json();
+      if (json.success) setAvailableTags(json.data);
+    } catch (err) {
+      console.error("Failed to fetch tags");
+    }
+  };
 
   const fetchRevisions = async () => {
     if (!initialPost.id) return;
@@ -279,15 +295,108 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave }: CM
                     </div>
 
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-muted-foreground ml-1">Tags (Komma-getrennt)</label>
+                       <label className="text-[10px] font-bold text-muted-foreground ml-1">Tags</label>
+                       
+                       {/* Selected Tags Chips */}
+                       <div className="flex flex-wrap gap-2 mb-2">
+                         {formData.tags?.split(',').filter(Boolean).map(tag => {
+                           const tagData = availableTags.find(t => t.name === tag.trim());
+                           return (
+                             <span 
+                               key={tag}
+                               className="px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 transition-all animate-in zoom-in-95"
+                               style={{ 
+                                 backgroundColor: (tagData?.color || '#3b82f6') + '20', 
+                                 color: tagData?.color || '#3b82f6',
+                                 border: `1px solid ${tagData?.color || '#3b82f6'}40`
+                               }}
+                             >
+                               {tagData?.emoji} {tag}
+                               <button 
+                                 onClick={() => {
+                                   const newTags = formData.tags?.split(',')
+                                     .filter(t => t.trim() !== tag.trim())
+                                     .join(',');
+                                   setFormData(prev => ({ ...prev, tags: newTags }));
+                                 }}
+                                 className="hover:text-white transition-colors"
+                               >
+                                 <X className="w-3 h-3" />
+                               </button>
+                             </span>
+                           );
+                         })}
+                       </div>
+
                        <div className="relative">
                         <input 
                           type="text"
-                          value={formData.tags || ''}
-                          onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 pl-8 text-xs outline-none"
+                          value={tagInput}
+                          placeholder="Tag suchen oder neu erstellen..."
+                          onChange={(e) => {
+                            setTagInput(e.target.value);
+                            setShowTagSuggestions(true);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && tagInput.trim()) {
+                              e.preventDefault();
+                              const currentTags = formData.tags?.split(',').filter(Boolean) || [];
+                              if (!currentTags.includes(tagInput.trim())) {
+                                const newTags = [...currentTags, tagInput.trim()].join(',');
+                                setFormData(prev => ({ ...prev, tags: newTags }));
+                              }
+                              setTagInput("");
+                            }
+                          }}
+                          onBlur={() => setTimeout(() => setShowTagSuggestions(false), 200)}
+                          onFocus={() => setShowTagSuggestions(true)}
+                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 pl-8 text-xs outline-none focus:border-primary transition-colors"
                         />
                         <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+
+                        {/* Suggestions Dropdown */}
+                        {showTagSuggestions && (
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-[#0f0f0f] border border-white/10 rounded-xl shadow-2xl z-[110] max-h-40 overflow-y-auto p-1 no-scrollbar">
+                            {availableTags
+                              .filter(t => t.name.toLowerCase().includes(tagInput.toLowerCase()) && !formData.tags?.split(',').map(s => s.trim()).includes(t.name))
+                              .map(tag => (
+                                <button
+                                  key={tag.id}
+                                  onClick={() => {
+                                    const currentTags = formData.tags?.split(',').filter(Boolean) || [];
+                                    const newTags = [...currentTags, tag.name].join(',');
+                                    setFormData(prev => ({ ...prev, tags: newTags }));
+                                    setTagInput("");
+                                    setShowTagSuggestions(false);
+                                  }}
+                                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 flex items-center justify-between group transition-colors"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm">{tag.emoji}</span>
+                                    <span className="text-xs font-bold">{tag.name}</span>
+                                  </div>
+                                  <div 
+                                    className="w-2 h-2 rounded-full shadow-[0_0_8px_currentColor]" 
+                                    style={{ backgroundColor: tag.color, color: tag.color }} 
+                                  />
+                                </button>
+                              ))
+                            }
+                            {tagInput && !availableTags.some(t => t.name.toLowerCase() === tagInput.toLowerCase()) && (
+                              <button
+                                onClick={() => {
+                                  const currentTags = formData.tags?.split(',').filter(Boolean) || [];
+                                  const newTags = [...currentTags, tagInput.trim()].join(',');
+                                  setFormData(prev => ({ ...prev, tags: newTags }));
+                                  setTagInput("");
+                                }}
+                                className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-[10px] font-bold text-primary"
+                              >
+                                Neu erstellen: "{tagInput}"
+                              </button>
+                            )}
+                          </div>
+                        )}
                        </div>
                     </div>
 

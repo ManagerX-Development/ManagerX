@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Image as ImageIcon, Trash2, Upload, Link, FileText, Film, File as FileIcon, Search } from "lucide-react";
 import { toast } from "sonner";
-import { API_URL } from "../lib/api";
-import { useAuth } from "../components/core/AuthProvider";
-import { cn } from "../lib/utils";
+import { API_URL } from "../../lib/api";
+import { useAuth } from "../../components/core/AuthProvider";
+import { cn } from "../../lib/utils";
 import { MediaItem } from "./cmsTypes";
 
 export default function CMSMediaTab() {
@@ -69,6 +69,11 @@ export default function CMSMediaTab() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Datei wirklich löschen?")) return;
+    
+    // Optimistic Update
+    const oldMedia = [...media];
+    setMedia(media.filter(m => m.id !== id));
+
     try {
       const res = await fetch(`${API_URL}/dashboard/cms/media/${id}`, {
         method: "DELETE",
@@ -80,9 +85,14 @@ export default function CMSMediaTab() {
       const data = await res.json();
       if (data.success) {
         toast.success("Datei gelöscht");
+        // Sicherheithalber nochmal synchronisieren
         fetchMedia();
+      } else {
+        setMedia(oldMedia);
+        toast.error(data.detail || "Fehler beim Löschen");
       }
     } catch (err) {
+      setMedia(oldMedia);
       toast.error("Fehler beim Löschen");
     }
   };

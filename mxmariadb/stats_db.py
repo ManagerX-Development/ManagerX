@@ -98,6 +98,17 @@ class StatsDB(MariaConnector):
                         )
                     ''')
                     await cur.execute('''
+                        CREATE TABLE IF NOT EXISTS command_usage (
+                            id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+                            guild_id     BIGINT NOT NULL,
+                            command_name VARCHAR(100) NOT NULL,
+                            used_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            INDEX idx_cmd (command_name),
+                            INDEX idx_guild (guild_id)
+                        )
+                    ''')
+                    
+                    await cur.execute('''
                         CREATE TABLE IF NOT EXISTS active_voice_sessions (
                             user_id    BIGINT PRIMARY KEY,
                             guild_id   BIGINT NOT NULL,
@@ -203,6 +214,38 @@ class StatsDB(MariaConnector):
             await self._update_global_xp(cur, user_id, guild_id, 'voice', duration_minutes)
 
         await cur.execute('DELETE FROM active_voice_sessions WHERE user_id = %s', (user_id,))
+
+    async def log_command(self, guild_id: int, command_name: str):
+        await self.ensure_connection()
+        async with self.lock:
+            try:
+                async with self.pool.acquire() as conn:
+                    async with conn.cursor() as cur:
+                        await cur.execute('''
+                            INSERT INTO command_usage (guild_id, command_name)
+                            VALUES (%s, %s)
+                        ''', (guild_id, command_name))
+                    await conn.commit()
+            except Exception as e:
+                logger.error(f"log_command fehlgeschlagen: {e}")
+
+    async def get_top_commands(self, limit: int = 5) -> List[Dict]:
+        await self.ensure_connection()
+        async with self.lock:
+            try:
+                async with self.pool.acquire() as conn:
+                    async with conn.cursor(aiomysql.DictCursor) as cur:
+                        await cur.execute('''
+                            SELECT command_name, COUNT(*) as usage_count 
+                            FROM command_usage 
+                            GROUP BY command_name 
+                            ORDER BY usage_count DESC 
+                            LIMIT %s
+                        ''', (limit,))
+                        return await cur.fetchall()
+            except Exception as e:
+                logger.error(f"get_top_commands fehlgeschlagen: {e}")
+                return []
 
     # ------------------------------------------------------------------
     # XP  (unverändert, nur ensure_connection nicht nötig — läuft intern)

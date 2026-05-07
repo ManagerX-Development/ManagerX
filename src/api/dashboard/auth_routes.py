@@ -6,10 +6,16 @@ import os
 import time
 from urllib.parse import urlencode
 
+from pydantic import BaseModel
+
 router = APIRouter(
     prefix="/auth",
     tags=["auth"]
 )
+
+class EmailLoginRequest(BaseModel):
+    email: str
+    password: str
 
 # JWT Setup
 JWT_SECRET = os.getenv("JWT_SECRET", "fallback-secret")
@@ -65,6 +71,90 @@ async def login():
     url = f"https://discord.com/oauth2/authorize?{urlencode(params)}"
     print(f"[DEBUG] Generated Discord URL: {url}")
     return {"url": url}
+
+# Brute Force Protection
+login_attempts = {} # {ip: {"count": 0, "last_attempt": 0}}
+
+@router.post("/login/email")
+async def login_email(request: Request, data: EmailLoginRequest):
+    """CMS Admin Login using Email and Password with Brute Force protection."""
+    client_ip = request.client.host
+    now = time.time()
+
+    # 1. Check Rate Limit
+    if client_ip in login_attempts:
+        attempt_data = login_attempts[client_ip]
+        # If more than 5 failed attempts in the last 15 minutes
+        if attempt_data["count"] >= 5 and (now - attempt_data["last_attempt"]) < 900:
+            wait_time = int(900 - (now - attempt_data["last_attempt"]))
+            raise HTTPException(
+                status_code=429, 
+                detail=f"Zu viele Fehlversuche. Bitte warte {wait_time // 60} Minuten."
+            )
+        # Reset if the last attempt was long ago
+        if (now - attempt_data["last_attempt"]) > 900:
+            login_attempts[client_ip] = {"count": 0, "last_attempt": now}
+
+    admin_email = os.getenv("CMS_ADMIN_EMAIL")
+    admin_pass = os.getenv("CMS_ADMIN_PASSWORD")
+
+    if data.email == admin_email and data.password == admin_pass:
+        # Success: Clear attempts
+        if client_ip in login_attempts:
+            del login_attempts[client_ip]
+
+        # Generate JWT for the admin
+        jwt_token = create_access_token({
+            "sub": "cms_admin",
+            "username": "Lenny (CMS Admin)",
+            "avatar": "https://cdn.discordapp.com/embed/avatars/0.png"
+        })
+
+        # 4. Security Alert: Notify owners via Discord
+        try:
+            from src.api.dashboard.routes import bot_instance
+            from src.bot.core.config import BotConfig
+            owners = getattr(BotConfig.security, 'bot_owners', [])
+            
+            if bot_instance:
+                alert_msg = (
+                    "⚠️ **Sicherheits-Alarm: Admin-Login** ⚠️\n\n"
+                    f"Ein Login in die Admin-Zentrale wurde soeben durchgeführt.\n"
+                    f"**E-Mail:** `{data.email}`\n"
+                    f"**IP-Adresse:** `{client_ip}`\n"
+                    f"**Zeitpunkt:** <t:{int(now)}:F>\n\n"
+                    "Falls du das nicht warst, ändere sofort dein Passwort in der `.env`!"
+                )
+                for owner_id in owners:
+                    owner = bot_instance.get_user(int(owner_id))
+                    if owner:
+                        await owner.send(alert_msg)
+        except Exception as e:
+            print(f"[ERROR] Failed to send security alert: {e}")
+
+        return {
+            "access_token": jwt_token,
+            "token_type": "bearer",
+            "user": {
+                "id": "cms_admin",
+                "username": "Lenny (CMS Admin)",
+                "avatar": "https://cdn.discordapp.com/embed/avatars/0.png",
+                "isAdmin": True
+            }
+        }
+    
+    # 2. Failure Logic
+    # Update attempts
+    if client_ip not in login_attempts:
+        login_attempts[client_ip] = {"count": 0, "last_attempt": now}
+    
+    login_attempts[client_ip]["count"] += 1
+    login_attempts[client_ip]["last_attempt"] = now
+    
+    # 3. Synthetic Delay (Brakes for Bots)
+    time.sleep(1.5)
+    
+    raise HTTPException(status_code=401, detail="Ungültige E-Mail oder Passwort")
 
 @router.post("/callback")
 async def callback(request: Request):
@@ -127,15 +217,27 @@ async def callback(request: Request):
 async def get_me(request: Request, user: dict = Depends(get_current_user)):
     """Returns the user along with guilds they manage that the bot is also in."""
     from src.api.dashboard.routes import bot_instance
+    from src.bot.core.config import BotConfig
+    
+    # Global Admin Check
+    is_bot_admin = False
+    if user.get("id") == "cms_admin":
+        is_bot_admin = True
+    else:
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            uid = int(user.get("id", 0))
+            if uid in owners:
+                is_bot_admin = True
+        except:
+            pass
+    
+    # Update user object with admin status
+    user["isAdmin"] = is_bot_admin
     
     auth_header = request.headers.get("Authorization")
     if not auth_header:
          raise HTTPException(status_code=401)
-    
-    # In a real app, we'd store the Discord Access Token in a session or database.
-    # For now, let's assume the client might send it or we fetch it if we had it.
-    # To make this "really work" without a DB yet, we expect a 'X-Discord-Token' header 
-    # or just use the one from the callback if we were to store it.
     
     discord_token = request.headers.get("X-Discord-Token")
     user_guilds = []
@@ -148,12 +250,10 @@ async def get_me(request: Request, user: dict = Depends(get_current_user)):
             if guilds_res.status_code == 200:
                 all_guilds = guilds_res.json()
                 for g in all_guilds:
-                    # check permissions (Manage Guild = 0x20)
                     perms = int(g.get("permissions", 0))
-                    is_admin = (perms & 0x20) == 0x20 or (perms & 0x8) == 0x8
+                    is_manageable = (perms & 0x20) == 0x20 or (perms & 0x8) == 0x8
                     
-                    if is_admin:
-                        # Check if bot is in guild
+                    if is_manageable:
                         guild_id = int(g.get("id"))
                         if bot_instance and bot_instance.get_guild(guild_id):
                             user_guilds.append({

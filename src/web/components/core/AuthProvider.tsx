@@ -6,7 +6,7 @@ interface AuthContextType {
     guilds: any[];
     selectedGuildId: string | null;
     isAuthenticated: boolean;
-    login: (token: string, user: any, discordToken?: string) => void;
+    login: (token: string, user: any, discordToken?: string, isSessionOnly?: boolean) => void;
     logout: () => void;
     setSelectedGuildId: (id: string) => void;
 }
@@ -18,9 +18,8 @@ import { API_URL } from "../../lib/api";
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const getSafeItem = (key: string) => {
         try {
-            return localStorage.getItem(key);
+            return localStorage.getItem(key) || sessionStorage.getItem(key);
         } catch (e) {
-            console.warn(`Error reading ${key} from localStorage:`, e);
             return null;
         }
     };
@@ -31,8 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             return JSON.parse(item);
         } catch (e) {
-            console.error(`Error parsing ${key} from localStorage:`, e);
-            localStorage.removeItem(key); // Clear corrupted data
             return null;
         }
     };
@@ -42,15 +39,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [guilds, setGuilds] = useState<any[]>([]);
     const [selectedGuildId, setSelectedGuildId] = useState<string | null>(getSafeItem("selectedGuildId"));
 
-    const login = (newToken: string, newUser: any, newDiscordToken?: string) => {
+    const login = (newToken: string, newUser: any, newDiscordToken?: string, isSessionOnly: boolean = false) => {
         setToken(newToken);
         setUser(newUser);
+        const storage = isSessionOnly ? sessionStorage : localStorage;
         try {
-            localStorage.setItem("token", newToken);
-            localStorage.setItem("user", JSON.stringify(newUser));
-            if (newDiscordToken) localStorage.setItem("discord_token", newDiscordToken);
+            storage.setItem("token", newToken);
+            storage.setItem("user", JSON.stringify(newUser));
+            storage.setItem("is_session_only", isSessionOnly ? "true" : "false");
+            if (newDiscordToken) storage.setItem("discord_token", newDiscordToken);
         } catch (e) {
-            console.error("Error saving to localStorage:", e);
+            console.error("Error saving to storage:", e);
         }
     };
 
@@ -61,8 +60,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSelectedGuildId(null);
         try {
             localStorage.clear();
+            sessionStorage.clear();
         } catch (e) {
-            console.error("Error clearing localStorage:", e);
+            console.error("Error clearing storage:", e);
         }
     };
 

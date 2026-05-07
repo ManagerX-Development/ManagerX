@@ -26,26 +26,26 @@ import {
     Brain,
     Radio
 } from "lucide-react";
-import { useAuth } from "../components/core/AuthProvider";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { cn } from "../lib/utils";
+import { useAuth } from "../../components/core/AuthProvider";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
+import { cn } from "../../lib/utils";
 import { lazy, Suspense } from "react";
-import GuildSelector from "../components/layout/GuildSelector";
-const AutoRoleSettings = lazy(() => import("../components/settings/AutoRoleSettings"));
-const WelcomeSettings = lazy(() => import("../components/settings/WelcomeSettings"));
-const AntiSpamSettings = lazy(() => import("../components/settings/AntiSpamSettings"));
-const GlobalChatSettings = lazy(() => import("../components/settings/GlobalChatSettings"));
-const LevelSettings = lazy(() => import("../components/settings/LevelSettings"));
-const LoggingSettings = lazy(() => import("../components/settings/LoggingSettings"));
-const AutoDeleteSettings = lazy(() => import("../components/settings/AutoDeleteSettings"));
-const TempVCSettings = lazy(() => import("../components/settings/TempVCSettings"));
-const OverviewSettings = lazy(() => import("../components/settings/OverviewSettings"));
-const AutoResponderSettings = lazy(() => import("../components/settings/AutoResponderSettings"));
-const NewsSyncSettings = lazy(() => import("../components/settings/NewsSyncSettings"));
-const ApplicationSettings = lazy(() => import("../components/settings/ApplicationSettings"));
+import GuildSelector from "../../components/layout/GuildSelector";
+const AutoRoleSettings = lazy(() => import("../../components/settings/AutoRoleSettings"));
+const WelcomeSettings = lazy(() => import("../../components/settings/WelcomeSettings"));
+const AntiSpamSettings = lazy(() => import("../../components/settings/AntiSpamSettings"));
+const GlobalChatSettings = lazy(() => import("../../components/settings/GlobalChatSettings"));
+const LevelSettings = lazy(() => import("../../components/settings/LevelSettings"));
+const LoggingSettings = lazy(() => import("../../components/settings/LoggingSettings"));
+const AutoDeleteSettings = lazy(() => import("../../components/settings/AutoDeleteSettings"));
+const TempVCSettings = lazy(() => import("../../components/settings/TempVCSettings"));
+const OverviewSettings = lazy(() => import("../../components/settings/OverviewSettings"));
+const AutoResponderSettings = lazy(() => import("../../components/settings/AutoResponderSettings"));
+const NewsSyncSettings = lazy(() => import("../../components/settings/NewsSyncSettings"));
+const ApplicationSettings = lazy(() => import("../../components/settings/ApplicationSettings"));
 
 const TabLoader = () => (
     <div className="w-full flex items-center justify-center py-20">
@@ -60,9 +60,9 @@ const CategoryHeader = ({ children }: { children: React.ReactNode }) => (
     <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 px-4 mt-6 mb-2">{children}</h3>
 );
 
-import { API_URL } from "../lib/api";
+import { API_URL } from "../../lib/api";
 import { toast, Toaster } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 
 export default function SettingsPage() {
     const { token, selectedGuildId } = useAuth();

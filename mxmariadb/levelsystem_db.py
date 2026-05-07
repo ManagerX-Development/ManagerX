@@ -56,6 +56,7 @@ class LevelDatabase(MariaConnector):
 
     async def init_db(self):
         """Create tables and load caches."""
+        await self.ensure_connection()
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute('''

@@ -88,6 +88,7 @@ async def get_leaderboard(limit: int = 50):
     
     try:
         stats_db = StatsDB()
+        blacklist_db = BlacklistDatabase()
         # get_leaderboard returns user_id, global_level, global_xp, total_messages, total_voice_minutes
         rows = await stats_db.get_leaderboard(limit=limit)
         
@@ -152,7 +153,208 @@ dashboard_main_router = APIRouter(
     tags=["dashboard"]
 )
 
-# Public sub-routers (no global X-API-KEY required, they manage their own like JWT)
+@dashboard_main_router.get("/admin/global-stats")
+async def get_admin_global_stats(user: dict = Depends(get_current_user)):
+    """Fetches global bot stats and CMS stats for the admin dashboard."""
+    # Auth check: Nur cms_admin oder bot owners
+    from .cms_routes import is_admin
+    # We need the request object for is_admin, but for now we simplify 
+    # as we already have the user from get_current_user
+    is_bot_admin = False
+    if user.get("id") == "cms_admin":
+        is_bot_admin = True
+    else:
+        from src.bot.core.config import BotConfig
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            if int(user.get("id", 0)) in owners:
+                is_bot_admin = True
+        except:
+            pass
+            
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    if bot_instance is None:
+        raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
+    
+    try:
+        from mxmariadb import CMSDatabase
+        db = CMSDatabase()
+        await db.ensure_connection()
+        posts = await db.get_posts(published_only=False)
+        
+        return {
+            "success": True,
+            "data": {
+                "totalGuilds": len(bot_instance.guilds),
+                "totalUsers": len(bot_instance.users),
+                "totalPosts": len(posts),
+                "apiLatency": f"{round(bot_instance.latency * 1000)}ms",
+                "uptime": str(discord.utils.utcnow() - getattr(bot_instance, 'start_time', discord.utils.utcnow())).split('.')[0]
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@dashboard_main_router.get("/admin/blacklist")
+async def get_admin_blacklist(user: dict = Depends(get_current_user)):
+    # Auth check: Nur cms_admin oder bot owners
+    user_id = user.get("id")
+    is_bot_admin = False
+    if user_id == "cms_admin":
+        is_bot_admin = True
+    else:
+        from src.bot.core.config import BotConfig
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            if int(user_id) in owners:
+                is_bot_admin = True
+        except:
+            pass
+            
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    from mxmariadb import BlacklistDatabase
+    db = BlacklistDatabase()
+    await db.ensure_connection()
+    data = await db.get_all_blacklisted()
+    return {"success": True, "data": data}
+
+@dashboard_main_router.post("/admin/blacklist")
+async def add_admin_blacklist(request: Request, user: dict = Depends(get_current_user)):
+    user_id = user.get("id")
+    is_bot_admin = False
+    if user_id == "cms_admin":
+        is_bot_admin = True
+    else:
+        from src.bot.core.config import BotConfig
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            if int(user_id) in owners:
+                is_bot_admin = True
+        except:
+            pass
+            
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    data = await request.json()
+    target_id = data.get("user_id")
+    reason = data.get("reason", "Kein Grund angegeben")
+    
+    if not target_id:
+        raise HTTPException(status_code=400, detail="Target User ID is required")
+
+    from mxmariadb import BlacklistDatabase
+    db = BlacklistDatabase()
+    await db.ensure_connection()
+    success = await db.add_to_blacklist(target_id, reason, user_id, user.get("username", "Admin"))
+    return {"success": success}
+
+@dashboard_main_router.delete("/admin/blacklist/{target_id}")
+async def remove_admin_blacklist(target_id: str, user: dict = Depends(get_current_user)):
+    user_id = user.get("id")
+    is_bot_admin = False
+    if user_id == "cms_admin":
+        is_bot_admin = True
+    else:
+        from src.bot.core.config import BotConfig
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            if int(user_id) in owners:
+                is_bot_admin = True
+        except:
+            pass
+            
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    from mxmariadb import BlacklistDatabase
+    db = BlacklistDatabase()
+    await db.ensure_connection()
+    success = await db.remove_from_blacklist(target_id)
+    return {"success": True}
+
+# --- GLOBAL CHAT CONTROL ---
+
+@dashboard_main_router.get("/admin/global-chat/logs")
+async def get_global_chat_logs(user: dict = Depends(get_current_user)):
+    user_id = user.get("id")
+    is_bot_admin = False
+    if user_id == "cms_admin":
+        is_bot_admin = True
+    else:
+        from src.bot.core.config import BotConfig
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            if int(user_id) in owners:
+                is_bot_admin = True
+        except:
+            pass
+            
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    from mxmariadb import GlobalChatDatabase
+    db = GlobalChatDatabase()
+    await db.ensure_connection()
+    # Letzte 50 Nachrichten
+    query = "SELECT * FROM message_log ORDER BY timestamp DESC LIMIT 50"
+    data = await db.fetch_all(query)
+    return {"success": True, "data": data}
+
+@dashboard_main_router.get("/admin/global-chat/blacklist")
+async def get_global_chat_blacklist(user: dict = Depends(get_current_user)):
+    user_id = user.get("id")
+    is_bot_admin = False
+    if user_id == "cms_admin":
+        is_bot_admin = True
+    else:
+        from src.bot.core.config import BotConfig
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            if int(user_id) in owners:
+                is_bot_admin = True
+        except:
+            pass
+            
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    from mxmariadb import GlobalChatDatabase
+    db = GlobalChatDatabase()
+    await db.ensure_connection()
+    query = "SELECT * FROM globalchat_blacklist ORDER BY banned_at DESC"
+    data = await db.fetch_all(query)
+    return {"success": True, "data": data}
+
+@dashboard_main_router.get("/admin/top-commands")
+async def get_admin_top_commands(user: dict = Depends(get_current_user)):
+    user_id = user.get("id")
+    is_bot_admin = False
+    if user_id == "cms_admin":
+        is_bot_admin = True
+    else:
+        from src.bot.core.config import BotConfig
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        try:
+            if int(user_id) in owners:
+                is_bot_admin = True
+        except:
+            pass
+            
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    from mxmariadb import StatsDB
+    db = StatsDB()
+    await db.ensure_connection()
+    data = await db.get_top_commands(limit=5)
+    return {"success": True, "data": data}
+
+# Public sub-routers
 @dashboard_main_router.get("/guilds/{guild_id}/channels")
 async def get_guild_channels(guild_id: int, user: dict = Depends(get_current_user)):
     """Fetches text channels for a specific guild."""

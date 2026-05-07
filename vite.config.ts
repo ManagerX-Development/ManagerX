@@ -26,12 +26,12 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "../../dist",
     emptyOutDir: true,
-    
+
     // ÄNDERUNG: Wir entfernen 'esbuild' als Minifier, da Vite 8 
     // standardmäßig 'terser' oder den internen 'oxc'/'rolldown' Weg nutzt.
     // Wenn du es weglässt, nutzt Vite den stabilsten Standard für v8.
-    minify: true, 
-    
+    minify: true,
+
     reportCompressedSize: false,
     rollupOptions: {
       input: {
@@ -45,8 +45,8 @@ export default defineConfig(({ mode }) => ({
           "vendor-react": ["react", "react-dom", "react-router-dom", "react-helmet-async"],
           "vendor-framer": ["framer-motion"],
           "vendor-ui": [
-            "@radix-ui/react-accordion", 
-            "@radix-ui/react-dialog", 
+            "@radix-ui/react-accordion",
+            "@radix-ui/react-dialog",
             "@radix-ui/react-dropdown-menu",
             "@radix-ui/react-tabs"
           ],

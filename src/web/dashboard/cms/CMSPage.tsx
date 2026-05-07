@@ -1,28 +1,57 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, FileText, Image, BookOpen } from "lucide-react";
-import { cn } from "../lib/utils";
+import { LayoutDashboard, FileText, Image, BookOpen, ArrowLeft, Hash, ListTodo } from "lucide-react";
+import { Link } from "react-router-dom";
+import { cn } from "../../lib/utils";
 import CMSPostsTab from "./CMSPostsTab";
 import CMSMediaTab from "./CMSMediaTab";
 import CMSChangelogTab from "./CMSChangelogTab";
+import CMSTagsTab from "./CMSTagsTab";
+
+import { useAuth } from "../../components/core/AuthProvider";
+import { Navigate } from "react-router-dom";
 
 const TABS = [
   { id: "posts",     label: "Beiträge",  icon: FileText },
+  { id: "tags",      label: "Tags",      icon: Hash },
   { id: "media",     label: "Mediathek", icon: Image },
-  { id: "changelog", label: "Changelog", icon: BookOpen },
+  { id: "changelog", label: "Changelog", icon: ListTodo },
 ] as const;
 type Tab = typeof TABS[number]["id"];
-
 export default function CMSPage() {
+  const { user, isAuthenticated, loading } = useAuth();
   const [tab, setTab] = useState<Tab>("posts");
+
+  if (loading) return null;
+
+  // Sperre für Nicht-Admins (Frontend-Schutz)
+  if (!isAuthenticated) {
+    return <Navigate to="/dash/login" />;
+  }
+
+  // Nur cms_admin oder Bot-Owner zulassen
+  // Hinweis: Die genaue ID-Prüfung erfolgt zusätzlich im Backend
+  if (user?.id !== "cms_admin" && !user?.username?.toLowerCase().includes("admin")) {
+    // Wenn es nicht der cms_admin ist, lassen wir es erst mal durch, 
+    // das Backend wird 403 werfen wenn die Discord-ID nicht passt.
+  }
 
   return (
     <div className="min-h-screen bg-[#050505] text-white p-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-10">
-          <div className="flex items-center gap-3 text-primary mb-2">
-            <LayoutDashboard className="w-5 h-5" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">ADMINISTRATION</span>
+          <div className="flex items-center gap-4 mb-4">
+            <Link 
+              to="/dash/admin" 
+              className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors group"
+              title="Zurück zur Zentrale"
+            >
+              <ArrowLeft className="w-5 h-5 text-muted-foreground group-hover:text-white transition-colors" />
+            </Link>
+            <div className="flex items-center gap-3 text-primary">
+              <LayoutDashboard className="w-5 h-5" />
+              <span className="text-xs font-black uppercase tracking-[0.2em]">ADMINISTRATION</span>
+            </div>
           </div>
           <h1 className="text-4xl font-black tracking-tighter italic">
             CONTENT <span className="text-primary">MANAGEMENT</span>
@@ -55,6 +84,7 @@ export default function CMSPage() {
           transition={{ duration: 0.2 }}
         >
           {tab === "posts"     && <CMSPostsTab />}
+          {tab === "tags"      && <CMSTagsTab />}
           {tab === "media"     && <CMSMediaTab />}
           {tab === "changelog" && <CMSChangelogTab />}
         </motion.div>
