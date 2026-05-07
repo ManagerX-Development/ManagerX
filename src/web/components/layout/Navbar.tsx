@@ -19,6 +19,7 @@ const dropdownLinks = [
   { label: "Team", href: "/team", icon: Users },
   { label: "Plugins", href: "/plugins", icon: Puzzle },
   { label: "Status", href: "/status", icon: Activity },
+  { label: "Blog", href: "/blog", icon: Newspaper },
 ];
 
 function NavDropdown({ label, links, location }: { label: string, links: any[], location: any }) {

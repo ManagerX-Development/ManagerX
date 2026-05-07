@@ -23,6 +23,8 @@ const SettingsPage = lazy(() => import("./dashboard/SettingsPage"));
 const UserSettingsPage = lazy(() => import("./dashboard/UserSettingsPage"));
 const GuildSelectionPage = lazy(() => import("./dashboard/GuildSelectionPage"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+const BlogPage = lazy(() => import("./pages/BlogPage"));
+const CMSPage = lazy(() => import("./dashboard/CMSPage"));
 
 const queryClient = new QueryClient();
 
@@ -110,6 +112,9 @@ const MainRoutes = () => {
             <Route path="/team" element={<TeamPage />} />
             <Route path="/roadmap" element={<RoadmapPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/tutorials" element={<BlogPage />} />
+            <Route path="/dash/cms" element={<CMSPage />} />
             <Route path="/dash/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dash/guilds" element={<GuildSelectionPage />} />

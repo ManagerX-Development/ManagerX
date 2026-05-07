@@ -12,6 +12,7 @@ from .auth_routes import router as auth_router
 from .settings_routes import router as settings_router
 from .user_routes import router as user_router
 from .management_routes import router as management_router
+from .cms_routes import router as cms_router
 
 # Wir erstellen einen Router, den wir später in die Haupt-App einbinden
 router_public = APIRouter(
@@ -81,7 +82,7 @@ async def get_leaderboard(limit: int = 50):
     """
     Fetches the global leaderboard from StatsDB and enriches it with Discord data.
     """
-    from mx_devtools import StatsDB
+    from mxmariadb import StatsDB
     if bot_instance is None:
         raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
     
@@ -120,8 +121,8 @@ async def get_leaderboard(limit: int = 50):
 @router_public.get("/version")
 async def get_version(request: Request):
     return {
-        "pypi_version": "1.2026.2.26",
-        "bot_version": "v2.0.0-open-beta"
+        "pypi_version": "1.2026.5.7",
+        "bot_version": "v2.1.0-open-beta"
     }
     
 
@@ -421,7 +422,7 @@ async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
             stats = {}
 
         # 2. Fetch Settings & Module Status
-        from mx_devtools import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase
+        from mxmariadb import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase
         
         # Check Level System
         try:
@@ -527,5 +528,6 @@ dashboard_main_router.include_router(auth_router)
 dashboard_main_router.include_router(settings_router)
 dashboard_main_router.include_router(user_router)
 dashboard_main_router.include_router(management_router)
+dashboard_main_router.include_router(cms_router)
 # dashboard_main_router.include_router(router_public) # Move to main.py for root access
 

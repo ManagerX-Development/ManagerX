@@ -21,6 +21,7 @@ from ezcord import CogLog
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
+from fastapi.staticfiles import StaticFiles
 from uvicorn import Server, Config
 
 # Logger (muss existieren!)
@@ -90,6 +91,11 @@ app.add_middleware(
 # Dashboard-Routes einbinden
 app.include_router(dashboard_main_router)
 app.include_router(router_public)
+
+# CMS Media Uploads als statische Dateien bereitstellen
+_uploads_dir = BASEDIR / "public" / "uploads" / "cms"
+_uploads_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/uploads/cms", StaticFiles(directory=str(_uploads_dir)), name="cms_uploads")
 
 @app.get("/robots.txt", response_class=PlainTextResponse)
 async def robots():

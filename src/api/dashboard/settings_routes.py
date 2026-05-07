@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Security, status, Depends
 from src.api.dashboard.auth_routes import get_current_user
-from mx_devtools import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase, AutoDeleteDB, AutoRoleDatabase, TempVCDatabase
+from mxmariadb import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase, AutoDeleteDB, AutoRoleDatabase, TempVCDatabase
 import discord
 from datetime import datetime
 

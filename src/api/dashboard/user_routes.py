@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from src.api.dashboard.auth_routes import get_current_user
-from mx_devtools import SettingsDB, StatsDB, EconomyDatabase
+from mxmariadb import SettingsDB, StatsDB, EconomyDatabase
 import discord
 import sqlite3
 import os
