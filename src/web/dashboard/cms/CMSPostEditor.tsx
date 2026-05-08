@@ -6,6 +6,7 @@ import { useAuth } from "../../components/core/AuthProvider";
 import { cn } from "../../lib/utils";
 import { Post, POST_TYPES, slugify, Revision } from "./cmsTypes";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface CMSPostEditorProps {
   post: Partial<Post>;
@@ -441,7 +442,7 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave }: CM
                     prose-headings:italic prose-headings:font-black
                     prose-code:text-primary prose-code:bg-primary/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
                   ">
-                    <ReactMarkdown>{formData.content || "_Kein Inhalt_"}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{formData.content || "_Kein Inhalt_"}</ReactMarkdown>
                   </div>
                 </div>
               </div>

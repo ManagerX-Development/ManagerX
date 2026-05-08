@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { API_URL } from "../../lib/api";
 import { useAuth } from "../../components/core/AuthProvider";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { cn } from "../../lib/utils";
 
 interface ChangelogItem {
@@ -193,7 +194,7 @@ export default function CMSChangelogTab() {
               prose-p:text-muted-foreground prose-p:text-sm
               prose-li:text-muted-foreground prose-li:text-sm
             ">
-              <ReactMarkdown>{generateMarkdown()}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{generateMarkdown()}</ReactMarkdown>
             </div>
           </div>
         </div>

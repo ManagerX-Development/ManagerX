@@ -17,6 +17,7 @@ import {
   Terminal
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { API_URL } from "../lib/api";
 import { cn } from "../lib/utils";
 import { Navbar } from "../components/layout/Navbar";
@@ -364,7 +365,7 @@ export default function BlogPage() {
                     prose-li:text-muted-foreground prose-li:font-medium
                     prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic
                   ">
-                    <ReactMarkdown>{currentPost.content}</ReactMarkdown>
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentPost.content}</ReactMarkdown>
                   </div>
 
                   {currentPost.tags && (
