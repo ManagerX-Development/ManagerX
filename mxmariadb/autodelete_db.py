@@ -90,8 +90,8 @@ class AutoDeleteDB(MariaConnector):
             async with conn.cursor() as cur:
                 await cur.execute('SELECT channel_id, duration, exclude_pinned, exclude_bots FROM autodelete ORDER BY channel_id')
                 results = await cur.fetchall()
-                # Umwandlung von Dict (aus Connector) in Tuple (für Cog Kompatibilität)
-                return [(r['channel_id'], r['duration'], r['exclude_pinned'], r['exclude_bots']) for r in results]
+                # results ist bereits eine Liste von Tupeln, keine Konvertierung nötig
+                return results
 
     async def get_autodelete_full(self, channel_id: int) -> Optional[tuple]:
         if not await self._ensure_pool(): return None
@@ -99,7 +99,8 @@ class AutoDeleteDB(MariaConnector):
             async with conn.cursor() as cur:
                 await cur.execute('SELECT duration, exclude_pinned, exclude_bots FROM autodelete WHERE channel_id = %s', (channel_id,))
                 r = await cur.fetchone()
-                return (r['duration'], r['exclude_pinned'], r['exclude_bots']) if r else None
+                # r ist bereits ein Tupel, wir können es direkt zurückgeben
+                return r if r else None
 
     async def update_stats(self, channel_id: int, deleted_count: int = 0, error_count: int = 0):
         if not await self._ensure_pool(): return

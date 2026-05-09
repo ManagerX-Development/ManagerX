@@ -1,12 +1,87 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "../components/layout/Navbar";
 import { Footer } from "../components/layout/Footer";
 import { Github, Twitter, Globe, Heart, Shield, Code2, Sparkles, Coffee, Youtube, Instagram } from "lucide-react";
-import { TEAM_MEMBERS } from "../data/team";
+import { API_URL } from "../lib/api";
 import { SEO } from "../components/layout/SEO";
 
 export const TeamPage = memo(function TeamPage() {
+    const [members, setMembers] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [resTeam, resCat] = await Promise.all([
+                    fetch(`${API_URL}/dashboard/cms/team`),
+                    fetch(`${API_URL}/dashboard/cms/team-categories`)
+                ]);
+                const jsonTeam = await resTeam.json();
+                const jsonCat = await resCat.json();
+                if (jsonTeam.success) setMembers(jsonTeam.data);
+                if (jsonCat.success) setCategories(jsonCat.data);
+            } catch (err) {
+                console.error("Failed to fetch team data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const renderMemberCard = (member: any, idx: number) => (
+        <motion.div
+            key={member.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className="glass rounded-[2.5rem] p-10 border border-white/5 relative overflow-hidden group"
+        >
+            <div className={member.color + " absolute top-0 left-0 w-2 h-full opacity-50"} />
+            <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
+                <div className={member.color + " w-24 h-24 rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-2xl relative z-10"}>
+                    {member.avatar}
+                </div>
+                <div className="flex-1 min-w-0">
+                    <h3 className="text-2xl font-black text-white italic tracking-tight mb-2 group-hover:text-primary transition-colors truncate">{member.name}</h3>
+                    <div className="text-primary text-xs font-black uppercase tracking-widest mb-4">{member.role}</div>
+                    <p className="text-slate-400 text-sm leading-relaxed font-medium mb-6 line-clamp-3">
+                        {member.bio}
+                    </p>
+                    <div className="flex flex-wrap gap-4">
+                        {member.github && (
+                            <a href={member.github} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all" title="GitHub">
+                                <Github className="w-5 h-5" />
+                            </a>
+                        )}
+                        {member.youtube && (
+                            <a href={member.youtube} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-[#FF0000] hover:bg-white/10 transition-all" title="YouTube">
+                                <Youtube className="w-5 h-5" />
+                            </a>
+                        )}
+                        {member.instagram && (
+                            <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-[#E4405F] hover:bg-white/10 transition-all" title="Instagram">
+                                <Instagram className="w-5 h-5" />
+                            </a>
+                        )}
+                        {member.twitter && (
+                            <a href={member.twitter} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-[#1DA1F2] hover:bg-white/10 transition-all" title="Twitter">
+                                <Twitter className="w-5 h-5" />
+                            </a>
+                        )}
+                        {member.website && (
+                            <a href={member.website} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-primary hover:bg-white/10 transition-all" title="Website">
+                                <Globe className="w-5 h-5" />
+                            </a>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+
     return (
         <div className="min-h-screen bg-[#0a0c10] text-slate-300 flex flex-col font-sans selection:bg-primary/30">
             <SEO
@@ -33,51 +108,45 @@ export const TeamPage = memo(function TeamPage() {
                     </p>
                 </header>
 
-                <section className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-32">
-                    {TEAM_MEMBERS.map((member, idx) => (
-                        <motion.div
-                            key={member.name}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="glass rounded-[2.5rem] p-10 border border-white/5 relative overflow-hidden group"
-                        >
-                            <div className={member.color + " absolute top-0 left-0 w-2 h-full opacity-50"} />
-                            <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
-                                <div className={member.color + " w-24 h-24 rounded-3xl flex items-center justify-center text-white text-3xl font-black shadow-2xl relative z-10"}>
-                                    {member.avatar}
-                                </div>
-                                <div className="flex-1">
-                                    <h3 className="text-2xl font-black text-white italic tracking-tight mb-2 group-hover:text-primary transition-colors">{member.name}</h3>
-                                    <div className="text-primary text-xs font-black uppercase tracking-widest mb-4">{member.role}</div>
-                                    <p className="text-slate-400 text-sm leading-relaxed font-medium mb-6">
-                                        {member.bio}
-                                    </p>
-                                    <div className="flex gap-4">
-                                        <a href={member.github} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all" title="GitHub">
-                                            <Github className="w-5 h-5" />
-                                        </a>
-                                        {member.youtube && (
-                                            <a href={member.youtube} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-[#FF0000] hover:bg-white/10 transition-all" title="YouTube">
-                                                <Youtube className="w-5 h-5" />
-                                            </a>
-                                        )}
-                                        {member.instagram && (
-                                            <a href={member.instagram} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-[#E4405F] hover:bg-white/10 transition-all" title="Instagram">
-                                                <Instagram className="w-5 h-5" />
-                                            </a>
-                                        )}
-                                        {member.website && (
-                                            <a href={member.website} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/5 rounded-xl text-slate-400 hover:text-primary hover:bg-white/10 transition-all" title="Website">
-                                                <Globe className="w-5 h-5" />
-                                            </a>
-                                        )}
+                <div className="max-w-5xl mx-auto mb-32 space-y-24">
+                    {loading ? (
+                         <div className="flex justify-center py-20">
+                            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                         </div>
+                    ) : (
+                        <>
+                            {/* Render members with a category */}
+                            {categories.map(cat => {
+                                const catMembers = members.filter(m => m.category_id === cat.id);
+                                if (catMembers.length === 0) return null;
+                                return (
+                                    <section key={cat.id}>
+                                        <h2 className="text-3xl md:text-4xl font-black text-white italic uppercase tracking-tighter mb-10 border-b border-white/5 pb-6">
+                                            <span className="text-primary mr-4">//</span>{cat.name}
+                                        </h2>
+                                        <div className="grid md:grid-cols-2 gap-8">
+                                            {catMembers.map((member, idx) => renderMemberCard(member, idx))}
+                                        </div>
+                                    </section>
+                                );
+                            })}
+                            
+                            {/* Render members without a category */}
+                            {members.filter(m => !m.category_id).length > 0 && (
+                                <section>
+                                    {categories.length > 0 && (
+                                        <h2 className="text-3xl md:text-4xl font-black text-white italic uppercase tracking-tighter mb-10 border-b border-white/5 pb-6">
+                                            <span className="text-primary mr-4">//</span>Weiteres Team
+                                        </h2>
+                                    )}
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        {members.filter(m => !m.category_id).map((member, idx) => renderMemberCard(member, idx))}
                                     </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </section>
+                                </section>
+                            )}
+                        </>
+                    )}
+                </div>
 
                 <section className="max-w-4xl mx-auto py-24 border-y border-white/5">
                     <div className="text-center mb-16">

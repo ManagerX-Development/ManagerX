@@ -7,17 +7,28 @@ import CMSPostsTab from "./CMSPostsTab";
 import CMSMediaTab from "./CMSMediaTab";
 import CMSChangelogTab from "./CMSChangelogTab";
 import CMSTagsTab from "./CMSTagsTab";
+import CMSRoadmapTab from "./CMSRoadmapTab";
+import CMSTeamTab from "./CMSTeamTab";
+import CMSFeedbackTab from "./CMSFeedbackTab";
 
 import { useAuth } from "../../components/core/AuthProvider";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
+import { Map, Users, FileText, Hash, Image, ListTodo, ArrowLeft, LayoutDashboard, MessageSquare } from "lucide-react";
+import { useState } from "react";
+import { cn } from "../../lib/utils";
+import { motion } from "framer-motion";
 
 const TABS = [
   { id: "posts",     label: "Beiträge",  icon: FileText },
   { id: "tags",      label: "Tags",      icon: Hash },
   { id: "media",     label: "Mediathek", icon: Image },
   { id: "changelog", label: "Changelog", icon: ListTodo },
+  { id: "roadmap",   label: "Roadmap",   icon: Map },
+  { id: "team",      label: "Team",      icon: Users },
+  { id: "feedback",  label: "Feedback",  icon: MessageSquare },
 ] as const;
 type Tab = typeof TABS[number]["id"];
+
 export default function CMSPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const [tab, setTab] = useState<Tab>("posts");
@@ -59,13 +70,13 @@ export default function CMSPage() {
         </header>
 
         {/* Tabs */}
-        <div className="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/10 mb-8 w-fit">
+        <div className="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/10 mb-8 w-fit overflow-x-auto no-scrollbar">
           {TABS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setTab(id)}
               className={cn(
-                "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all",
+                "flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap",
                 tab === id
                   ? "bg-primary text-white shadow-lg shadow-primary/20"
                   : "text-muted-foreground hover:text-white"
@@ -87,6 +98,9 @@ export default function CMSPage() {
           {tab === "tags"      && <CMSTagsTab />}
           {tab === "media"     && <CMSMediaTab />}
           {tab === "changelog" && <CMSChangelogTab />}
+          {tab === "roadmap"   && <CMSRoadmapTab />}
+          {tab === "team"      && <CMSTeamTab />}
+          {tab === "feedback"  && <CMSFeedbackTab />}
         </motion.div>
       </div>
     </div>
