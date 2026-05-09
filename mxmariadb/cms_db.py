@@ -71,10 +71,23 @@ class CMSDatabase(MariaConnector):
                         size_bytes INT NOT NULL,
                         uploader_id BIGINT NOT NULL,
                         uploader_name VARCHAR(100),
+                        is_stock BOOLEAN DEFAULT FALSE,
                         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         INDEX(uploader_id)
                     )
                 """)
+
+                # Add new columns to existing table (safe migration)
+                for col_def in [
+                    "ALTER TABLE cms_posts ADD COLUMN IF NOT EXISTS excerpt TEXT NULL",
+                    "ALTER TABLE cms_posts ADD COLUMN IF NOT EXISTS cover_image VARCHAR(500) NULL",
+                    "ALTER TABLE cms_posts ADD COLUMN IF NOT EXISTS view_count INT DEFAULT 0",
+                    "ALTER TABLE cms_media ADD COLUMN IF NOT EXISTS is_stock BOOLEAN DEFAULT FALSE"
+                ]:
+                    try:
+                        await cur.execute(col_def)
+                    except Exception:
+                        pass  # Column already exists or unsupported syntax
 
                 # Revision history table
                 await cur.execute("""
@@ -92,6 +105,77 @@ class CMSDatabase(MariaConnector):
                         changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (post_id) REFERENCES cms_posts(id) ON DELETE CASCADE,
                         INDEX(post_id)
+                    )
+                """)
+
+                # Roadmap table
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS cms_roadmap (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        title VARCHAR(255) NOT NULL,
+                        status ENUM('completed', 'in-progress', 'planned') DEFAULT 'planned',
+                        description TEXT NOT NULL,
+                        icon VARCHAR(50) DEFAULT 'Rocket',
+                        date_info VARCHAR(50),
+                        order_index INT DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    )
+                """)
+
+                # Team Categories table
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS cms_team_categories (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(100) NOT NULL,
+                        order_index INT DEFAULT 0,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                    )
+                """)
+
+                # Team table
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS cms_team (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(100) NOT NULL,
+                        role VARCHAR(100) NOT NULL,
+                        bio TEXT,
+                        avatar VARCHAR(255),
+                        color VARCHAR(50) DEFAULT 'bg-primary',
+                        github VARCHAR(255),
+                        twitter VARCHAR(255),
+                        youtube VARCHAR(255),
+                        instagram VARCHAR(255),
+                        website VARCHAR(255),
+                        order_index INT DEFAULT 0,
+                        category_id INT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        FOREIGN KEY (category_id) REFERENCES cms_team_categories(id) ON DELETE SET NULL
+                    )
+                """)
+                
+                # Sicheres Hinzufügen der category_id Spalte falls die Tabelle schon existiert
+                try:
+                    await cur.execute("ALTER TABLE cms_team ADD COLUMN category_id INT NULL")
+                    await cur.execute("ALTER TABLE cms_team ADD CONSTRAINT fk_team_cat FOREIGN KEY (category_id) REFERENCES cms_team_categories(id) ON DELETE SET NULL")
+                except aiomysql.OperationalError as e:
+                    if e.args[0] != 1060: # 1060 is Duplicate column name
+                        pass
+
+                # Feedback table
+
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS cms_feedback (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        type ENUM('bug', 'suggestion') NOT NULL,
+                        content TEXT NOT NULL,
+                        user_id VARCHAR(25) NOT NULL,
+                        user_name VARCHAR(100) NOT NULL,
+                        guild_id VARCHAR(25),
+                        status ENUM('new', 'read', 'accepted', 'rejected') DEFAULT 'new',
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
 
@@ -229,24 +313,39 @@ class CMSDatabase(MariaConnector):
     # ─────────────────────────────────────────
 
     async def create_media(self, filename: str, original_name: str, mime_type: str,
-                           size_bytes: int, uploader_id: int, uploader_name: str):
+                           size_bytes: int, uploader_id: int, uploader_name: str, is_stock: bool = False):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
                     INSERT INTO cms_media
-                    (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                """, (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name))
+                    (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name, is_stock)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name, is_stock))
             await conn.commit()
             return True
 
-    async def get_media(self, limit: int = 100):
+    async def get_media(self, limit: int = 100, is_stock: bool = None):
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
-                await cur.execute("""
-                    SELECT * FROM cms_media ORDER BY uploaded_at DESC LIMIT %s
-                """, (limit,))
+                query = "SELECT * FROM cms_media"
+                params = []
+                
+                if is_stock is not None:
+                    query += " WHERE is_stock = %s"
+                    params.append(is_stock)
+                    
+                query += " ORDER BY uploaded_at DESC LIMIT %s"
+                params.append(limit)
+                
+                await cur.execute(query, tuple(params))
                 return await cur.fetchall()
+
+    async def update_media(self, media_id: int, is_stock: bool):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("UPDATE cms_media SET is_stock = %s WHERE id = %s", (is_stock, media_id))
+            await conn.commit()
+            return True
 
     async def delete_media(self, media_id: int):
         async with self.pool.acquire() as conn:
@@ -342,3 +441,164 @@ class CMSDatabase(MariaConnector):
         except Exception as e:
             logger.error(f"Error deleting tag: {e}")
             return False
+
+    # ─────────────────────────────────────────
+    # ROADMAP
+    # ─────────────────────────────────────────
+
+    async def get_roadmap(self):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM cms_roadmap ORDER BY order_index ASC, created_at DESC")
+                return await cur.fetchall()
+
+    async def create_roadmap_item(self, title: str, status: str, description: str, icon: str, date_info: str, order_index: int = 0):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    INSERT INTO cms_roadmap (title, status, description, icon, date_info, order_index)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (title, status, description, icon, date_info, order_index))
+            await conn.commit()
+            return True
+
+    async def update_roadmap_item(self, item_id: int, title: str, status: str, description: str, icon: str, date_info: str, order_index: int):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    UPDATE cms_roadmap 
+                    SET title=%s, status=%s, description=%s, icon=%s, date_info=%s, order_index=%s
+                    WHERE id=%s
+                """, (title, status, description, icon, date_info, order_index, item_id))
+            await conn.commit()
+            return True
+
+    async def delete_roadmap_item(self, item_id: int):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM cms_roadmap WHERE id = %s", (item_id,))
+            await conn.commit()
+            return True
+
+    # ─────────────────────────────────────────
+    # TEAM CATEGORIES
+    # ─────────────────────────────────────────
+
+    async def get_team_categories(self):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM cms_team_categories ORDER BY order_index ASC")
+                return await cur.fetchall()
+
+    async def create_team_category(self, data: dict):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    INSERT INTO cms_team_categories (name, order_index)
+                    VALUES (%s, %s)
+                """, (data.get("name"), data.get("order_index", 0)))
+            await conn.commit()
+            return True
+
+    async def update_team_category(self, cat_id: int, data: dict):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    UPDATE cms_team_categories 
+                    SET name=%s, order_index=%s
+                    WHERE id=%s
+                """, (data.get("name"), data.get("order_index", 0), cat_id))
+            await conn.commit()
+            return True
+
+    async def delete_team_category(self, cat_id: int):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM cms_team_categories WHERE id = %s", (cat_id,))
+            await conn.commit()
+            return True
+
+    # ─────────────────────────────────────────
+    # TEAM
+    # ─────────────────────────────────────────
+
+    async def get_team(self):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM cms_team ORDER BY order_index ASC, created_at DESC")
+                return await cur.fetchall()
+
+    async def create_team_member(self, data: dict):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    INSERT INTO cms_team 
+                    (name, role, bio, avatar, color, github, twitter, youtube, instagram, website, order_index, category_id)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    data.get("name"), data.get("role"), data.get("bio"), data.get("avatar"),
+                    data.get("color", "bg-primary"), data.get("github"), data.get("twitter"),
+                    data.get("youtube"), data.get("instagram"), data.get("website"),
+                    data.get("order_index", 0), data.get("category_id")
+                ))
+            await conn.commit()
+            return True
+
+    async def update_team_member(self, member_id: int, data: dict):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    UPDATE cms_team 
+                    SET name=%s, role=%s, bio=%s, avatar=%s, color=%s, github=%s, twitter=%s, 
+                        youtube=%s, instagram=%s, website=%s, order_index=%s, category_id=%s
+                    WHERE id=%s
+                """, (
+                    data.get("name"), data.get("role"), data.get("bio"), data.get("avatar"),
+                    data.get("color"), data.get("github"), data.get("twitter"),
+                    data.get("youtube"), data.get("instagram"), data.get("website"),
+                    data.get("order_index"), data.get("category_id"), member_id
+                ))
+            await conn.commit()
+            return True
+
+    async def delete_team_member(self, member_id: int):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM cms_team WHERE id = %s", (member_id,))
+            await conn.commit()
+            return True
+
+    # ─────────────────────────────────────────
+    # FEEDBACK
+    # ─────────────────────────────────────────
+
+    async def create_feedback(self, type: str, content: str, user_id: str, user_name: str, guild_id: str = None):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    INSERT INTO cms_feedback (type, content, user_id, user_name, guild_id)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (type, content, user_id, user_name, guild_id))
+            await conn.commit()
+            return True
+
+    async def get_all_feedback(self):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM cms_feedback ORDER BY created_at DESC")
+                return await cur.fetchall()
+
+    async def update_feedback_status(self, feedback_id: int, status: str):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("UPDATE cms_feedback SET status = %s WHERE id = %s", (status, feedback_id))
+            await conn.commit()
+            return True
+
+    async def delete_feedback(self, feedback_id: int):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("DELETE FROM cms_feedback WHERE id = %s", (feedback_id,))
+            await conn.commit()
+            return True
+

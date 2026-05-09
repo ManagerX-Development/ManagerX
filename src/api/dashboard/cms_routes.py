@@ -297,6 +297,7 @@ async def restore_revision(post_id: int, revision_id: int, request: Request, use
 async def upload_media(
     request: Request,
     file: UploadFile = File(...),
+    is_stock: bool = False,
     user: dict = Depends(get_maybe_user),
     db: CMSDatabase = Depends(get_cms_db)
 ):
@@ -323,31 +324,119 @@ async def upload_media(
 
     user_id, username = get_requester_info(request, user)
 
+    # Convert string boolean if sent via form-data
+    form_data = await request.form()
+    stock_flag = form_data.get("is_stock") == "true" or is_stock
+
     await db.create_media(
         filename=unique_name,
         original_name=file.filename or unique_name,
         mime_type=file.content_type,
         size_bytes=len(content),
         uploader_id=user_id,
-        uploader_name=username
+        uploader_name=username,
+        is_stock=stock_flag
     )
 
     public_url = f"/uploads/cms/{unique_name}"
-    return {"success": True, "url": public_url, "filename": unique_name}
+    return {"success": True, "url": public_url, "filename": unique_name, "is_stock": stock_flag}
 
 @router.get("/media")
-async def list_media(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
-    """Admin: list all uploaded media files."""
+async def list_media(request: Request, is_stock: bool = None, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: list uploaded media files, optionally filtered by stock status."""
     if not is_admin(request, user):
         raise HTTPException(status_code=403, detail="Not authorized")
     try:
-        media = await db.get_media()
+        media = await db.get_media(is_stock=is_stock)
         # Enrich with public URLs
         for m in media:
             m["url"] = f"/uploads/cms/{m['filename']}"
         return {"success": True, "data": media}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.put("/media/{media_id}")
+async def update_media_stock(media_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: toggle is_stock flag for media."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.update_media(media_id, data.get("is_stock", False))
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update media")
+    return {"success": True}
+
+# ─────────────────────────────────────────
+# PUBLIC MEDIA VIEWER (FOR DISCORD EMBEDS)
+# ─────────────────────────────────────────
+
+from fastapi.responses import HTMLResponse
+
+@router.get("/media/view/{media_id}", response_class=HTMLResponse)
+async def view_media_embed(media_id: int, request: Request, db: CMSDatabase = Depends(get_cms_db)):
+    """Public: Returns an HTML page with Open Graph tags for Discord embeds."""
+    try:
+        # We need a new method or just fetch all and filter, or add get_media_by_id
+        media_list = await db.get_media(limit=1000)
+        media_item = next((m for m in media_list if m["id"] == media_id), None)
+        
+        if not media_item:
+            return HTMLResponse(content="<h1>Media not found</h1>", status_code=404)
+        
+        # Build absolute URL for the image
+        base_url = str(request.base_url).rstrip('/')
+        image_url = f"{base_url}/uploads/cms/{media_item['filename']}"
+        
+        # Format date safely
+        date_str = "Unknown date"
+        if media_item.get("uploaded_at"):
+            date_str = media_item["uploaded_at"].strftime("%d.%m.%Y %H:%M")
+            
+        title = media_item["original_name"]
+        description = f"Hochgeladen am: {date_str} von {media_item.get('uploader_name', 'Unknown')}"
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{title} - ManagerX Media</title>
+            
+            <!-- Open Graph / Discord Meta Tags -->
+            <meta property="og:type" content="website">
+            <meta property="og:title" content="{title}">
+            <meta property="og:description" content="{description}">
+            <meta property="og:image" content="{image_url}">
+            
+            <meta name="theme-color" content="#3498db">
+            
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:title" content="{title}">
+            <meta name="twitter:description" content="{description}">
+            <meta name="twitter:image" content="{image_url}">
+            
+            <style>
+                body {{ background-color: #050505; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }}
+                img {{ max-width: 90%; max-height: 80vh; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); }}
+                .info {{ margin-top: 20px; text-align: center; color: #a1a1aa; }}
+                h1 {{ font-size: 1.2rem; color: #fff; margin-bottom: 5px; }}
+            </style>
+        </head>
+        <body>
+            <img src="{image_url}" alt="{title}">
+            <div class="info">
+                <h1>{title}</h1>
+                <p>{description}</p>
+            </div>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html_content)
+    except Exception as e:
+        return HTMLResponse(content=f"<h1>Error</h1><p>{str(e)}</p>", status_code=500)
+
 
 @router.delete("/media/{media_id}")
 async def delete_media(media_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
@@ -418,4 +507,231 @@ async def delete_tag(tag_id: int, request: Request, user: dict = Depends(get_may
     success = await db.delete_tag(tag_id)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to delete tag")
+    return {"success": True}
+
+# ─────────────────────────────────────────
+# ROADMAP ROUTES
+# ─────────────────────────────────────────
+
+@router.get("/roadmap")
+async def get_roadmap(db: CMSDatabase = Depends(get_cms_db)):
+    """Public: Get all roadmap items."""
+    items = await db.get_roadmap()
+    return {"success": True, "data": items}
+
+@router.post("/roadmap")
+async def create_roadmap_item(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Create a new roadmap item."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.create_roadmap_item(
+        title=data.get("title"),
+        status=data.get("status", "planned"),
+        description=data.get("description"),
+        icon=data.get("icon", "Rocket"),
+        date_info=data.get("date_info"),
+        order_index=data.get("order_index", 0)
+    )
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to create roadmap item")
+    return {"success": True}
+
+@router.put("/roadmap/{item_id}")
+async def update_roadmap_item(item_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Update an existing roadmap item."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.update_roadmap_item(
+        item_id=item_id,
+        title=data.get("title"),
+        status=data.get("status"),
+        description=data.get("description"),
+        icon=data.get("icon"),
+        date_info=data.get("date_info"),
+        order_index=data.get("order_index", 0)
+    )
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update roadmap item")
+    return {"success": True}
+
+@router.delete("/roadmap/{item_id}")
+async def delete_roadmap_item(item_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Delete a roadmap item."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    success = await db.delete_roadmap_item(item_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete roadmap item")
+    return {"success": True}
+
+# ─────────────────────────────────────────
+# TEAM CATEGORIES ROUTES
+# ─────────────────────────────────────────
+
+@router.get("/team-categories")
+async def get_team_categories(db: CMSDatabase = Depends(get_cms_db)):
+    """Public: Get all team categories."""
+    items = await db.get_team_categories()
+    return {"success": True, "data": items}
+
+@router.post("/team-categories")
+async def create_team_category(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Create a new team category."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.create_team_category(data)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to create category")
+    return {"success": True}
+
+@router.put("/team-categories/{cat_id}")
+async def update_team_category(cat_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Update a team category."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.update_team_category(cat_id, data)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update category")
+    return {"success": True}
+
+@router.delete("/team-categories/{cat_id}")
+async def delete_team_category(cat_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Delete a team category."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    success = await db.delete_team_category(cat_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete category")
+    return {"success": True}
+
+# ─────────────────────────────────────────
+# TEAM ROUTES
+# ─────────────────────────────────────────
+
+@router.get("/team")
+async def get_team(db: CMSDatabase = Depends(get_cms_db)):
+    """Public: Get all team members."""
+    items = await db.get_team()
+    return {"success": True, "data": items}
+
+@router.post("/team")
+async def create_team_member(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Create a new team member."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.create_team_member(data)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to create team member")
+    return {"success": True}
+
+@router.put("/team/{member_id}")
+async def update_team_member(member_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Update an existing team member."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    success = await db.update_team_member(member_id, data)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update team member")
+    return {"success": True}
+
+@router.delete("/team/{member_id}")
+async def delete_team_member(member_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Delete a team member."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    success = await db.delete_team_member(member_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete team member")
+    return {"success": True}
+
+# ─────────────────────────────────────────
+# FEEDBACK ROUTES
+# ─────────────────────────────────────────
+
+@router.get("/feedback")
+async def get_all_feedback(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Get all feedback items."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    items = await db.get_all_feedback()
+    return {"success": True, "data": items}
+
+@router.put("/feedback/{feedback_id}/status")
+async def update_feedback_status(feedback_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Update feedback status."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    data = await request.json()
+    status = data.get("status")
+    if status not in ["new", "read", "accepted", "rejected"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+        
+    success = await db.update_feedback_status(feedback_id, status)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to update status")
+    return {"success": True}
+
+@router.delete("/feedback/{feedback_id}")
+async def delete_feedback(feedback_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Delete a feedback item."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    success = await db.delete_feedback(feedback_id)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to delete feedback")
+    return {"success": True}
+
+@router.post("/feedback/{feedback_id}/to-roadmap")
+async def move_feedback_to_roadmap(feedback_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: Move a feedback item to the roadmap and mark as accepted."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # 1. Feedback abrufen
+    feedbacks = await db.get_all_feedback()
+    item = next((f for f in feedbacks if f["id"] == feedback_id), None)
+    
+    if not item:
+        raise HTTPException(status_code=404, detail="Feedback not found")
+        
+    if item["status"] == "accepted":
+        raise HTTPException(status_code=400, detail="Already moved to roadmap")
+
+    # 2. Roadmap Eintrag erstellen
+    title = f"User Vorschlag ({item['user_name']})" if item["type"] == "suggestion" else f"Bugfix ({item['user_name']})"
+    icon = "Sparkles" if item["type"] == "suggestion" else "ShieldAlert"
+    description = item["content"]
+    
+    success_roadmap = await db.create_roadmap_item(
+        title=title,
+        status="planned",
+        description=description,
+        icon=icon,
+        date_info="Demnächst"
+    )
+    
+    if not success_roadmap:
+        raise HTTPException(status_code=500, detail="Failed to create roadmap item")
+        
+    # 3. Status auf accepted setzen
+    await db.update_feedback_status(feedback_id, "accepted")
+    
     return {"success": True}

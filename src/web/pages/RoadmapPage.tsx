@@ -1,14 +1,20 @@
-import { memo } from "react";
+import { memo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "../components/layout/Navbar";
 import { Footer } from "../components/layout/Footer";
 import {
     Rocket, CheckCircle2, CircleDashed, Clock, Sparkles,
-    MessageSquare, ShieldAlert, Zap, Globe, Cpu
+    MessageSquare, ShieldAlert, Zap, Globe, Cpu, LucideIcon, Map as MapIcon
 } from "lucide-react";
 import { cn } from "../lib/utils";
-import { ROADMAP_ITEMS } from "../data/roadmap";
+import { API_URL } from "../lib/api";
 import { SEO } from "../components/layout/SEO";
+
+// Icon mapping helper
+const ICONS: Record<string, LucideIcon> = {
+    Rocket, CheckCircle2, CircleDashed, Clock, Sparkles,
+    MessageSquare, ShieldAlert, Zap, Globe, Cpu, MapIcon
+};
 
 const StatusBadge = ({ status }: { status: string }) => {
     const configs: { [key: string]: { label: string, color: string, icon: any } } = {
@@ -28,6 +34,26 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 export const RoadmapPage = memo(function RoadmapPage() {
+    const [items, setItems] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchRoadmap = async () => {
+            try {
+                const res = await fetch(`${API_URL}/dashboard/cms/roadmap`);
+                const json = await res.json();
+                if (json.success) {
+                    setItems(json.data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch roadmap:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchRoadmap();
+    }, []);
+
     return (
         <div className="min-h-screen bg-[#0a0c10] text-slate-300 flex flex-col font-sans selection:bg-primary/30">
             <SEO
@@ -59,13 +85,17 @@ export const RoadmapPage = memo(function RoadmapPage() {
                     <div className="absolute left-[39px] md:left-1/2 top-4 bottom-4 w-px bg-white/5 md:-translate-x-1/2" />
 
                     <div className="space-y-24">
-                        {ROADMAP_ITEMS.map((item, idx) => {
-                            const Icon = item.icon;
+                        {loading ? (
+                             <div className="flex justify-center py-20">
+                                <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                             </div>
+                        ) : items.map((item, idx) => {
+                            const Icon = ICONS[item.icon] || Rocket;
                             const isEven = idx % 2 === 0;
 
                             return (
                                 <motion.div
-                                    key={item.title}
+                                    key={item.id}
                                     initial={{ opacity: 0, x: isEven ? -50 : 50 }}
                                     whileInView={{ opacity: 1, x: 0 }}
                                     viewport={{ once: true, margin: "-100px" }}
@@ -91,7 +121,7 @@ export const RoadmapPage = memo(function RoadmapPage() {
                                         )}>
                                             <div className="mb-4 flex flex-wrap gap-4 items-center md:contents">
                                                 <StatusBadge status={item.status} />
-                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest md:block md:mt-2">{item.date}</span>
+                                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest md:block md:mt-2">{item.date_info}</span>
                                             </div>
                                             <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter mt-4 mb-3">{item.title}</h3>
                                             <p className="text-slate-400 font-medium leading-relaxed italic">

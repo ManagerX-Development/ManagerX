@@ -48,7 +48,55 @@ export interface MediaItem {
   url: string;
 }
 
+export interface RoadmapItem {
+  id: number;
+  title: string;
+  status: 'completed' | 'in-progress' | 'planned';
+  description: string;
+  icon: string;
+  date_info: string;
+  order_index: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TeamCategory {
+  id: number;
+  name: string;
+  order_index: number;
+}
+
+export interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  bio: string | null;
+  avatar: string | null;
+  color: string;
+  github: string | null;
+  twitter: string | null;
+  youtube: string | null;
+  instagram: string | null;
+  website: string | null;
+  order_index: number;
+  category_id: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FeedbackItem {
+  id: number;
+  type: 'bug' | 'suggestion';
+  content: string;
+  user_id: string;
+  user_name: string;
+  guild_id: string | null;
+  status: 'new' | 'read' | 'accepted' | 'rejected';
+  created_at: string;
+}
+
 export function getPostType(value: string) {
+
   return POST_TYPES.find(t => t.value === value) ?? POST_TYPES[0];
 }
 
