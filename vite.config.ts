@@ -46,10 +46,25 @@ export default defineConfig(({ mode }) => ({
           "vendor-framer": ["framer-motion"],
           "vendor-ui": [
             "@radix-ui/react-accordion",
+            "@radix-ui/react-alert-dialog",
+            "@radix-ui/react-avatar",
             "@radix-ui/react-dialog",
             "@radix-ui/react-dropdown-menu",
-            "@radix-ui/react-tabs"
+            "@radix-ui/react-popover",
+            "@radix-ui/react-select",
+            "@radix-ui/react-tabs",
+            "@radix-ui/react-tooltip"
           ],
+          "vendor-charts": ["recharts"],
+          "vendor-shiki": ["shiki"],
+          "vendor-markdown": [
+            "react-markdown",
+            "rehype-katex",
+            "rehype-highlight",
+            "rehype-raw",
+            "remark-gfm",
+            "remark-math"
+          ]
         }
       }
     },
