@@ -16,12 +16,11 @@ import {
   Bell,
   Terminal
 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { API_URL } from "../lib/api";
 import { cn } from "../lib/utils";
 import { Navbar } from "../components/layout/Navbar";
 import { Footer } from "../components/layout/Footer";
+import { PremiumMarkdown } from "../components/core/PremiumMarkdown";
 
 interface Post {
   id: number;
@@ -353,20 +352,7 @@ export default function BlogPage() {
                     {currentPost.title}
                   </h1>
 
-                  <div className="prose prose-invert prose-primary max-w-none 
-                    prose-headings:font-black prose-headings:tracking-tight prose-headings:italic
-                    prose-p:text-muted-foreground prose-p:text-lg prose-p:leading-relaxed prose-p:font-medium
-                    prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                    prose-strong:text-white prose-strong:font-black
-                    prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
-                    prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-2xl
-                    prose-img:rounded-[2rem] prose-img:border prose-img:border-white/10
-                    prose-ul:list-disc prose-ul:pl-6 prose-ol:list-decimal prose-ol:pl-6
-                    prose-li:text-muted-foreground prose-li:font-medium
-                    prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-2xl prose-blockquote:italic
-                  ">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentPost.content}</ReactMarkdown>
-                  </div>
+                  <PremiumMarkdown content={currentPost.content} />
 
                   {currentPost.tags && (
                     <div className="mt-16 pt-8 border-t border-white/5 flex flex-wrap gap-2">
