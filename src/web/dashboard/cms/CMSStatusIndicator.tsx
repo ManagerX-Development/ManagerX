@@ -39,7 +39,7 @@ export function CMSStatusIndicator({ status, message, onClear }: CMSStatusIndica
   const current = config[status === "idle" && message ? "idle" : (status as keyof typeof config)];
 
   return (
-    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[200] pointer-events-none">
+    <div className="absolute top-8 left-8 z-[250] pointer-events-none">
       <AnimatePresence>
         {isVisible && (
           <motion.div

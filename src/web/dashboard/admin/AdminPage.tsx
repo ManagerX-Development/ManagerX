@@ -16,7 +16,6 @@ import { useAuth } from "../../components/core/AuthProvider";
 import { API_URL } from "../../lib/api";
 import { cn } from "../../lib/utils";
 import AdminBlacklist from "./AdminBlacklist";
-import AdminAnalytics from "./AdminAnalytics";
 import AdminGlobalChat from "./AdminGlobalChat";
 
 const AdminPage = () => {
@@ -31,7 +30,6 @@ const AdminPage = () => {
   });
 
   const [showBlacklist, setShowBlacklist] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(false);
   const [showGlobalChat, setShowGlobalChat] = useState(false);
 
   useEffect(() => {
@@ -182,11 +180,9 @@ const AdminPage = () => {
               onClick={() => {
                 if (module.title === "User & Security") {
                   setShowBlacklist(true);
-                } else if (module.title === "Bot Analytics") {
-                  setShowAnalytics(true);
                 } else if (module.title === "Global Chat Control") {
                   setShowGlobalChat(true);
-                } else if (module.path && !module.status) {
+                } else if (module.path) {
                   navigate(module.path);
                 }
               }}
@@ -251,7 +247,6 @@ const AdminPage = () => {
 
       </div>
       {showBlacklist && <AdminBlacklist onClose={() => setShowBlacklist(false)} />}
-      {showAnalytics && <AdminAnalytics onClose={() => setShowAnalytics(false)} />}
       {showGlobalChat && <AdminGlobalChat onClose={() => setShowGlobalChat(false)} />}
     </div>
   );

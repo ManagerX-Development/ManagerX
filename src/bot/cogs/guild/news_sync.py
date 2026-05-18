@@ -40,7 +40,9 @@ class NewsSync(ezcord.Cog):
         if message.channel.id == DEV_MASTER_CHANNEL_ID:
             targets = [c for c in all_channels if c['sync_group'] == 'dev_news' and not c['is_master']]
             if targets:
-                embed = self._build_dev_embed(message)
+                # Count unique guilds subscribed to dev_news
+                guild_count = len(set(c['guild_id'] for c in targets))
+                embed = self._build_dev_embed(message, guild_count)
                 await self._broadcast(targets, embed, message)
             return
 
@@ -57,14 +59,18 @@ class NewsSync(ezcord.Cog):
                 embed = self._build_network_embed(message)
                 await self._broadcast(targets, embed, message)
 
-    def _build_dev_embed(self, message):
+    def _build_dev_embed(self, message, guild_count: int = 0):
         embed = discord.Embed(
             title="🛠️ **ManagerX Engineering Updates**",
             description=message.content or "*Bild-Nachricht*",
             color=discord.Color.gold(),
             timestamp=message.created_at
         )
-        embed.set_footer(text=f"Official Developer Feed • {message.guild.name}")
+        footer_text = f"Official Developer Feed • {message.guild.name}"
+        if guild_count > 0:
+            footer_text += f" • Guilds: {guild_count}"
+            
+        embed.set_footer(text=footer_text)
         if message.attachments: embed.set_image(url=message.attachments[0].url)
         return embed
 

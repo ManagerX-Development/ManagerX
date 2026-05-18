@@ -26,6 +26,7 @@ const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const BlogPage = lazy(() => import("./pages/BlogPage"));
 const CMSPage = lazy(() => import("./dashboard/cms/CMSPage"));
 const AdminPage = lazy(() => import("./dashboard/admin/AdminPage"));
+const BotStatisticsPage = lazy(() => import("./dashboard/admin/BotStatisticsPage"));
 
 const queryClient = new QueryClient();
 
@@ -72,6 +73,7 @@ const DashboardRoutes = () => {
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dash/admin" element={<AdminPage />} />
             <Route path="/dash/admin/cms" element={<CMSPage />} />
+            <Route path="/dash/admin/stats" element={<BotStatisticsPage />} />
             <Route path="/dash/guilds" element={<GuildSelectionPage />} />
           </Routes>
         </Suspense>
@@ -115,6 +117,7 @@ const MainRoutes = () => {
             <Route path="/tutorials" element={<BlogPage />} />
             <Route path="/dash/admin" element={<AdminPage />} />
             <Route path="/dash/admin/cms" element={<CMSPage />} />
+            <Route path="/dash/admin/stats" element={<BotStatisticsPage />} />
             <Route path="/dash/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/dash/guilds" element={<GuildSelectionPage />} />

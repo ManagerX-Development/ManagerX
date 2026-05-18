@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => ({
       },
       output: {
         manualChunks: {
-          "vendor-react": ["react", "react-dom", "react-router-dom", "react-helmet-async"],
+          "vendor-react": ["react", "react-dom", "react-router-dom", "react-helmet-async", "react-is"],
           "vendor-framer": ["framer-motion"],
           "vendor-ui": [
             "@radix-ui/react-accordion",

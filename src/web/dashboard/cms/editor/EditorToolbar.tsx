@@ -3,7 +3,8 @@ import {
   Undo, Redo, Heading1, Heading2, Heading3, 
   Bold, Italic, Strikethrough, Code, List, 
   ListOrdered, CheckSquare, Quote, Minus, 
-  Link2, Image as ImageIcon, Type, Table 
+  Link2, Image as ImageIcon, Type, Table,
+  Search
 } from "lucide-react";
 
 export type ToolbarAction = {
@@ -81,7 +82,12 @@ export function insertBlock(
   }, 0);
 }
 
-export const buildToolbarActions = (): ToolbarAction[] => [
+interface CustomActionProps {
+  onOpenTableGenerator: () => void;
+  onOpenMediaPicker: () => void;
+}
+
+export const buildToolbarActions = (props?: CustomActionProps): ToolbarAction[] => [
   {
     icon: <Undo className="w-3.5 h-3.5" />,
     label: "Rückgängig (Strg+Z)",
@@ -158,28 +164,29 @@ export const buildToolbarActions = (): ToolbarAction[] => [
   },
   {
     icon: <Link2 className="w-3.5 h-3.5" />,
-    label: "Link",
+    label: "Link einfügen",
     action: (ta, set) => wrapSelection(ta, set, "[", "](https://)", "Linktext"),
   },
   {
     icon: <ImageIcon className="w-3.5 h-3.5" />,
-    label: "Bild",
-    action: (ta, set) => insertBlock(ta, set, "![Bildbeschreibung](https://)"),
+    label: "Bild aus Mediathek",
+    action: (ta) => { 
+      if (props?.onOpenMediaPicker) props.onOpenMediaPicker();
+      else insertBlock(ta, (v) => {}, "![Bildbeschreibung](https://)"); 
+    },
     divider: true,
   },
   {
     icon: <Type className="w-3.5 h-3.5" />,
     label: "Codeblock",
-    action: (ta, set) => insertBlock(ta, set, "```\nCode hier...\n```"),
+    action: (ta, set) => insertBlock(ta, set, "```javascript\n// Code hier...\n```"),
   },
   {
     icon: <Table className="w-3.5 h-3.5" />,
-    label: "Tabelle",
-    action: (ta, set) =>
-      insertBlock(
-        ta,
-        set,
-        "| Spalte 1 | Spalte 2 | Spalte 3 |\n|----------|----------|----------|\n| Zelle 1  | Zelle 2  | Zelle 3  |"
-      ),
+    label: "Tabelle generieren",
+    action: (ta, set) => {
+      if (props?.onOpenTableGenerator) props.onOpenTableGenerator();
+      else insertBlock(ta, set, "| Kopf | Kopf |\n|---|---|\n| Zelle | Zelle |");
+    },
   },
 ];
