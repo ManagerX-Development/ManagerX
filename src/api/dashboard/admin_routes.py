@@ -112,7 +112,7 @@ async def get_admin_top_commands(user: dict = Depends(get_current_user)):
 
 @router.get("/performance/live")
 async def get_performance_live(user: dict = Depends(get_current_user)):
-    """Admin: Get real-time performance data (CPU, RAM, Latency)."""
+    """Admin: Get real-time performance data (CPU, RAM, Latency, Active Voice)."""
     # Simple check for admin
     is_bot_admin = user.get("id") == "cms_admin"
     try:
@@ -127,15 +127,76 @@ async def get_performance_live(user: dict = Depends(get_current_user)):
     bot = get_bot()
     process = psutil.Process(os.getpid())
     
+    active_voice = 0
+    try:
+        from mxmariadb import StatsDB
+        db = StatsDB()
+        await db.ensure_connection()
+        active_voice = await db.get_active_voice_count()
+    except Exception as e:
+        print(f"Error getting active voice count: {e}")
+    
     return {
         "success": True,
         "data": {
             "cpu": psutil.cpu_percent(interval=None),
             "ram": process.memory_info().rss / (1024 * 1024), # MB
             "latency": round(bot.latency * 1000) if bot else 0,
+            "activeVoice": active_voice,
             "timestamp": discord.utils.utcnow().isoformat()
         }
     }
+
+@router.get("/performance/analytics")
+async def get_performance_analytics(user: dict = Depends(get_current_user)):
+    """Admin: Get deep dashboard analytics (Top commands, interactions, active servers, top active server)."""
+    is_bot_admin = user.get("id") == "cms_admin"
+    try:
+        owners = getattr(BotConfig.security, 'bot_owners', [])
+        if int(user.get("id", 0)) in owners:
+            is_bot_admin = True
+    except: pass
+    
+    if not is_bot_admin:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    bot = get_bot()
+    
+    try:
+        from mxmariadb import StatsDB
+        db = StatsDB()
+        await db.ensure_connection()
+        
+        # 1. Fetch top 5 commands
+        top_commands = await db.get_top_commands(limit=5)
+        
+        # 2. Fetch 24h dashboard statistics (interactions, active servers, top active guild_id)
+        db_stats = await db.get_dashboard_analytics()
+        
+        # Map top guild ID to actual guild name
+        top_guild_name = "Keine Aktivität"
+        top_guild_id = db_stats.get("top_guild_id")
+        if top_guild_id and bot:
+            try:
+                guild = bot.get_guild(int(top_guild_id))
+                if guild:
+                    top_guild_name = guild.name
+                else:
+                    top_guild_name = f"Server ID {top_guild_id}"
+            except Exception as e:
+                top_guild_name = f"Server ID {top_guild_id}"
+        
+        return {
+            "success": True,
+            "data": {
+                "top_commands": top_commands,
+                "interactions_24h": db_stats.get("interactions_24h", 0),
+                "active_servers_24h": db_stats.get("active_servers_24h", 0),
+                "top_guild": top_guild_name
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/performance/history")
 async def get_performance_history(days: int = 7, user: dict = Depends(get_current_user)):

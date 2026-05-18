@@ -18,7 +18,20 @@ interface LiveStats {
   cpu: number;
   ram: number;
   latency: number;
+  activeVoice?: number;
   timestamp: string;
+}
+
+interface CommandUsage {
+  command_name: string;
+  usage_count: number;
+}
+
+interface AnalyticsStats {
+  top_commands: CommandUsage[];
+  interactions_24h: number;
+  active_servers_24h: number;
+  top_guild: string;
 }
 
 interface HistoryStats {
@@ -34,7 +47,9 @@ export default function BotStatisticsPage() {
   const [liveData, setLiveData] = useState<LiveStats[]>([]);
   const [historyData, setHistoryData] = useState<HistoryStats[]>([]);
   const [currentStats, setCurrentStats] = useState<LiveStats | null>(null);
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
 
   const fetchHistory = async () => {
     try {
@@ -45,6 +60,21 @@ export default function BotStatisticsPage() {
       if (json.success) setHistoryData(json.data);
     } catch (err) {
       console.error("Failed to fetch history:", err);
+    }
+  };
+
+  const fetchAnalytics = async () => {
+    try {
+      setLoadingAnalytics(true);
+      const res = await fetch(`${API_URL}/dashboard/admin/performance/analytics`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const json = await res.json();
+      if (json.success) setAnalyticsData(json.data);
+    } catch (err) {
+      console.error("Failed to fetch dashboard analytics:", err);
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
 
@@ -72,6 +102,7 @@ export default function BotStatisticsPage() {
 
   useEffect(() => {
     fetchHistory();
+    fetchAnalytics();
     fetchLive();
     const interval = setInterval(fetchLive, 5000); // Alle 5 Sek Live-Update
     return () => clearInterval(interval);
@@ -153,9 +184,10 @@ export default function BotStatisticsPage() {
               </div>
            </div>
 
-           {/* RAM & Info */}
+           {/* RAM & Voice Info */}
            <div className="flex flex-col gap-6">
-              <div className="flex-1 glass-strong rounded-[2.5rem] p-8 border border-white/5">
+              {/* RAM Card */}
+              <div className="glass-strong rounded-[2.5rem] p-8 border border-white/5">
                  <div className="flex items-center gap-3 mb-6">
                     <HardDrive className="w-5 h-5 text-accent" />
                     <h3 className="text-sm font-black uppercase tracking-widest">RAM Nutzung</h3>
@@ -166,13 +198,30 @@ export default function BotStatisticsPage() {
                  </div>
                  <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                     <div 
-                      className="h-full bg-accent transition-all duration-1000" 
-                      style={{ width: `${Math.min(100, (currentStats?.ram || 0) / 10.24)}%` }} 
+                       className="h-full bg-accent transition-all duration-1000" 
+                       style={{ width: `${Math.min(100, (currentStats?.ram || 0) / 10.24)}%` }} 
                     />
                  </div>
                  <p className="text-[10px] text-muted-foreground mt-4 font-medium italic">Max. Speicherlimit: 1024 MB</p>
               </div>
+
+              {/* Voice Status Card */}
+              <div className="glass-strong rounded-[2.5rem] p-8 border border-white/5 relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <Users className="w-32 h-32 text-green-500" />
+                 </div>
+                 <div className="flex items-center gap-3 mb-6">
+                    <Users className="w-5 h-5 text-green-400 animate-pulse" />
+                    <h3 className="text-sm font-black uppercase tracking-widest text-green-400">Live Voice</h3>
+                 </div>
+                 <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-4xl font-black text-white">{currentStats?.activeVoice ?? 0}</span>
+                    <span className="text-muted-foreground text-xs font-black uppercase tracking-widest">User aktiv</span>
+                 </div>
+                 <p className="text-[10px] text-muted-foreground font-medium italic">In allen Sprachkanälen</p>
+              </div>
               
+              {/* System Health Card */}
               <div className="glass-strong rounded-[2.5rem] p-8 border border-white/5 bg-primary/5">
                  <div className="flex items-center gap-3 mb-4">
                     <Zap className="w-5 h-5 text-primary" />
@@ -183,7 +232,6 @@ export default function BotStatisticsPage() {
                  </p>
               </div>
            </div>
-        </div>
 
         {/* Growth & History */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -241,26 +289,82 @@ export default function BotStatisticsPage() {
            </div>
         </div>
 
-        {/* Command Usage Mini Table */}
-        <div className="mt-8 glass-strong rounded-[2.5rem] p-8 border border-white/5">
-           <div className="flex items-center gap-3 mb-6">
-              <Zap className="w-5 h-5 text-yellow-500" />
-              <h3 className="text-sm font-black uppercase tracking-widest">Meistgenutzte Funktionen (24h)</h3>
+        {/* Analytics & Command Usage Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
+           {/* Left side: Overview Stats Cards */}
+           <div className="lg:col-span-2 glass-strong rounded-[2.5rem] p-8 border border-white/5 flex flex-col justify-between">
+              <div>
+                 <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                       <Zap className="w-5 h-5 text-orange-500" />
+                       <h3 className="text-sm font-black uppercase tracking-widest">Aktivitäts-Übersicht</h3>
+                    </div>
+                    <button 
+                       onClick={fetchAnalytics}
+                       className="p-2 hover:bg-white/5 rounded-xl border border-white/10 text-muted-foreground hover:text-white transition-colors"
+                       title="Aktualisieren"
+                       disabled={loadingAnalytics}
+                    >
+                       <RefreshCw className={loadingAnalytics ? "w-4 h-4 animate-spin" : "w-4 h-4"} />
+                    </button>
+                 </div>
+                 
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                       { label: "Top Command (24h)", value: analyticsData?.top_commands?.[0]?.command_name ? `/${analyticsData.top_commands[0].command_name}` : "Keines", color: "text-orange-500" },
+                       { label: "Interaktionen (24h)", value: analyticsData?.interactions_24h.toLocaleString() ?? "0", color: "text-white" },
+                       { label: "Aktivster Server", value: analyticsData?.top_guild ?? "Keine Aktivität", color: "text-white" },
+                       { label: "User in Voice (Live)", value: `${currentStats?.activeVoice ?? 0} aktiv`, color: "text-green-400" }
+                    ].map(item => (
+                      <div key={item.label} className="p-5 bg-white/5 rounded-2xl border border-white/5">
+                         <p className="text-[10px] text-muted-foreground font-black uppercase tracking-widest mb-2">{item.label}</p>
+                         <p className={item.color + " text-xl font-black truncate"} title={String(item.value)}>{item.value}</p>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+              
+              <div className="mt-6 pt-6 border-t border-white/5 text-[10px] text-muted-foreground flex justify-between items-center italic">
+                 <span>Statistiken basieren auf Live-Bot-Interaktionen der letzten 24h</span>
+                 {loadingAnalytics && <span>Lade Daten...</span>}
+              </div>
            </div>
-           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {historyData.length > 0 && [
-                 { label: "Top Command", value: "Help", color: "text-blue-400" },
-                 { label: "Interaktionen", value: historyData[historyData.length-1].command_count, color: "text-white" },
-                 { label: "Aktivster Server", value: "Leipzig RP", color: "text-white" },
-                 { label: "Peak Time", value: "20:00 - 22:00", color: "text-white" }
-              ].map(item => (
-                <div key={item.label} className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                   <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest mb-1">{item.label}</p>
-                   <p className={cn("text-lg font-black", item.color)}>{item.value}</p>
-                </div>
-              ))}
+
+           {/* Right side: Top 5 Commands with percentage progress bars */}
+           <div className="glass-strong rounded-[2.5rem] p-8 border border-white/5">
+              <div className="flex items-center gap-3 mb-6">
+                 <TrendingUp className="w-5 h-5 text-primary" />
+                 <h3 className="text-sm font-black uppercase tracking-widest">Top 5 Befehle</h3>
+              </div>
+              
+              <div className="flex flex-col gap-4">
+                 {analyticsData && analyticsData.top_commands && analyticsData.top_commands.length > 0 ? (
+                   (() => {
+                     const totalUsage = analyticsData.top_commands.reduce((sum, c) => sum + c.usage_count, 0);
+                     return analyticsData.top_commands.map((cmd, idx) => {
+                       const percentage = totalUsage > 0 ? (cmd.usage_count / totalUsage) * 100 : 0;
+                       return (
+                         <div key={cmd.command_name} className="flex flex-col">
+                            <div className="flex justify-between items-center mb-1">
+                               <span className="text-xs font-bold text-white">/{cmd.command_name}</span>
+                               <span className="text-xs text-muted-foreground font-medium">{cmd.usage_count} Aufrufe</span>
+                            </div>
+                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                               <div 
+                                  className="h-full bg-primary transition-all duration-1000" 
+                                  style={{ width: `${percentage}%` }} 
+                               />
+                            </div>
+                         </div>
+                       );
+                     });
+                   })()
+                 ) : (
+                   <p className="text-xs text-muted-foreground italic py-4 text-center">Keine Befehlsdaten verfügbar</p>
+                 )}
+              </div>
            </div>
-        </div>
+        </div></div>
 
       </div>
     </div>
