@@ -101,7 +101,7 @@ all = [
     "colorama==0.4.6",
     "typing_extensions==4.15.0",
     "typing-inspection==0.4.2",
-    "attrs==25.4.0",
+    "attrs==26.1.0",
     "annotated-types==0.7.0",
     "anyio==4.13.0",
     "certifi==2026.4.22",
