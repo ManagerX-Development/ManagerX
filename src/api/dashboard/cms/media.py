@@ -37,6 +37,7 @@ async def upload_media(
     user_id, username = get_requester_info(request, user)
     form_data = await request.form()
     stock_flag = form_data.get("is_stock") == "true" or is_stock
+    folder = form_data.get("folder", "general")
 
     await db.create_media(
         filename=unique_name,
@@ -45,33 +46,64 @@ async def upload_media(
         size_bytes=len(content),
         uploader_id=user_id,
         uploader_name=username,
-        is_stock=stock_flag
+        is_stock=stock_flag,
+        folder=folder
     )
 
     public_url = f"/uploads/cms/{unique_name}"
     return {"success": True, "url": public_url, "filename": unique_name, "is_stock": stock_flag}
 
 @router.get("/media")
-async def list_media(request: Request, is_stock: bool = None, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
-    """Admin: list uploaded media files, optionally filtered by stock status."""
+async def list_media(request: Request, is_stock: bool = None, folder: str = None, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: list uploaded media files, optionally filtered by stock status or folder."""
     if not is_admin(request, user):
         raise HTTPException(status_code=403, detail="Not authorized")
     try:
-        media = await db.get_media(is_stock=is_stock)
+        media = await db.get_media(is_stock=is_stock, folder=folder)
         for m in media:
             m["url"] = f"/uploads/cms/{m['filename']}"
         return {"success": True, "data": media}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/folders")
+async def list_folders(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: list all custom media folders."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    folders = await db.get_folders()
+    return {"success": True, "data": folders}
+
+@router.post("/folders")
+async def create_folder(request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: create a new media folder."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    data = await request.json()
+    name = data.get("name")
+    if not name:
+        raise HTTPException(status_code=400, detail="Folder name required")
+    await db.create_folder(name)
+    return {"success": True}
+
+@router.delete("/folders/{name}")
+async def delete_folder(name: str, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: delete a media folder."""
+    if not is_admin(request, user):
+        raise HTTPException(status_code=403, detail="Not authorized")
+    if name == "general":
+        raise HTTPException(status_code=400, detail="Cannot delete general folder")
+    await db.delete_folder(name)
+    return {"success": True}
+
 @router.put("/media/{media_id}")
-async def update_media_stock(media_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
-    """Admin: toggle is_stock flag for media."""
+async def update_media(media_id: int, request: Request, user: dict = Depends(get_maybe_user), db: CMSDatabase = Depends(get_cms_db)):
+    """Admin: update media properties (is_stock, folder, etc.)."""
     if not is_admin(request, user):
         raise HTTPException(status_code=403, detail="Not authorized")
     
     data = await request.json()
-    success = await db.update_media(media_id, data.get("is_stock", False))
+    success = await db.update_media(media_id, **data)
     if not success:
         raise HTTPException(status_code=500, detail="Failed to update media")
     return {"success": True}

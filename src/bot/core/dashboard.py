@@ -21,6 +21,7 @@ class DashboardTask:
         self.basedir = basedir
         self.stats_file = basedir / 'data' / 'bot_stats.json'
         self._task = None
+        self._last_daily_log = None
         
         # Task definieren
         @tasks.loop(minutes=1)
@@ -56,6 +57,19 @@ class DashboardTask:
             # In Datei schreiben
             with open(self.stats_file, 'w', encoding='utf-8') as f:
                 json.dump(stats, f, indent=4, ensure_ascii=False)
+            
+            # Daily Log in Database
+            today = datetime.now().date()
+            if self._last_daily_log != today:
+                if hasattr(self.bot, 'cms_db'):
+                    await self.bot.cms_db.log_daily_stats(
+                        guild_count=stats["stats"]["server_count"],
+                        user_count=stats["stats"]["user_count"],
+                        command_count=stats["stats"]["commands"],
+                        avg_latency=self.bot.latency
+                    )
+                    self._last_daily_log = today
+                    logger.info(Category.DATABASE, "Tägliche Statistiken geloggt")
                 
         except Exception as e:
             logger.error(Category.DISCORD_BOT, f"Dashboard-Update fehlgeschlagen: {e}")

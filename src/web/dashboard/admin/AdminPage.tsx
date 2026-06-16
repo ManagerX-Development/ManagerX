@@ -47,7 +47,7 @@ const AdminPage = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_URL}/dashboard/admin/global-stats`, {
+        const res = await fetch(`${API_URL}/admin/global-stats`, {
           headers: {
             "Authorization": `Bearer ${token}`
           }

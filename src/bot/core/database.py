@@ -9,11 +9,12 @@ Pfad: src/bot/core/database.py
 from logger import logger, Category
 
 try:
-    from mxmariadb import SettingsDB, StatsDB
+    from mxmariadb import SettingsDB, StatsDB, CMSDatabase
 except ImportError as e:
     logger.critical(Category.DATABASE, f"Database Imports fehlgeschlagen: {e}")
     SettingsDB = None
     StatsDB = None
+    CMSDatabase = None
 
 class DatabaseManager:
     """Verwaltet die Datenbank-Initialisierung"""
@@ -43,6 +44,12 @@ class DatabaseManager:
             if StatsDB:
                 bot.stats_db = StatsDB()
                 logger.success(Category.DATABASE, "Stats Database initialized ✓")
+            
+            if CMSDatabase:
+                bot.cms_db = CMSDatabase()
+                # Initialize CMS tables
+                bot.loop.create_task(bot.cms_db.init_db())
+                logger.success(Category.DATABASE, "CMS Database initialized ✓")
             
             return True
             

@@ -1,8 +1,18 @@
-from fastapi import APIRouter, Request, HTTPException, Security, status, Depends
-from src.api.dashboard.auth_routes import get_current_user
-from mxmariadb import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase, AutoDeleteDB, AutoRoleDatabase, TempVCDatabase
+from fastapi import APIRouter, HTTPException, Depends
+from typing import List, Dict, Any
 import discord
 from datetime import datetime
+
+from .dependencies import (
+    get_current_user, get_bot, get_welcome_db, get_antispam_db, 
+    get_globalchat_db, get_level_db, get_logging_db, 
+    get_autorole_db, get_autodelete_db, get_tempvc_db
+)
+from .schemas import (
+    GeneralSettingsUpdate, WelcomeSettingsUpdate, AntiSpamSettingsUpdate, 
+    GlobalChatSettingsUpdate, LoggingSettingsUpdate, AutoRoleSettingsUpdate, 
+    AutoDeleteItem, TempVCSettingsUpdate
+)
 
 router = APIRouter(
     prefix="/settings",
@@ -10,9 +20,8 @@ router = APIRouter(
     dependencies=[Depends(get_current_user)]
 )
 
-async def send_dashboard_notification(guild_id: int, module_name: str, user_name: str, channel_id: int = None):
+async def send_dashboard_notification(bot_instance, guild_id: int, module_name: str, user_name: str, channel_id: int = None):
     """Helper to send a notification to a Discord channel when settings are saved."""
-    from src.api.dashboard.routes import bot_instance
     if not bot_instance:
         return
 
@@ -22,7 +31,6 @@ async def send_dashboard_notification(guild_id: int, module_name: str, user_name
 
     # Try to find a suitable channel if none provided
     if not channel_id:
-        # For general settings, we might use a system channel or first available
         target_channel = guild.system_channel or guild.text_channels[0]
     else:
         target_channel = guild.get_channel(channel_id)
@@ -46,21 +54,19 @@ async def send_dashboard_notification(guild_id: int, module_name: str, user_name
         print(f"Failed to send dashboard notification: {e}")
 
 @router.get("/{guild_id}")
-async def get_settings(guild_id: int):
+async def get_settings(guild_id: int, bot = Depends(get_bot)):
     """Fetch settings for a specific guild."""
-    from src.api.dashboard.routes import bot_instance
-    
-    if not bot_instance or not hasattr(bot_instance, 'settings_db'):
+    if not hasattr(bot, 'settings_db'):
          raise HTTPException(status_code=503, detail="Bot database not ready")
          
     try:
-        guild_settings = bot_instance.settings_db.get_guild_settings(guild_id) if hasattr(bot_instance.settings_db, 'get_guild_settings') else {}
+        guild_settings = bot.settings_db.get_guild_settings(guild_id) if hasattr(bot.settings_db, 'get_guild_settings') else {}
         guild_lang = guild_settings.get("language", "de")
         
         return {
             "success": True,
             "data": {
-                "bot_name": bot_instance.user.name,
+                "bot_name": bot.user.name,
                 "prefix": "!" ,
                 "auto_mod": True,
                 "welcome_message": False,
@@ -73,59 +79,43 @@ async def get_settings(guild_id: int):
          raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{guild_id}")
-async def update_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_settings(guild_id: int, data: GeneralSettingsUpdate, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
     """Update general settings for a specific guild."""
-    from src.api.dashboard.routes import bot_instance
-    
-    if not bot_instance or not hasattr(bot_instance, 'settings_db'):
+    if not hasattr(bot, 'settings_db'):
          raise HTTPException(status_code=503, detail="Bot database not ready")
          
-    data = await request.json()
-    
     try:
-        # Update logic
-        update_data = {}
-        if "language" in data:
-             update_data["language"] = data["language"]
-        if "user_role_id" in data:
-             update_data["user_role_id"] = int(data["user_role_id"]) if data["user_role_id"] else None
-        if "team_role_id" in data:
-             update_data["team_role_id"] = int(data["team_role_id"]) if data["team_role_id"] else None
+        update_data = data.model_dump(exclude_unset=True)
+        if "user_role_id" in update_data and update_data["user_role_id"] is not None:
+             update_data["user_role_id"] = int(update_data["user_role_id"])
+        if "team_role_id" in update_data and update_data["team_role_id"] is not None:
+             update_data["team_role_id"] = int(update_data["team_role_id"])
              
-        if update_data and hasattr(bot_instance.settings_db, 'update_guild_settings'):
-            bot_instance.settings_db.update_guild_settings(guild_id, **update_data)
+        if update_data and hasattr(bot.settings_db, 'update_guild_settings'):
+            bot.settings_db.update_guild_settings(guild_id, **update_data)
 
         user_name = user.get("username", "Unbekannter User")
-        await send_dashboard_notification(guild_id, "Allgemein", user_name)
+        await send_dashboard_notification(bot, guild_id, "Allgemein", user_name)
         return {"success": True, "message": "Settings updated"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save settings: {e}")
 
 # --- Welcome Module Routes ---
-
 @router.get("/{guild_id}/channels")
-async def get_guild_channels(guild_id: int):
+async def get_guild_channels(guild_id: int, bot = Depends(get_bot)):
     """Returns a list of text channels for the guild."""
-    from src.api.dashboard.routes import bot_instance
-    if not bot_instance:
-        raise HTTPException(status_code=503, detail="Bot not ready")
-        
-    guild = bot_instance.get_guild(guild_id)
+    guild = bot.get_guild(guild_id)
     if not guild:
         raise HTTPException(status_code=404, detail="Guild not found")
         
-    channels = [
-        {"id": str(c.id), "name": c.name}
-        for c in guild.text_channels
-    ]
+    channels = [{"id": str(c.id), "name": c.name} for c in guild.text_channels]
     return {"success": True, "channels": channels}
 
 @router.get("/{guild_id}/welcome")
-async def get_welcome_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_welcome_settings(guild_id: int, db = Depends(get_welcome_db)):
     """Fetch welcome-specific settings."""
-    db = WelcomeDatabase()
     try:
-        await db.init_db() # Sicherstellen dass Tabellen existieren
+        await db.init_db()
         settings = await db.get_welcome_settings(guild_id)
         if settings and "channel_id" in settings and settings["channel_id"]:
             settings["channel_id"] = str(settings["channel_id"])
@@ -137,40 +127,34 @@ async def get_welcome_settings(guild_id: int, user: dict = Depends(get_current_u
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/welcome")
-async def update_welcome_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_welcome_settings(guild_id: int, data: WelcomeSettingsUpdate, user: dict = Depends(get_current_user), db = Depends(get_welcome_db), bot = Depends(get_bot)):
     """Update welcome-specific settings."""
-    data = await request.json()
-    db = WelcomeDatabase()
-    
-    if "channel_id" in data and data["channel_id"]:
-        data["channel_id"] = int(data["channel_id"])
-    if "auto_role_id" in data and data["auto_role_id"]:
-        data["auto_role_id"] = int(data["auto_role_id"])
+    update_data = data.model_dump(exclude_unset=True)
+    if "channel_id" in update_data and update_data["channel_id"]:
+        update_data["channel_id"] = int(update_data["channel_id"])
+    if "auto_role_id" in update_data and update_data["auto_role_id"]:
+        update_data["auto_role_id"] = int(update_data["auto_role_id"])
 
     try:
         await db.init_db()
-        success = await db.update_welcome_settings(guild_id, **data)
+        success = await db.update_welcome_settings(guild_id, **update_data)
         if success:
             user_name = user.get("username", "Unbekannter User")
-            from src.api.dashboard.routes import bot_instance
-            if bot_instance:
-                cog = bot_instance.get_cog("WelcomeSystem")
-                if cog and hasattr(cog, 'invalidate_cache'):
-                    cog.invalidate_cache(guild_id)
+            cog = bot.get_cog("WelcomeSystem")
+            if cog and hasattr(cog, 'invalidate_cache'):
+                cog.invalidate_cache(guild_id)
             
-            channel_id = data.get("channel_id")
-            await send_dashboard_notification(guild_id, "Welcome System", user_name, channel_id)
+            channel_id = update_data.get("channel_id")
+            await send_dashboard_notification(bot, guild_id, "Welcome System", user_name, channel_id)
             
         return {"success": success}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save welcome settings: {e}")
 
 # --- AntiSpam Module Routes ---
-
 @router.get("/{guild_id}/antispam")
-async def get_antispam_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_antispam_settings(guild_id: int, db = Depends(get_antispam_db)):
     """Fetch AntiSpam-specific settings."""
-    db = AntiSpamDatabase()
     try:
         await db.init_db()
         settings = await db.get_spam_settings(guild_id)
@@ -181,36 +165,29 @@ async def get_antispam_settings(guild_id: int, user: dict = Depends(get_current_
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/antispam")
-async def update_antispam_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_antispam_settings(guild_id: int, data: AntiSpamSettingsUpdate, user: dict = Depends(get_current_user), db = Depends(get_antispam_db), bot = Depends(get_bot)):
     """Update AntiSpam-specific settings."""
-    data = await request.json()
-    db = AntiSpamDatabase()
-    
-    if "log_channel_id" in data and data["log_channel_id"]:
-        data["log_channel_id"] = int(data["log_channel_id"])
-
     try:
         await db.init_db()
+        log_channel_id = int(data.log_channel_id) if data.log_channel_id else None
         success = await db.set_spam_settings(
             guild_id, 
-            max_messages=data.get("max_messages", 5),
-            time_frame=data.get("time_frame", 10),
-            log_channel_id=data.get("log_channel_id")
+            max_messages=data.max_messages,
+            time_frame=data.time_frame,
+            log_channel_id=log_channel_id
         )
         if success:
             user_name = user.get("username", "Unbekannter User")
-            await send_dashboard_notification(guild_id, "Anti-Spam", user_name, data.get("log_channel_id"))
+            await send_dashboard_notification(bot, guild_id, "Anti-Spam", user_name, log_channel_id)
             
         return {"success": success}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save AntiSpam settings: {e}")
 
 # --- GlobalChat Module Routes ---
-
 @router.get("/{guild_id}/globalchat")
-async def get_globalchat_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_globalchat_settings(guild_id: int, db = Depends(get_globalchat_db)):
     """Fetch GlobalChat-specific settings."""
-    db = GlobalChatDatabase()
     try:
         await db.init_db()
         settings = await db.get_guild_settings(guild_id)
@@ -221,69 +198,60 @@ async def get_globalchat_settings(guild_id: int, user: dict = Depends(get_curren
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/globalchat")
-async def update_globalchat_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_globalchat_settings(guild_id: int, data: GlobalChatSettingsUpdate, user: dict = Depends(get_current_user), db = Depends(get_globalchat_db), bot = Depends(get_bot)):
     """Update GlobalChat-specific settings."""
-    data = await request.json()
-    db = GlobalChatDatabase()
-    
     try:
         await db.init_db()
         success = True
         user_name = user.get("username", "Unbekannter User")
         
-        new_channel_id = data.get("channel_id")
-        if new_channel_id:
+        new_channel_id = data.channel_id
+        if new_channel_id is not None:
             success = await db.set_globalchat_channel(guild_id, int(new_channel_id))
         
-        for key in ["filter_enabled", "nsfw_filter", "embed_color"]:
-            if key in data:
-                await db.update_guild_setting(guild_id, key, data[key])
+        if data.filter_enabled is not None:
+            await db.update_guild_setting(guild_id, "filter_enabled", data.filter_enabled)
+        if data.nsfw_filter is not None:
+            await db.update_guild_setting(guild_id, "nsfw_filter", data.nsfw_filter)
+        if data.embed_color is not None:
+            await db.update_guild_setting(guild_id, "embed_color", data.embed_color)
         
         if success:
-            await send_dashboard_notification(guild_id, "Global Chat", user_name, int(new_channel_id) if new_channel_id else None)
+            await send_dashboard_notification(bot, guild_id, "Global Chat", user_name, int(new_channel_id) if new_channel_id else None)
             
         return {"success": success}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save GlobalChat settings: {e}")
 
 # --- LevelSystem Module Routes ---
-
 @router.get("/{guild_id}/levels")
-async def get_level_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_level_settings(guild_id: int, db = Depends(get_level_db)):
     """Fetch LevelSystem settings."""
-    db = LevelDatabase()
     try:
         await db.init_db()
-        # Hinweis: LevelDatabase verwendet get_guild_config statt get_guild_settings
         settings = await db.get_guild_config(guild_id)
         return {"success": True, "data": settings or {}}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/levels")
-async def update_level_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_level_settings(guild_id: int, data: Dict[str, Any], user: dict = Depends(get_current_user), db = Depends(get_level_db), bot = Depends(get_bot)):
     """Update LevelSystem settings."""
-    data = await request.json()
-    db = LevelDatabase()
     try:
         await db.init_db()
-        # Hinweis: LevelDatabase verwendet set_guild_config statt update_guild_settings
         await db.set_guild_config(guild_id, **data)
         user_name = user.get("username", "Unbekannter User")
-        await send_dashboard_notification(guild_id, "Level-System", user_name)
+        await send_dashboard_notification(bot, guild_id, "Level-System", user_name)
         return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save level settings: {e}")
 
 # --- Logging Module Routes ---
-
 @router.get("/{guild_id}/logging")
-async def get_logging_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_logging_settings(guild_id: int, db = Depends(get_logging_db)):
     """Fetch Logging settings."""
-    db = LoggingDatabase()
     try:
         await db.init_db()
-        # LoggingDatabase liefert ein Dict von Typ -> ChannelID
         channels = await db.get_all_log_channels(guild_id)
         settings = {"channel_id": str(channels.get("general")) if channels.get("general") else None}
         return {"success": True, "data": settings}
@@ -291,31 +259,25 @@ async def get_logging_settings(guild_id: int, user: dict = Depends(get_current_u
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/logging")
-async def update_logging_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_logging_settings(guild_id: int, data: LoggingSettingsUpdate, user: dict = Depends(get_current_user), db = Depends(get_logging_db), bot = Depends(get_bot)):
     """Update Logging settings."""
-    data = await request.json()
-    db = LoggingDatabase()
-    
     try:
         await db.init_db()
-        if "channel_id" in data and data["channel_id"]:
-            await db.set_log_channel(guild_id, int(data["channel_id"]))
+        if data.channel_id is not None:
+            await db.set_log_channel(guild_id, int(data.channel_id))
             
         user_name = user.get("username", "Unbekannter User")
-        await send_dashboard_notification(guild_id, "Server-Log", user_name, int(data["channel_id"]) if data.get("channel_id") else None)
+        await send_dashboard_notification(bot, guild_id, "Server-Log", user_name, int(data.channel_id) if data.channel_id else None)
         return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save logging settings: {e}")
 
 # --- AutoRole Module Routes ---
-
 @router.get("/{guild_id}/autorole")
-async def get_autorole_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_autorole_settings(guild_id: int, db = Depends(get_autorole_db)):
     """Fetch AutoRole settings."""
-    db = AutoRoleDatabase()
     try:
         await db.init_db()
-        # AutoRole liefert eine Liste von Rollen
         roles = await db.get_all_autoroles(guild_id)
         settings = {}
         if roles:
@@ -327,69 +289,57 @@ async def get_autorole_settings(guild_id: int, user: dict = Depends(get_current_
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/autorole")
-async def update_autorole_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_autorole_settings(guild_id: int, data: AutoRoleSettingsUpdate, user: dict = Depends(get_current_user), db = Depends(get_autorole_db), bot = Depends(get_bot)):
     """Update AutoRole settings."""
-    data = await request.json()
-    db = AutoRoleDatabase()
-    
     try:
         await db.init_db()
-        if "role_id" in data and data["role_id"]:
-            # Existierende entfernen und neu setzen (vereinfacht für Dashboard)
+        if data.role_id is not None:
             roles = await db.get_all_autoroles(guild_id)
             for r in roles:
                 await db.remove_autorole(r["autorole_id"])
-            await db.add_autorole(guild_id, int(data["role_id"]))
+            await db.add_autorole(guild_id, int(data.role_id))
 
         user_name = user.get("username", "Unbekannter User")
-        await send_dashboard_notification(guild_id, "Auto-Role", user_name)
+        await send_dashboard_notification(bot, guild_id, "Auto-Role", user_name)
         return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save autorole settings: {e}")
 
 # --- AutoDelete Module Routes ---
-
 @router.get("/{guild_id}/autodelete")
-async def get_autodelete_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_autodelete_settings(guild_id: int, db = Depends(get_autodelete_db)):
     """Fetch AutoDelete settings."""
-    db = AutoDeleteDB()
     try:
         await db.init_db()
         settings = await db.get_all()
-        # Filter für die aktuelle Guild (Note: autodelete table might need guild_id for better filtering)
+        # TODO: Filter by guild if the DB supports it
         return {"success": True, "data": settings or []}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/autodelete")
-async def update_autodelete_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_autodelete_settings(guild_id: int, items: List[AutoDeleteItem], user: dict = Depends(get_current_user), db = Depends(get_autodelete_db), bot = Depends(get_bot)):
     """Update AutoDelete settings."""
-    data = await request.json()
-    db = AutoDeleteDB()
     try:
         await db.init_db()
-        # In MariaDB Version heißt es add_autodelete
-        for item in data:
-            if "channel_id" in item and "duration" in item:
-                await db.add_autodelete(
-                    int(item["channel_id"]), 
-                    int(item["duration"]),
-                    item.get("exclude_pinned", True),
-                    item.get("exclude_bots", False)
-                )
+        for item in items:
+            await db.add_autodelete(
+                int(item.channel_id), 
+                item.duration,
+                item.exclude_pinned,
+                item.exclude_bots
+            )
         
         user_name = user.get("username", "Unbekannter User")
-        await send_dashboard_notification(guild_id, "Auto-Delete", user_name)
+        await send_dashboard_notification(bot, guild_id, "Auto-Delete", user_name)
         return {"success": True}
     except Exception as e:
          raise HTTPException(status_code=500, detail=f"Failed to save autodelete settings: {e}")
 
 # --- TempVC Module Routes ---
-
 @router.get("/{guild_id}/tempvc")
-async def get_tempvc_settings(guild_id: int, user: dict = Depends(get_current_user)):
+async def get_tempvc_settings(guild_id: int, db = Depends(get_tempvc_db)):
     """Fetch TempVC-specific settings."""
-    db = TempVCDatabase()
     try:
         await db.init_db()
         settings = await db.get_tempvc_settings(guild_id)
@@ -415,26 +365,23 @@ async def get_tempvc_settings(guild_id: int, user: dict = Depends(get_current_us
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/{guild_id}/tempvc")
-async def update_tempvc_settings(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
+async def update_tempvc_settings(guild_id: int, data: TempVCSettingsUpdate, user: dict = Depends(get_current_user), db = Depends(get_tempvc_db), bot = Depends(get_bot)):
     """Update TempVC-specific settings."""
-    data = await request.json()
-    db = TempVCDatabase()
-    
     try:
         await db.init_db()
-        creator_channel_id = int(data.get("creator_channel_id")) if data.get("creator_channel_id") else 0
-        category_id = int(data.get("category_id")) if data.get("category_id") else 0
-        auto_delete_time = int(data.get("auto_delete_time", 0))
+        creator_channel_id = int(data.creator_channel_id) if data.creator_channel_id else 0
+        category_id = int(data.category_id) if data.category_id else 0
+        auto_delete_time = int(data.auto_delete_time) if data.auto_delete_time else 0
         
         if creator_channel_id and category_id:
             await db.set_tempvc_settings(guild_id, creator_channel_id, category_id, auto_delete_time)
         
-        ui_enabled = bool(data.get("ui_enabled", False))
-        ui_prefix = data.get("ui_prefix", "🔧")
+        ui_enabled = bool(data.ui_enabled)
+        ui_prefix = data.ui_prefix or "🔧"
         await db.set_ui_settings(guild_id, ui_enabled, ui_prefix)
         
         user_name = user.get("username", "Unbekannter User")
-        await send_dashboard_notification(guild_id, "TempVC System", user_name, creator_channel_id or None)
+        await send_dashboard_notification(bot, guild_id, "TempVC System", user_name, creator_channel_id or None)
         
         return {"success": True}
     except Exception as e:

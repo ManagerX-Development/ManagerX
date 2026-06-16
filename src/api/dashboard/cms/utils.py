@@ -24,9 +24,6 @@ def slugify(text: str) -> str:
 
 async def get_maybe_user(request: Request):
     """Optional JWT user – returns None if unauthenticated."""
-    auth_header = request.headers.get("Authorization")
-    if not auth_header or not auth_header.startswith("Bearer "):
-        return None
     try:
         return get_current_user(request)
     except Exception:

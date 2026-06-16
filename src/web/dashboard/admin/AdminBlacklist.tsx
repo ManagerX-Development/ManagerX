@@ -35,7 +35,7 @@ export default function AdminBlacklist({ onClose }: AdminBlacklistProps) {
 
   const fetchBlacklist = async () => {
     try {
-      const res = await fetch(`${API_URL}/dashboard/admin/blacklist`, {
+      const res = await fetch(`${API_URL}/admin/blacklist`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const json = await res.json();
@@ -52,7 +52,7 @@ export default function AdminBlacklist({ onClose }: AdminBlacklistProps) {
     if (!formData.user_id) return toast.error("Bitte eine Discord-ID eingeben");
 
     try {
-      const res = await fetch(`${API_URL}/dashboard/admin/blacklist`, {
+      const res = await fetch(`${API_URL}/admin/blacklist`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
@@ -80,7 +80,7 @@ export default function AdminBlacklist({ onClose }: AdminBlacklistProps) {
     setEntries(entries.filter(e => e.user_id !== userId));
 
     try {
-      const res = await fetch(`${API_URL}/dashboard/admin/blacklist/${userId}`, {
+      const res = await fetch(`${API_URL}/admin/blacklist/${userId}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });

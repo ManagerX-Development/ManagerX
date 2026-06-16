@@ -530,5 +530,74 @@ class StatsDB(MariaConnector):
                 logger.error(f"get_weekly_stats fehlgeschlagen: {e}")
                 return []
 
+    async def get_active_voice_count(self) -> int:
+        await self.ensure_connection()
+        async with self.lock:
+            try:
+                async with self.pool.acquire() as conn:
+                    async with conn.cursor() as cur:
+                        await cur.execute('SELECT COUNT(*) FROM active_voice_sessions')
+                        row = await cur.fetchone()
+                        return row[0] if row else 0
+            except Exception as e:
+                logger.error(f"get_active_voice_count fehlgeschlagen: {e}")
+                return 0
+
+    async def clear_active_voice_sessions(self):
+        await self.ensure_connection()
+        async with self.lock:
+            try:
+                async with self.pool.acquire() as conn:
+                    async with conn.cursor() as cur:
+                        await cur.execute('DELETE FROM active_voice_sessions')
+                    await conn.commit()
+            except Exception as e:
+                logger.error(f"clear_active_voice_sessions fehlgeschlagen: {e}")
+
+    async def get_dashboard_analytics(self) -> dict:
+        await self.ensure_connection()
+        async with self.lock:
+            try:
+                async with self.pool.acquire() as conn:
+                    async with conn.cursor() as cur:
+                        # 1. Interactions in last 24 hours
+                        await cur.execute('''
+                            SELECT COUNT(*) FROM command_usage 
+                            WHERE used_at > DATE_SUB(NOW(), INTERVAL 1 DAY)
+                        ''')
+                        interactions_24h = (await cur.fetchone())[0] or 0
+
+                        # 2. Unique active servers in last 24 hours
+                        await cur.execute('''
+                            SELECT COUNT(DISTINCT guild_id) FROM command_usage 
+                            WHERE used_at > DATE_SUB(NOW(), INTERVAL 1 DAY)
+                        ''')
+                        active_servers_24h = (await cur.fetchone())[0] or 0
+
+                        # 3. Top active server in last 24 hours
+                        await cur.execute('''
+                            SELECT guild_id, COUNT(*) as count 
+                            FROM command_usage 
+                            WHERE used_at > DATE_SUB(NOW(), INTERVAL 1 DAY)
+                            GROUP BY guild_id 
+                            ORDER BY count DESC 
+                            LIMIT 1
+                        ''')
+                        top_guild_row = await cur.fetchone()
+                        top_guild_id = top_guild_row[0] if top_guild_row else None
+                        
+                        return {
+                            "interactions_24h": interactions_24h,
+                            "active_servers_24h": active_servers_24h,
+                            "top_guild_id": top_guild_id
+                        }
+            except Exception as e:
+                logger.error(f"get_dashboard_analytics fehlgeschlagen: {e}")
+                return {
+                    "interactions_24h": 0,
+                    "active_servers_24h": 0,
+                    "top_guild_id": None
+                }
+
     def close(self):
         logger.info("StatsDB.close() aufgerufen (Pool wird über MariaConnector.close() geschlossen).")

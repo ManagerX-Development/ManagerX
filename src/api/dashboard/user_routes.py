@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
-from src.api.dashboard.auth_routes import get_current_user
+from fastapi import APIRouter, HTTPException, Depends
 from mxmariadb import SettingsDB, StatsDB, EconomyDatabase
 import discord
 import sqlite3
 import os
 from pathlib import Path
+
+from .dependencies import get_current_user, get_bot
+from .schemas import UserSettingsUpdate
 
 # Paths to databases
 BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
@@ -19,9 +21,8 @@ router = APIRouter(
 )
 
 @router.get("/settings")
-async def get_user_settings(user: dict = Depends(get_current_user)):
+async def get_user_settings(user: dict = Depends(get_current_user), bot = Depends(get_bot)):
     """Fetch user settings from SettingsDB."""
-    from src.api.dashboard.routes import bot_instance
     settings_db = SettingsDB()
     try:
         user_id = int(user["id"])
@@ -80,8 +81,8 @@ async def get_user_settings(user: dict = Depends(get_current_user)):
                     guild_name = "Unknown Server"
                     guild_icon = None
                     
-                    if bot_instance:
-                        guild = bot_instance.get_guild(guild_id)
+                    if bot:
+                        guild = bot.get_guild(guild_id)
                         if guild:
                             guild_name = guild.name
                             guild_icon = guild.icon.url if guild.icon else None
@@ -122,24 +123,23 @@ async def get_user_settings(user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
 
 @router.post("/settings")
-async def update_user_settings(request: Request, user: dict = Depends(get_current_user)):
+async def update_user_settings(data: UserSettingsUpdate, user: dict = Depends(get_current_user)):
     """Update user settings in SettingsDB."""
-    data = await request.json()
     settings_db = SettingsDB()
     try:
         user_id = int(user["id"])
         
         # Update language in SettingsDB if provided
-        if "language" in data:
-            settings_db.set_user_language(user_id, data["language"])
+        if data.language is not None:
+            settings_db.set_user_language(user_id, data.language)
             
         # Update privacy in StatsDB if provided
-        if "is_private" in data:
+        if data.is_private is not None:
             stats_db = StatsDB()
             async with stats_db.lock:
                 stats_db.cursor.execute(
                     "UPDATE global_user_levels SET is_private = ? WHERE user_id = ?", 
-                    (1 if data["is_private"] else 0, user_id)
+                    (1 if data.is_private else 0, user_id)
                 )
                 stats_db.conn.commit()
                 

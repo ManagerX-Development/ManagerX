@@ -28,7 +28,7 @@ const Status = memo(function Status() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await fetch(`${API_URL}/v1/managerx/stats`);
+        const response = await fetch(`${API_URL}/public/stats`);
         if (!response.ok) throw new Error("Offline");
 
         const result = await response.json();

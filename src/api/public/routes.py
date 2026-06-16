@@ -1,19 +1,15 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import discord
 from typing import List, Optional
+from src.api.dashboard.dependencies import get_bot
 
 router = APIRouter(
-    prefix="/v1/managerx",
+    prefix="/public",
     tags=["public"]
 )
 
-def get_bot():
-    from .routes import bot_instance
-    return bot_instance
-
 @router.get("/stats")
-async def get_stats(request: Request):
-    bot = get_bot()
+async def get_stats(bot = Depends(get_bot)):
     if bot is None:
         raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
     
@@ -41,9 +37,8 @@ async def get_stats(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/leaderboard")
-async def get_leaderboard(limit: int = 50):
+async def get_leaderboard(limit: int = 50, bot = Depends(get_bot)):
     from mxmariadb import StatsDB
-    bot = get_bot()
     if bot is None:
         raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
     

@@ -49,7 +49,10 @@ config_loader = ConfigLoader(BASEDIR)
 config = config_loader.load()
 
 # API Routes & Translation
-from src.api.dashboard.routes import set_bot_instance, dashboard_main_router, router_public
+from src.api.dashboard.routes import set_bot_instance, dashboard_main_router
+from src.api.public.routes import router as public_router
+from src.api.admin.routes import router as admin_router
+from fastapi import APIRouter
 from mxmariadb import TranslationHandler, BlacklistDatabase
 
 colorama_init(autoreset=True)
@@ -88,9 +91,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Dashboard-Routes einbinden
-app.include_router(dashboard_main_router)
-app.include_router(router_public)
+# API v1 Router erstellen und Sub-Router einbinden
+api_v1 = APIRouter(prefix="/v1")
+api_v1.include_router(dashboard_main_router) # /v1/dashboard/...
+api_v1.include_router(public_router)         # /v1/public/...
+api_v1.include_router(admin_router)          # /v1/admin/...
+
+app.include_router(api_v1)
 
 # CMS Media Uploads als statische Dateien bereitstellen
 _uploads_dir = BASEDIR / "public" / "uploads" / "cms"

@@ -68,6 +68,26 @@ class EnhancedStatsCog(ezcord.Cog):
     async def on_ready(self):
         """Called when the bot is ready and connected to Discord."""
         logger.info(f"Enhanced StatsCog ready - Bot connected as {self.bot.user}")
+        await self.sync_active_voice_sessions()
+
+    async def sync_active_voice_sessions(self):
+        """Synchronisiert die aktiven Voice-Sessions beim Bot-Start, um tote Sessions zu entfernen."""
+        try:
+            logger.info("Synchronisiere aktive Voice-Sessions...")
+            # 1. Alle alten Sessions löschen
+            await self.db.clear_active_voice_sessions()
+            
+            # 2. Alle aktuellen Voice-Mitglieder scannen und eintragen
+            count = 0
+            for guild in self.bot.guilds:
+                for voice_channel in guild.voice_channels:
+                    for member in voice_channel.members:
+                        if not member.bot:
+                            await self.db.start_voice_session(member.id, guild.id, voice_channel.id)
+                            count += 1
+            logger.info(f"Erfolgreich {count} aktive Voice-Sessions beim Bot-Start synchronisiert.")
+        except Exception as e:
+            logger.error(f"Fehler bei der Voice-Session-Synchronisierung: {e}")
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState,

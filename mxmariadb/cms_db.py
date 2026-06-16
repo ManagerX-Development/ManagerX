@@ -72,8 +72,19 @@ class CMSDatabase(MariaConnector):
                         uploader_id BIGINT NOT NULL,
                         uploader_name VARCHAR(100),
                         is_stock BOOLEAN DEFAULT FALSE,
+                        folder VARCHAR(100) DEFAULT 'general',
                         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        INDEX(uploader_id)
+                        INDEX(uploader_id),
+                        INDEX(folder)
+                    )
+                """)
+
+                # Media Folders table
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS cms_media_folders (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(100) NOT NULL UNIQUE,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
                 """)
 
@@ -82,13 +93,24 @@ class CMSDatabase(MariaConnector):
                     "ALTER TABLE cms_posts ADD COLUMN IF NOT EXISTS excerpt TEXT NULL",
                     "ALTER TABLE cms_posts ADD COLUMN IF NOT EXISTS cover_image VARCHAR(500) NULL",
                     "ALTER TABLE cms_posts ADD COLUMN IF NOT EXISTS view_count INT DEFAULT 0",
-                    "ALTER TABLE cms_media ADD COLUMN IF NOT EXISTS is_stock BOOLEAN DEFAULT FALSE"
+                    "ALTER TABLE cms_media ADD COLUMN IF NOT EXISTS is_stock BOOLEAN DEFAULT FALSE",
+                    "ALTER TABLE cms_media ADD COLUMN IF NOT EXISTS folder VARCHAR(100) DEFAULT 'general'"
                 ]:
                     try:
                         await cur.execute(col_def)
                     except Exception:
-                        pass  # Column already exists or unsupported syntax
+                        pass
 
+                # Bot Performance & Growth Stats
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS bot_daily_stats (
+                        date DATE PRIMARY KEY,
+                        guild_count INT,
+                        user_count INT,
+                        command_count INT,
+                        avg_latency FLOAT
+                    )
+                """)
                 # Revision history table
                 await cur.execute("""
                     CREATE TABLE IF NOT EXISTS cms_revisions (
@@ -313,18 +335,18 @@ class CMSDatabase(MariaConnector):
     # ─────────────────────────────────────────
 
     async def create_media(self, filename: str, original_name: str, mime_type: str,
-                           size_bytes: int, uploader_id: int, uploader_name: str, is_stock: bool = False):
+                           size_bytes: int, uploader_id: int, uploader_name: str, is_stock: bool = False, folder: str = 'general'):
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
                     INSERT INTO cms_media
-                    (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name, is_stock)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name, is_stock))
+                    (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name, is_stock, folder)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (filename, original_name, mime_type, size_bytes, uploader_id, uploader_name, is_stock, folder))
             await conn.commit()
             return True
 
-    async def get_media(self, limit: int = 100, is_stock: bool = None):
+    async def get_media(self, limit: int = 100, is_stock: bool = None, folder: str = None):
         async with self.pool.acquire() as conn:
             async with conn.cursor(aiomysql.DictCursor) as cur:
                 query = "SELECT * FROM cms_media"
@@ -333,6 +355,10 @@ class CMSDatabase(MariaConnector):
                 if is_stock is not None:
                     query += " WHERE is_stock = %s"
                     params.append(is_stock)
+                
+                if folder:
+                    query += (" AND " if "WHERE" in query else " WHERE ") + "folder = %s"
+                    params.append(folder)
                     
                 query += " ORDER BY uploaded_at DESC LIMIT %s"
                 params.append(limit)
@@ -340,10 +366,15 @@ class CMSDatabase(MariaConnector):
                 await cur.execute(query, tuple(params))
                 return await cur.fetchall()
 
-    async def update_media(self, media_id: int, is_stock: bool):
+    async def update_media(self, media_id: int, **kwargs):
+        if not kwargs: return False
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute("UPDATE cms_media SET is_stock = %s WHERE id = %s", (is_stock, media_id))
+                fields = [f"{k} = %s" for k in kwargs.keys()]
+                params = list(kwargs.values())
+                params.append(media_id)
+                query = f"UPDATE cms_media SET {', '.join(fields)} WHERE id = %s"
+                await cur.execute(query, tuple(params))
             await conn.commit()
             return True
 
@@ -356,6 +387,29 @@ class CMSDatabase(MariaConnector):
                 await cur.execute("DELETE FROM cms_media WHERE id = %s", (media_id,))
             await conn.commit()
             return row["filename"] if row else None
+
+    async def get_folders(self):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("SELECT * FROM cms_media_folders ORDER BY name ASC")
+                return await cur.fetchall()
+
+    async def create_folder(self, name: str):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("INSERT IGNORE INTO cms_media_folders (name) VALUES (%s)", (name,))
+            await conn.commit()
+            return True
+
+    async def delete_folder(self, name: str):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                # Ordner löschen
+                await cur.execute("DELETE FROM cms_media_folders WHERE name = %s", (name,))
+                # Bilder im Ordner zurück auf 'general' setzen
+                await cur.execute("UPDATE cms_media SET folder = 'general' WHERE folder = %s", (name,))
+            await conn.commit()
+            return True
 
     # ─────────────────────────────────────────
     # CHANGELOG
@@ -601,4 +655,49 @@ class CMSDatabase(MariaConnector):
                 await cur.execute("DELETE FROM cms_feedback WHERE id = %s", (feedback_id,))
             await conn.commit()
             return True
+
+    # ─────────────────────────────────────────
+    # PERFORMANCE & GROWTH
+    # ─────────────────────────────────────────
+
+    async def log_daily_stats(self, guild_count: int, user_count: int, command_count: int, avg_latency: float):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                # Safety: Ensure table exists
+                await cur.execute("""
+                    CREATE TABLE IF NOT EXISTS bot_daily_stats (
+                        date DATE PRIMARY KEY,
+                        guild_count INT,
+                        user_count INT,
+                        command_count INT,
+                        avg_latency FLOAT
+                    )
+                """)
+                
+                await cur.execute("""
+                    INSERT INTO bot_daily_stats (date, guild_count, user_count, command_count, avg_latency)
+                    VALUES (CURDATE(), %s, %s, %s, %s)
+                    ON DUPLICATE KEY UPDATE
+                        guild_count = %s,
+                        user_count = %s,
+                        command_count = %s,
+                        avg_latency = %s
+                """, (guild_count, user_count, command_count, avg_latency, 
+                      guild_count, user_count, command_count, avg_latency))
+            await conn.commit()
+
+    async def get_historical_stats(self, days: int = 30):
+        async with self.pool.acquire() as conn:
+            async with conn.cursor(aiomysql.DictCursor) as cur:
+                await cur.execute("""
+                    SELECT 
+                        DATE_FORMAT(date, '%%Y-%%m-%%d') as date,
+                        guild_count,
+                        user_count,
+                        command_count,
+                        avg_latency
+                    FROM bot_daily_stats 
+                    ORDER BY date ASC LIMIT %s
+                """, (days,))
+                return await cur.fetchall()
 
