@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
-from src.api.dashboard.auth_routes import get_current_user
+from fastapi import APIRouter, HTTPException, Depends
 from mxmariadb import ManagementDatabase
 import discord
 from datetime import datetime
+
+from .dependencies import get_current_user, get_bot
+from .schemas import AutoResponderAddRequest, ApplicationQuestionsUpdate
 
 router = APIRouter(
     prefix="/management",
@@ -10,11 +12,10 @@ router = APIRouter(
     dependencies=[Depends(get_current_user)]
 )
 
-async def send_management_notification(guild_id: int, module_name: str, user_name: str):
+async def send_management_notification(bot, guild_id: int, module_name: str, user_name: str):
     """Helper for dashboard notifications."""
-    from src.api.dashboard.routes import bot_instance
-    if not bot_instance: return
-    guild = bot_instance.get_guild(guild_id)
+    if not bot: return
+    guild = bot.get_guild(guild_id)
     if not guild: return
     
     target_channel = guild.system_channel or guild.text_channels[0]
@@ -43,18 +44,17 @@ async def get_autoresponder(guild_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{guild_id}/autoresponder")
-async def add_autoresponder(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
-    data = await request.json()
+async def add_autoresponder(guild_id: int, data: AutoResponderAddRequest, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
     db = ManagementDatabase()
     try:
         await db.ensure_connection()
         await db.add_auto_response(
             guild_id, 
-            data.get("keyword"), 
-            data.get("response"), 
-            data.get("match_type", "partial")
+            data.keyword, 
+            data.response, 
+            data.match_type
         )
-        await send_management_notification(guild_id, "Auto-Responder", user.get("username"))
+        await send_management_notification(bot, guild_id, "Auto-Responder", user.get("username"))
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -76,7 +76,6 @@ async def get_newssync(guild_id: int):
     try:
         await db.ensure_connection()
         all_channels = await db.get_sync_channels()
-        # Filter for this guild
         guild_syncs = [c for c in all_channels if c['guild_id'] == guild_id]
         return {"success": True, "data": guild_syncs}
     except Exception as e:
@@ -94,16 +93,15 @@ async def get_app_questions(guild_id: int):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/{guild_id}/applications")
-async def set_app_questions(guild_id: int, request: Request, user: dict = Depends(get_current_user)):
-    data = await request.json()
-    questions = data.get("questions", []) # List of strings
+async def set_app_questions(guild_id: int, data: ApplicationQuestionsUpdate, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
+    questions = data.questions
     db = ManagementDatabase()
     try:
         await db.ensure_connection()
         await db.clear_questions(guild_id)
         for i, q_text in enumerate(questions):
             await db.add_question(guild_id, q_text, i)
-        await send_management_notification(guild_id, "Bewerbungssystem", user.get("username"))
+        await send_management_notification(bot, guild_id, "Bewerbungssystem", user.get("username"))
         return {"success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

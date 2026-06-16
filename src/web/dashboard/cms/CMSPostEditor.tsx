@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   X, Save, History, FileText,
-  Columns, Maximize2, AlignLeft, Table as TableIcon,
-  Check
+  Columns, Maximize2, AlignLeft
 } from "lucide-react";
 import { toast } from "sonner";
 import { API_URL } from "../../lib/api";
@@ -16,16 +15,14 @@ import { CMSStatusIndicator, StatusType } from "./CMSStatusIndicator";
 import { SeoPanel } from "./editor/SEOPanel";
 import { SidebarPanel } from "./editor/SidebarPanel";
 import { buildToolbarActions, insertBlock } from "./editor/EditorToolbar";
-import { MediaPicker } from "./editor/MediaPicker";
 
 interface CMSPostEditorProps {
   post: Partial<Post>;
   onClose: () => void;
   onSave: () => void;
-  notify: (type: StatusType, msg: string) => void;
 }
 
-export default function CMSPostEditor({ post: initialPost, onClose, onSave, notify }: CMSPostEditorProps) {
+export default function CMSPostEditor({ post: initialPost, onClose, onSave }: CMSPostEditorProps) {
   const { user, token } = useAuth();
   
   // ─── State Management ───────────────────────────────────────────────────────
@@ -44,31 +41,55 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
   const [loadingRevisions, setLoadingRevisions] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<"settings" | "seo">("settings");
   const [seoScore, setSeoScore] = useState(0);
+  const [status, setStatus] = useState<StatusType>("idle");
+  const [statusMessage, setStatusMessage] = useState("");
   
-  // NEW: Tool Modals
-  const [showTableGenerator, setShowTableGenerator] = useState(false);
-  const [showMediaPicker, setShowMediaPicker] = useState(false);
-  const [tableConfig, setTableConfig] = useState({ rows: 3, cols: 3 });
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  
+  const toolbarActions = useMemo(() => buildToolbarActions(), []);
+
+  // ─── Side Effects ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (activeTab === "revisions" && initialPost.id) {
+      fetchRevisions();
+    }
+  }, [activeTab, initialPost.id]);
+
+  // ─── Handlers ───────────────────────────────────────────────────────────────
   const setContent = useCallback((content: string) => {
     setFormData((prev) => ({ ...prev, content }));
   }, []);
 
-  const toolbarActions = useMemo(() => buildToolbarActions({
-    onOpenTableGenerator: () => setShowTableGenerator(true),
-    onOpenMediaPicker: () => setShowMediaPicker(true)
-  }), []);
+  const handleTitleChange = (title: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      title,
+      slug: prev.id ? prev.slug : slugify(title),
+    }));
+  };
 
-  // ─── Handlers ───────────────────────────────────────────────────────────────
+  const fetchRevisions = async () => {
+    setLoadingRevisions(true);
+    try {
+      const res = await fetch(`${API_URL}/dashboard/cms/posts/${initialPost.id}/revisions`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (data.success) setRevisions(data.data);
+    } catch {
+      toast.error("Revisionen konnten nicht geladen werden");
+    } finally {
+      setLoadingRevisions(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!formData.title || !formData.content) {
       toast.error("Titel und Inhalt sind erforderlich");
       return;
     }
     setSaving(true);
-    notify("sending", "Beitrag wird gespeichert...");
+    setStatus("sending");
+    setStatusMessage("Beitrag wird gespeichert...");
     try {
       const method = initialPost.id ? "PUT" : "POST";
       const url = initialPost.id
@@ -85,40 +106,60 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
       });
       const data = await res.json();
       if (data.success) {
-        notify("success", initialPost.id ? "Änderungen erfolgreich gespeichert" : "Beitrag erfolgreich erstellt");
-        setTimeout(() => onSave(), 1200);
+        toast.success(initialPost.id ? "Beitrag aktualisiert" : "Beitrag erstellt");
+        setStatus("success");
+        setStatusMessage(initialPost.id ? "Änderungen gespeichert" : "Beitrag veröffentlicht");
+        
+        setTimeout(() => {
+          setStatus("idle");
+          onSave();
+        }, 1200);
       } else {
-        notify("error", data.detail || "Speichern fehlgeschlagen");
+        toast.error(data.detail || "Fehler beim Speichern");
+        setStatus("error");
+        setStatusMessage(data.detail || "Speichern fehlgeschlagen");
       }
     } catch (err: any) {
-      notify("error", err.message || "Netzwerkfehler");
+      toast.error("Verbindungsfehler zum Server");
+      setStatus("error");
+      setStatusMessage(err.message || "Netzwerkfehler");
     } finally {
       setSaving(false);
     }
   };
 
-  const generateTable = () => {
-    const { rows, cols } = tableConfig;
-    let table = "| " + Array(cols).fill("Kopf").join(" | ") + " |\n";
-    table += "| " + Array(cols).fill("---").join(" | ") + " |\n";
-    for (let i = 0; i < rows; i++) {
-      table += "| " + Array(cols).fill("Zelle").join(" | ") + " |\n";
+  const restoreRevision = async (revId: number) => {
+    if (!confirm("Diesen Stand wirklich wiederherstellen?")) return;
+    try {
+      const res = await fetch(`${API_URL}/dashboard/cms/posts/${initialPost.id}/restore/${revId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "X-User-ID": user?.id || "1427994077332373554" }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFormData(data.data);
+        setActiveTab("edit");
+        toast.success("Revision wiederhergestellt");
+      }
+    } catch {
+      toast.error("Fehler beim Wiederherstellen");
     }
-    if (textareaRef.current) insertBlock(textareaRef.current, setContent, table);
-    setShowTableGenerator(false);
-  };
-
-  const handleMediaSelect = (url: string, name: string) => {
-    if (textareaRef.current) {
-      insertBlock(textareaRef.current, setContent, `![${name}](${url})`);
-    }
-    setShowMediaPicker(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.ctrlKey && e.key === "s") {
       e.preventDefault();
       handleSave();
+    }
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const ta = textareaRef.current;
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      ta.value = ta.value.substring(0, start) + "  " + ta.value.substring(end);
+      ta.selectionStart = ta.selectionEnd = start + 2;
+      setContent(ta.value);
     }
   };
 
@@ -131,15 +172,13 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
       <div
         className={cn(
-          "w-full bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden transition-all duration-300 relative",
+          "w-full bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 shadow-2xl flex flex-col overflow-hidden transition-all duration-300",
           editorMode === "fullscreen" ? "h-screen max-w-full rounded-none" : "max-w-7xl h-full max-h-[920px]"
         )}
       >
-        {/* ── Status Indicator ── */}
-        {/* Managed globally in CMSPage */}
-
         {/* ── Header ── */}
         <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-white/[0.02] shrink-0 relative">
+          <CMSStatusIndicator status={status} message={statusMessage} onClear={() => setStatus("idle")} />
           <div className="flex items-center gap-4">
             <div className="p-2.5 rounded-2xl bg-primary/10 border border-primary/20 text-primary">
               <FileText className="w-5 h-5" />
@@ -149,7 +188,7 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
                 {initialPost.id ? "Beitrag bearbeiten" : "Neuer Beitrag"}
               </h2>
               <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                {formData.post_type} · {wordCount} Wörter
+                {formData.post_type} · {wordCount} Wörter · {charCount} Zeichen
               </p>
             </div>
           </div>
@@ -172,13 +211,13 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
 
             {activeTab === "edit" && (
               <div className="flex p-1 bg-white/5 rounded-xl border border-white/5 mr-2">
-                <button onClick={() => setEditorMode("editor")} className={cn("p-1.5 rounded-lg transition-all", editorMode === "editor" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white")}>
+                <button onClick={() => setEditorMode("editor")} title="Nur Editor" className={cn("p-1.5 rounded-lg transition-all", editorMode === "editor" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white")}>
                   <AlignLeft className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setEditorMode("split")} className={cn("p-1.5 rounded-lg transition-all", editorMode === "split" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white")}>
+                <button onClick={() => setEditorMode("split")} title="Split View" className={cn("p-1.5 rounded-lg transition-all", editorMode === "split" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white")}>
                   <Columns className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => setEditorMode(editorMode === "fullscreen" ? "editor" : "fullscreen")} className={cn("p-1.5 rounded-lg transition-all", editorMode === "fullscreen" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white")}>
+                <button onClick={() => setEditorMode(editorMode === "fullscreen" ? "editor" : "fullscreen")} title="Vollbild" className={cn("p-1.5 rounded-lg transition-all", editorMode === "fullscreen" ? "bg-white/10 text-white" : "text-muted-foreground hover:text-white")}>
                   <Maximize2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -202,8 +241,8 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
                 <input
                   type="text"
                   value={formData.title || ""}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value, slug: prev.id ? prev.slug : slugify(e.target.value) }))}
-                  placeholder="Titel..."
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  placeholder="Einen packenden Titel wählen..."
                   className="w-full bg-transparent text-2xl font-black italic tracking-tight focus:outline-none placeholder:text-white/15"
                 />
               </div>
@@ -216,13 +255,21 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
                         {action.divider && <span className="w-px h-5 bg-white/10 mx-1.5" />}
                         <button
                           title={action.label}
-                          onMouseDown={(e) => { e.preventDefault(); action.action(textareaRef.current!, setContent); }}
+                          onMouseDown={(e) => { e.preventDefault(); if (textareaRef.current) action.action(textareaRef.current, setContent); }}
                           className="p-1.5 rounded-lg text-muted-foreground hover:text-white hover:bg-white/10 transition-all"
                         >
                           {action.icon}
                         </button>
                       </span>
                     ))}
+                    <span className="w-px h-5 bg-white/10 mx-1.5" />
+                    <button
+                      title="Codeblock mit Sprache"
+                      onMouseDown={(e) => { e.preventDefault(); if (textareaRef.current) insertBlock(textareaRef.current, setContent, "```javascript\n// Dein Code hier\n```"); }}
+                      className="px-2 py-1 rounded-lg text-muted-foreground hover:text-white hover:bg-white/10 transition-all text-[9px] font-mono font-bold"
+                    >
+                      {"</>"}
+                    </button>
                   </div>
 
                   <textarea
@@ -230,10 +277,16 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
                     value={formData.content || ""}
                     onChange={(e) => setContent(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Markdown hier schreiben..."
-                    className="flex-1 w-full bg-transparent px-6 py-5 text-sm font-mono text-white/85 leading-relaxed focus:outline-none resize-none overflow-y-auto"
+                    placeholder={"Schreibe deinen Beitrag hier in Markdown...\n\nTipps:\n• **Fett**, _kursiv_, `code`\n• # Überschrift 1, ## Überschrift 2\n• - Liste oder 1. Nummeriert\n• > Zitat\n• Zweimal Enter = neuer Absatz"}
+                    spellCheck
+                    className="flex-1 w-full bg-transparent px-6 py-5 text-sm font-mono text-white/85 leading-relaxed focus:outline-none resize-none placeholder:text-white/15 placeholder:font-sans placeholder:not-italic overflow-y-auto"
                     style={{ tabSize: 2 }}
                   />
+
+                  <div className="px-6 py-2 border-t border-white/5 bg-white/[0.01] flex items-center justify-between text-[10px] text-muted-foreground font-mono shrink-0">
+                    <span>Markdown · UTF-8</span>
+                    <span>{wordCount} Wörter · {charCount} Zeichen</span>
+                  </div>
                 </div>
 
                 {isSplit && (
@@ -243,69 +296,101 @@ export default function CMSPostEditor({ post: initialPost, onClose, onSave, noti
                 )}
 
                 {!isSplit && (
-                  <div className="w-80 shrink-0 flex flex-col border-l border-white/5 overflow-y-auto p-5 space-y-5">
-                    <div className="flex border-b border-white/5 shrink-0 -mx-5 -mt-5 mb-5">
-                      <button onClick={() => setSidebarTab("settings")} className={cn("flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2", sidebarTab === "settings" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-white")}>Einstellungen</button>
-                      <button onClick={() => setSidebarTab("seo")} className={cn("flex-1 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2", sidebarTab === "seo" ? "border-emerald-400 text-emerald-400" : "border-transparent text-muted-foreground hover:text-white")}>SEO ({seoScore})</button>
+                  <div className="w-80 shrink-0 flex flex-col border-l border-white/5">
+                    <div className="flex border-b border-white/5 shrink-0">
+                      <button onClick={() => setSidebarTab("settings")} className={cn("flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2", sidebarTab === "settings" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-white")}>
+                         Einstellungen
+                      </button>
+                      <button onClick={() => setSidebarTab("seo")} className={cn("flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 relative", sidebarTab === "seo" ? "border-emerald-400 text-emerald-400" : "border-transparent text-muted-foreground hover:text-white")}>
+                         SEO
+                        <span className={cn("absolute top-1.5 right-3 text-[8px] font-black px-1 rounded", seoScoreColor(seoScore) === "green" ? "bg-emerald-400/20 text-emerald-400" : seoScoreColor(seoScore) === "yellow" ? "bg-amber-400/20 text-amber-400" : "bg-red-400/20 text-red-400")}>
+                          {seoScore}
+                        </span>
+                      </button>
                     </div>
-                    {sidebarTab === "settings" ? (
-                      <SidebarPanel formData={formData} setFormData={setFormData} availableTags={[]} tagInput={tagInput} setTagInput={setTagInput} showTagSuggestions={showTagSuggestions} setShowTagSuggestions={setShowTagSuggestions} />
-                    ) : (
-                      <SeoPanel formData={formData} onScoreChange={setSeoScore} />
-                    )}
+                    <div className="flex-1 overflow-y-auto p-5 space-y-5">
+                      {sidebarTab === "settings" ? (
+                        <SidebarPanel formData={formData} setFormData={setFormData} availableTags={initialPost.id ? [] : [] /* will be passed from props in future */} tagInput={tagInput} setTagInput={setTagInput} showTagSuggestions={showTagSuggestions} setShowTagSuggestions={setShowTagSuggestions} />
+                      ) : (
+                        <SeoPanel formData={formData} onScoreChange={setSeoScore} />
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
+
+              {isSplit && (
+                <div className="shrink-0 border-t border-white/5 overflow-x-auto">
+                  <div className="flex gap-6 px-6 py-4 min-w-max">
+                    <SidebarPanel formData={formData} setFormData={setFormData} availableTags={[]} tagInput={tagInput} setTagInput={setTagInput} showTagSuggestions={showTagSuggestions} setShowTagSuggestions={setShowTagSuggestions} horizontal />
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {activeTab === "preview" && (
             <div className="flex-1 overflow-y-auto p-8">
-               <div className="max-w-3xl mx-auto glass-strong rounded-[2.5rem] p-10 border border-white/10 bg-black/40">
-                  <h1 className="text-4xl font-black italic tracking-tighter mb-8">{formData.title || "Vorschau"}</h1>
+              <div className="max-w-3xl mx-auto glass-strong rounded-[2.5rem] border border-white/10 overflow-hidden bg-black/40">
+                {formData.cover_image && (
+                  <div className="w-full h-64 overflow-hidden border-b border-white/10">
+                    <img src={formData.cover_image} alt="Cover" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="p-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest">{formData.post_type}</span>
+                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Vorschau</span>
+                  </div>
+                  <h1 className="text-4xl font-black italic tracking-tighter mb-8 leading-tight">{formData.title || "Unbenannter Beitrag"}</h1>
                   <PremiumMarkdown content={formData.content || ""} />
-               </div>
+                </div>
+              </div>
             </div>
           )}
-          
-          {/* History logic omitted for brevity, same as before */}
+
+          {activeTab === "revisions" && (
+            <div className="flex-1 overflow-y-auto p-8 max-w-4xl mx-auto w-full">
+              <div className="flex items-center gap-2 mb-6 ml-2">
+                <History className="w-5 h-5 text-primary" />
+                <h3 className="text-lg font-bold italic tracking-tight">Revisionshistorie</h3>
+              </div>
+              {loadingRevisions ? (
+                <div className="flex justify-center py-10"><div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" /></div>
+              ) : revisions.length > 0 ? (
+                <div className="space-y-3">
+                  {revisions.map((rev) => (
+                    <div key={rev.id} className="flex items-center justify-between p-5 glass-strong rounded-2xl border border-white/5 hover:border-white/20 transition-all group">
+                      <div>
+                        <div className="font-bold text-sm text-white/90 group-hover:text-primary transition-colors">{rev.title}</div>
+                        <div className="text-[10px] text-muted-foreground font-medium flex items-center gap-2 mt-1 uppercase tracking-wider">
+                          <span>{new Date(rev.changed_at).toLocaleString()}</span>
+                          <span>·</span>
+                          <span>Von {rev.changed_by_name}</span>
+                          {rev.change_note && (<><span>·</span><span className="text-amber-400/80">{rev.change_note}</span></>)}
+                        </div>
+                      </div>
+                      <button onClick={() => restoreRevision(rev.id)} className="px-4 py-2 rounded-xl bg-white/5 hover:bg-primary hover:text-white text-[10px] font-black uppercase tracking-widest transition-all opacity-0 group-hover:opacity-100">Wiederherstellen</button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
+                  <History className="w-10 h-10 text-muted-foreground/20 mx-auto mb-3" />
+                  <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest">Noch keine Revisionen vorhanden</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ── Table Generator Modal ── */}
-      {showTableGenerator && (
-        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in zoom-in duration-200">
-           <div className="w-80 bg-[#111] border border-white/10 rounded-3xl p-6 shadow-2xl">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-6 flex items-center gap-2">
-                <TableIcon className="w-4 h-4 text-primary" /> Tabelle erstellen
-              </h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Spalten</label>
-                  <input type="number" min="1" max="10" value={tableConfig.cols} onChange={e => setTableConfig({...tableConfig, cols: parseInt(e.target.value) || 1})} className="w-16 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-center" />
-                </div>
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase">Zeilen</label>
-                  <input type="number" min="1" max="20" value={tableConfig.rows} onChange={e => setTableConfig({...tableConfig, rows: parseInt(e.target.value) || 1})} className="w-16 bg-white/5 border border-white/10 rounded-lg px-2 py-1 text-xs text-center" />
-                </div>
-                <div className="flex gap-2 pt-4">
-                  <button onClick={() => setShowTableGenerator(false)} className="flex-1 py-2 text-[10px] font-bold uppercase text-muted-foreground hover:text-white transition-colors">Abbrechen</button>
-                  <button onClick={generateTable} className="flex-1 py-2 bg-primary text-white rounded-xl text-[10px] font-bold uppercase flex items-center justify-center gap-2">
-                    <Check className="w-3 h-3" /> Erstellen
-                  </button>
-                </div>
-              </div>
-           </div>
-        </div>
-      )}
-
-      {/* ── Media Picker Modal ── */}
-      {showMediaPicker && (
-        <MediaPicker 
-          onSelect={handleMediaSelect} 
-          onClose={() => setShowMediaPicker(false)} 
-        />
-      )}
+      <style>{`
+        .invert-calendar-icon::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        textarea::-webkit-scrollbar { width: 4px; }
+        textarea::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
+      `}</style>
     </div>
   );
 }

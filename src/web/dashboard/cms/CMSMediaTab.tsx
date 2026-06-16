@@ -1,15 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
-import { 
-  Image as ImageIcon, Trash2, Upload, Link, 
-  FileText, Film, File as FileIcon, Search, 
-  Star, Folder, Plus, FolderOpen, MoreVertical,
-  ChevronRight, Move, X
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Image as ImageIcon, Trash2, Upload, Link, FileText, Film, File as FileIcon, Search, Star } from "lucide-react";
 import { toast } from "sonner";
 import { API_URL } from "../../lib/api";
 import { useAuth } from "../../components/core/AuthProvider";
 import { cn } from "../../lib/utils";
-import { StatusType } from "./CMSStatusIndicator";
 
 interface MediaItemEx {
   id: number;
@@ -21,102 +15,38 @@ interface MediaItemEx {
   uploaded_at: string;
   url: string;
   is_stock: boolean;
-  folder: string;
 }
 
-interface MediaFolder {
-  id: number;
-  name: string;
-  created_at: string;
-}
-
-export default function CMSMediaTab({ notify }: { notify: (type: StatusType, msg: string) => void }) {
+export default function CMSMediaTab() {
   const { user, token } = useAuth();
   const [media, setMedia] = useState<MediaItemEx[]>([]);
-  const [dbFolders, setDbFolders] = useState<MediaFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFolder, setActiveFolder] = useState<string>("all");
-  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
-  const [newFolderName, setNewFolderName] = useState("");
-  const [movingId, setMovingId] = useState<number | null>(null);
+  const [filterMode, setFilterMode] = useState<"all" | "uploads" | "stock">("all");
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchMedia = async () => {
     try {
-      const [mediaRes, foldersRes] = await Promise.all([
-        fetch(`${API_URL}/dashboard/cms/media`, {
-          headers: { "Authorization": `Bearer ${token}`, "X-User-ID": user?.id || "1" }
-        }),
-        fetch(`${API_URL}/dashboard/cms/folders`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        })
-      ]);
-      
-      const mediaData = await mediaRes.json();
-      const foldersData = await foldersRes.json();
-      
-      if (mediaData.success) setMedia(mediaData.data);
-      if (foldersData.success) setDbFolders(foldersData.data);
+      const res = await fetch(`${API_URL}/dashboard/cms/media`, {
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": user?.id || "1427994077332373554"
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMedia(data.data);
+      }
     } catch (err) {
-      notify("error", "Fehler beim Laden der Daten");
+      toast.error("Fehler beim Laden der Medien");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchMedia();
   }, [token, user]);
-
-  const allFolders = useMemo(() => {
-    const names = new Set<string>(["general"]);
-    dbFolders.forEach(f => names.add(f.name));
-    media.forEach(m => names.add(m.folder || "general"));
-    return Array.from(names).sort();
-  }, [media, dbFolders]);
-
-  const handleCreateFolder = async () => {
-    if (!newFolderName) return;
-    try {
-      const res = await fetch(`${API_URL}/dashboard/cms/folders`, {
-        method: "POST",
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ name: newFolderName })
-      });
-      if (res.ok) {
-        notify("success", `Ordner '${newFolderName}' erstellt`);
-        setNewFolderName("");
-        setShowNewFolderInput(false);
-        fetchData();
-      }
-    } catch {
-      notify("error", "Ordner konnte nicht erstellt werden");
-    }
-  };
-
-  const handleDeleteFolder = async (name: string) => {
-    if (name === "general") return;
-    if (!confirm(`Ordner '${name}' wirklich löschen? Bilder werden nach 'general' verschoben.`)) return;
-    
-    try {
-      const res = await fetch(`${API_URL}/dashboard/cms/folders/${name}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      if (res.ok) {
-        notify("success", "Ordner gelöscht");
-        if (activeFolder === name) setActiveFolder("all");
-        fetchData();
-      }
-    } catch {
-      notify("error", "Fehler beim Löschen");
-    }
-  };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -124,72 +54,89 @@ export default function CMSMediaTab({ notify }: { notify: (type: StatusType, msg
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("folder", activeFolder === "all" ? "general" : activeFolder);
+    if (filterMode === "stock") {
+        formData.append("is_stock", "true");
+    }
 
     setUploading(true);
-    notify("sending", "Datei wird hochgeladen...");
     try {
       const res = await fetch(`${API_URL}/dashboard/cms/upload`, {
         method: "POST",
         headers: { 
           "Authorization": `Bearer ${token}`,
-          "X-User-ID": user?.id || "1"
+          "X-User-ID": user?.id || "1427994077332373554"
         },
         body: formData
       });
       const data = await res.json();
       if (data.success) {
-        notify("success", "Datei erfolgreich hochgeladen");
-        fetchData();
+        toast.success("Datei hochgeladen");
+        fetchMedia();
       } else {
-        notify("error", data.detail || "Upload fehlgeschlagen");
+        toast.error(data.detail || "Upload fehlgeschlagen");
       }
     } catch (err) {
-      notify("error", "Upload fehlgeschlagen");
+      toast.error("Upload fehlgeschlagen");
     } finally {
       setUploading(false);
     }
   };
 
-  const handleMove = async (id: number, newFolder: string) => {
-    try {
-      const res = await fetch(`${API_URL}/dashboard/cms/media/${id}`, {
-        method: "PUT",
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-          "X-User-ID": user?.id || "1"
-        },
-        body: JSON.stringify({ folder: newFolder })
-      });
-      if (res.ok) {
-        notify("success", `Verschoben nach ${newFolder}`);
-        setMovingId(null);
-        fetchData();
-      }
-    } catch {
-      notify("error", "Fehler beim Verschieben");
-    }
-  };
-
   const handleDelete = async (id: number) => {
     if (!confirm("Datei wirklich löschen?")) return;
-    notify("sending", "Datei wird gelöscht...");
+    
+    const oldMedia = [...media];
+    setMedia(media.filter(m => m.id !== id));
+
     try {
       const res = await fetch(`${API_URL}/dashboard/cms/media/${id}`, {
         method: "DELETE",
         headers: { 
           "Authorization": `Bearer ${token}`,
-          "X-User-ID": user?.id || "1"
+          "X-User-ID": user?.id || "1427994077332373554"
         }
       });
       const data = await res.json();
       if (data.success) {
-        notify("success", "Datei erfolgreich gelöscht");
-        fetchData();
+        toast.success("Datei gelöscht");
+        fetchMedia();
+      } else {
+        setMedia(oldMedia);
+        toast.error(data.detail || "Fehler beim Löschen");
       }
     } catch (err) {
-      notify("error", "Fehler beim Löschen");
+      setMedia(oldMedia);
+      toast.error("Fehler beim Löschen");
+    }
+  };
+
+  const toggleStock = async (item: MediaItemEx) => {
+    const newStatus = !item.is_stock;
+    const oldMedia = [...media];
+    
+    // Optimistic Update
+    setMedia(media.map(m => m.id === item.id ? { ...m, is_stock: newStatus } : m));
+
+    try {
+      const res = await fetch(`${API_URL}/dashboard/cms/media/${item.id}`, {
+        method: "PUT",
+        headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "X-User-ID": user?.id || "1427994077332373554"
+        },
+        body: JSON.stringify({ is_stock: newStatus })
+      });
+      const data = await res.json();
+      if (!data.success) {
+         setMedia(oldMedia);
+         toast.error("Fehler beim Aktualisieren");
+      } else {
+         toast.success(newStatus ? "Als Stockfoto markiert" : "Markierung entfernt");
+      }
+    } catch (err) {
+      setMedia(oldMedia);
+      toast.error("Fehler beim Aktualisieren");
     }
   };
 
@@ -197,229 +144,142 @@ export default function CMSMediaTab({ notify }: { notify: (type: StatusType, msg
     navigator.clipboard.writeText(text);
     toast.success("URL kopiert!");
   };
+  
+  const copyEmbedUrl = (id: number) => {
+     // Discord embed URL
+     const url = `${API_URL}/dashboard/cms/media/view/${id}`;
+     navigator.clipboard.writeText(url);
+     toast.success("Discord Embed-URL kopiert!");
+  };
+
+  const getFileIcon = (mime: string) => {
+    if (mime.startsWith('image/')) return <ImageIcon className="w-6 h-6" />;
+    if (mime.startsWith('video/')) return <Film className="w-6 h-6" />;
+    if (mime === 'application/pdf') return <FileText className="w-6 h-6" />;
+    return <FileIcon className="w-6 h-6" />;
+  };
 
   const filteredMedia = media.filter(m => {
-    const matchesSearch = m.original_name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFolder = activeFolder === "all" || m.folder === activeFolder;
-    return matchesSearch && matchesFolder;
+    const matchesSearch = m.original_name.toLowerCase().includes(searchQuery.toLowerCase()) || m.mime_type.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTab = filterMode === "all" || (filterMode === "stock" && m.is_stock) || (filterMode === "uploads" && !m.is_stock);
+    return matchesSearch && matchesTab;
   });
 
   return (
-    <div className="flex flex-col md:flex-row gap-8 h-full min-h-[600px] animate-in fade-in duration-500">
-      {/* Sidebar Folders */}
-      <div className="w-full md:w-64 shrink-0 flex flex-col gap-6">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-2">
-            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Mediathek</h3>
-            <button 
-              onClick={() => setShowNewFolderInput(!showNewFolderInput)}
-              className="p-1.5 rounded-lg bg-white/5 hover:bg-primary/20 text-muted-foreground hover:text-primary transition-all shadow-sm"
-              title="Neuer Ordner"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-
-          {showNewFolderInput && (
-            <div className="px-2 space-y-2 animate-in slide-in-from-top-2 duration-200">
-               <input 
-                 autoFocus
-                 type="text" 
-                 placeholder="Ordnername..."
-                 value={newFolderName}
-                 onChange={e => setNewFolderName(e.target.value)}
-                 onKeyDown={e => e.key === "Enter" && handleCreateFolder()}
-                 className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-xs focus:border-primary outline-none shadow-inner"
-               />
-               <div className="flex gap-2">
-                  <button onClick={handleCreateFolder} className="flex-1 bg-primary text-white text-[10px] font-bold py-1.5 rounded-lg uppercase">Erstellen</button>
-                  <button onClick={() => setShowNewFolderInput(false)} className="px-3 bg-white/5 text-muted-foreground py-1.5 rounded-lg"><X className="w-3 h-3" /></button>
-               </div>
-            </div>
-          )}
-
-          <div className="space-y-1">
-            <button 
-              onClick={() => setActiveFolder("all")}
-              className={cn(
-                "w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all group",
-                activeFolder === "all" ? "bg-primary text-white shadow-xl shadow-primary/20 scale-[1.02]" : "text-muted-foreground hover:bg-white/5 hover:text-white"
-              )}
-            >
-              <div className="flex items-center gap-3">
-                <FolderOpen className={cn("w-4 h-4", activeFolder === "all" ? "text-white" : "text-primary")} />
-                Alle Medien
-              </div>
-              <span className="text-[10px] opacity-60 bg-black/20 px-2 py-0.5 rounded-full">{media.length}</span>
-            </button>
-
-            <div className="pt-2 pb-1 px-2">
-               <div className="h-px bg-white/5 w-full" />
-            </div>
-
-            {allFolders.map(f => (
-              <div key={f} className="group/folder relative">
-                <button 
-                  onClick={() => setActiveFolder(f)}
-                  className={cn(
-                    "w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all",
-                    activeFolder === f ? "bg-white/10 text-white border border-white/5 shadow-lg" : "text-muted-foreground hover:bg-white/5 hover:text-white"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Folder className={cn("w-4 h-4", activeFolder === f ? "text-primary" : "text-muted-foreground/40")} />
-                    <span className="truncate max-w-[120px]">{f}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] opacity-40">
-                      {media.filter(m => m.folder === f).length}
-                    </span>
-                  </div>
-                </button>
-                {f !== "general" && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleDeleteFolder(f); }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 opacity-0 group-hover/folder:opacity-100 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
-                    title="Ordner löschen"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Mediathek</h2>
+          <p className="text-muted-foreground text-sm">Verwalte deine hochgeladenen Bilder und Dateien.</p>
         </div>
-
-        <div className="mt-auto p-5 glass-strong rounded-3xl border border-white/5 space-y-4 shadow-2xl relative overflow-hidden group">
-           <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-           <h4 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground relative">Cloud-Speicher</h4>
-           <div className="space-y-2 relative">
-             <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
-                <div className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{ width: `${Math.min(100, (media.reduce((acc, m) => acc + m.size_bytes, 0) / (100 * 1024 * 1024)) * 100)}%` }} />
-             </div>
-             <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground">
-                <span>{(media.reduce((acc, m) => acc + m.size_bytes, 0) / 1024 / 1024).toFixed(1)} MB</span>
-                <span className="text-white/20">/ 100 MB</span>
-             </div>
-           </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="relative flex-1 w-full max-w-md group">
-            <div className="absolute inset-0 bg-primary/10 blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+        
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input 
               type="text"
-              placeholder={`${activeFolder === "all" ? "Alle Medien" : activeFolder} durchsuchen...`}
+              placeholder="Suchen..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-11 pr-4 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all relative z-10"
+              className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs focus:ring-1 focus:ring-primary outline-none transition-all"
             />
           </div>
           
           <label className={cn(
-            "btn-primary flex items-center gap-3 !px-8 !py-3.5 !text-xs cursor-pointer group shadow-2xl shadow-primary/20",
+            "btn-primary flex items-center gap-2 !px-5 !py-2.5 !text-xs cursor-pointer whitespace-nowrap",
             uploading && "opacity-50 pointer-events-none"
           )}>
-            <Upload className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
-            {uploading ? "Wird hochgeladen..." : "Datei hochladen"}
+            <Upload className="w-4 h-4" />
+            {uploading ? "Wird hochgeladen..." : "Hochladen"}
             <input type="file" className="hidden" onChange={handleUpload} disabled={uploading} />
           </label>
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 overflow-y-auto pr-2 custom-scrollbar pb-10">
+      <div className="flex gap-2 p-1 bg-white/5 border border-white/10 w-fit rounded-xl">
+         <button onClick={() => setFilterMode("all")} className={cn("px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all", filterMode === "all" ? "bg-primary text-white" : "text-muted-foreground hover:text-white")}>Alle</button>
+         <button onClick={() => setFilterMode("uploads")} className={cn("px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all", filterMode === "uploads" ? "bg-primary text-white" : "text-muted-foreground hover:text-white")}>Uploads</button>
+         <button onClick={() => setFilterMode("stock")} className={cn("px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all", filterMode === "stock" ? "bg-amber-500 text-white" : "text-muted-foreground hover:text-amber-400")}>Stockfotos</button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : filteredMedia.length > 0 ? (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {filteredMedia.map((item) => (
-            <div key={item.id} className="group relative glass-strong rounded-[2rem] border border-white/5 overflow-hidden aspect-square hover:border-primary/50 transition-all shadow-xl hover:shadow-primary/10">
+            <div key={item.id} className="group relative glass-strong rounded-2xl border border-white/10 overflow-hidden aspect-square">
+              {item.is_stock && (
+                 <div className="absolute top-2 left-2 z-10 p-1.5 bg-amber-500/20 text-amber-500 backdrop-blur-md rounded-lg">
+                    <Star className="w-4 h-4 fill-amber-500" />
+                 </div>
+              )}
               {item.mime_type.startsWith('image/') ? (
                 <img 
                   src={`${API_URL}${item.url}`} 
                   alt={item.original_name}
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-white/[0.02] text-muted-foreground">
-                  <FileText className="w-10 h-10 opacity-10" />
-                  <span className="text-[9px] mt-3 font-black uppercase tracking-widest px-4 text-center line-clamp-1">{item.original_name}</span>
+                <div className="w-full h-full flex flex-col items-center justify-center bg-white/5 text-muted-foreground">
+                  {getFileIcon(item.mime_type)}
+                  <span className="text-[10px] mt-2 font-bold px-2 text-center line-clamp-1">{item.original_name}</span>
                 </div>
               )}
               
-              <div className={cn(
-                "absolute inset-0 bg-black/90 transition-all duration-500 flex flex-col items-center justify-center p-6 backdrop-blur-sm",
-                movingId === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-              )}>
-                <p className="text-[10px] font-black text-white text-center line-clamp-2 mb-6 uppercase tracking-widest leading-relaxed">{item.original_name}</p>
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-4">
+                <p className="text-[10px] font-bold text-white text-center line-clamp-2 mb-2">{item.original_name}</p>
                 
-                <div className="grid grid-cols-2 gap-3 w-full">
+                {/* Actions Grid */}
+                <div className="grid grid-cols-2 gap-2 w-full max-w-[120px]">
                   <button 
-                    onClick={() => copyToClipboard(`${API_URL}${item.url}`)}
-                    className="p-3 rounded-2xl bg-white/5 hover:bg-primary hover:text-white transition-all text-white flex items-center justify-center border border-white/5"
-                    title="URL kopieren"
+                    onClick={() => toggleStock(item)}
+                    className={cn("p-2 flex items-center justify-center rounded-lg transition-all", item.is_stock ? "bg-amber-500/20 text-amber-500 hover:bg-amber-500/30" : "bg-white/10 hover:bg-amber-500 hover:text-white text-white")}
+                    title={item.is_stock ? "Markierung entfernen" : "Als Stockfoto markieren"}
                   >
-                    <Link className="w-4 h-4" />
+                    <Star className={cn("w-4 h-4", item.is_stock && "fill-amber-500")} />
                   </button>
                   <button 
                     onClick={() => handleDelete(item.id)}
-                    className="p-3 rounded-2xl bg-white/5 hover:bg-rose-500 hover:text-white transition-all text-white flex items-center justify-center border border-white/5"
+                    className="p-2 flex items-center justify-center rounded-lg bg-white/10 hover:bg-red-500 hover:text-white transition-all text-white"
                     title="Löschen"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                  
-                  <div className="col-span-2 relative">
-                    <button 
-                      onClick={() => setMovingId(movingId === item.id ? null : item.id)}
-                      className={cn(
-                        "w-full py-3 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 border border-white/5 transition-all",
-                        movingId === item.id ? "bg-primary text-white" : "bg-white/5 hover:bg-white/10"
-                      )}
-                    >
-                       <Move className={cn("w-3 h-3", movingId === item.id ? "text-white" : "text-primary")} /> {movingId === item.id ? "Abbrechen" : "Verschieben"}
-                    </button>
-                    
-                    {movingId === item.id && (
-                      <div className="absolute bottom-full left-0 right-0 mb-2 bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden z-20 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
-                         <div className="p-2 text-[8px] font-black text-muted-foreground uppercase tracking-widest border-b border-white/5 bg-white/[0.02]">Ziel wählen</div>
-                         <div className="max-h-40 overflow-y-auto custom-scrollbar">
-                           {allFolders.filter(f => f !== item.folder).map(f => (
-                             <button 
-                               key={f}
-                               onClick={() => handleMove(item.id, f)}
-                               className="w-full px-4 py-2.5 text-[9px] font-bold text-left hover:bg-primary hover:text-white transition-colors border-b border-white/5 last:border-0 flex items-center gap-2"
-                             >
-                               <ChevronRight className="w-3 h-3 opacity-40" /> {f}
-                             </button>
-                           ))}
-                         </div>
-                      </div>
-                    )}
-                  </div>
+                  <button 
+                    onClick={() => copyToClipboard(`${API_URL}${item.url}`)}
+                    className="p-2 flex items-center justify-center rounded-lg bg-white/10 hover:bg-primary hover:text-white transition-all text-white col-span-2"
+                    title="Bild-URL kopieren"
+                  >
+                    <Link className="w-4 h-4 mr-2" />
+                    <span className="text-[10px] font-bold uppercase">Direkt-URL</span>
+                  </button>
+                  {item.mime_type.startsWith('image/') && (
+                     <button 
+                       onClick={() => copyEmbedUrl(item.id)}
+                       className="p-2 flex items-center justify-center rounded-lg bg-[#5865F2]/20 text-[#5865F2] hover:bg-[#5865F2] hover:text-white transition-all col-span-2"
+                       title="Discord Embed URL kopieren"
+                     >
+                       <ImageIcon className="w-4 h-4 mr-2" />
+                       <span className="text-[10px] font-bold uppercase">Discord Embed</span>
+                     </button>
+                  )}
                 </div>
-              </div>
 
-              {/* Label Tags */}
-              <div className="absolute top-3 left-3 flex flex-col gap-1.5 pointer-events-none">
-                 <div className="px-2 py-0.5 rounded-lg bg-black/60 text-[8px] font-black uppercase tracking-widest text-primary backdrop-blur-md border border-white/5 shadow-lg">
-                    {item.folder}
-                 </div>
+                <div className="text-[8px] text-white/60 mt-1">
+                  {(item.size_bytes / 1024 / 1024).toFixed(2)} MB
+                </div>
               </div>
             </div>
           ))}
-          
-          {filteredMedia.length === 0 && (
-             <div className="col-span-full py-32 text-center border border-dashed border-white/10 rounded-[3rem] bg-white/[0.01]">
-                <div className="relative inline-block mb-6">
-                   <FolderOpen className="w-16 h-16 text-white/5 mx-auto" />
-                   <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                </div>
-                <p className="text-muted-foreground text-xs font-black uppercase tracking-[0.3em]">Dieser Ordner ist leer</p>
-                <p className="text-[10px] text-white/20 mt-2 font-bold italic">Lade Bilder hoch, um sie hier zu sehen.</p>
-             </div>
-          )}
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 glass-strong rounded-[2rem] border border-dashed border-white/10">
+          <ImageIcon className="w-12 h-12 text-muted-foreground/20 mb-4" />
+          <p className="text-muted-foreground text-sm font-bold uppercase tracking-widest">Keine Medien gefunden</p>
+        </div>
+      )}
     </div>
   );
 }

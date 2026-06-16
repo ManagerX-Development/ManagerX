@@ -15,7 +15,6 @@ import { API_URL } from "../../lib/api";
 import { useAuth } from "../../components/core/AuthProvider";
 import { toast } from "sonner";
 import { cn } from "../../lib/utils";
-import { StatusType } from "./CMSStatusIndicator";
 
 interface Tag {
   id: number;
@@ -25,7 +24,7 @@ interface Tag {
   emoji: string;
 }
 
-const CMSTagsTab = ({ notify }: { notify: (type: StatusType, msg: string) => void }) => {
+const CMSTagsTab = () => {
   const { token } = useAuth();
   const [tags, setTags] = useState<Tag[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +57,6 @@ const CMSTagsTab = ({ notify }: { notify: (type: StatusType, msg: string) => voi
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    notify("sending", "Tag wird erstellt...");
     try {
       const res = await fetch(`${API_URL}/dashboard/cms/tags`, {
         method: "POST",
@@ -70,18 +68,17 @@ const CMSTagsTab = ({ notify }: { notify: (type: StatusType, msg: string) => voi
       });
       const json = await res.json();
       if (json.success) {
-        notify("success", "Tag erfolgreich erstellt");
+        toast.success("Tag erstellt!");
         setShowAddForm(false);
         setFormData({ name: "", slug: "", color: "#3b82f6", emoji: "" });
         fetchTags();
       }
     } catch (err) {
-      notify("error", "Erstellen fehlgeschlagen");
+      toast.error("Fehler beim Erstellen");
     }
   };
 
   const handleUpdate = async (tagId: number) => {
-    notify("sending", "Tag wird aktualisiert...");
     try {
       const tagToUpdate = tags.find(t => t.id === tagId);
       if (!tagToUpdate) return;
@@ -96,17 +93,16 @@ const CMSTagsTab = ({ notify }: { notify: (type: StatusType, msg: string) => voi
       });
       const json = await res.json();
       if (json.success) {
-        notify("success", "Tag erfolgreich aktualisiert");
+        toast.success("Tag aktualisiert");
         setIsEditing(null);
       }
     } catch (err) {
-      notify("error", "Aktualisierung fehlgeschlagen");
+      toast.error("Fehler beim Speichern");
     }
   };
 
   const handleDelete = async (tagId: number) => {
     if (!confirm("Tag wirklich löschen?")) return;
-    notify("sending", "Tag wird gelöscht...");
     
     // Optimistic Update
     const oldTags = [...tags];
@@ -121,15 +117,15 @@ const CMSTagsTab = ({ notify }: { notify: (type: StatusType, msg: string) => voi
       });
       const json = await res.json();
       if (json.success) {
-        notify("success", "Tag erfolgreich gelöscht");
+        toast.success("Tag gelöscht");
         fetchTags();
       } else {
         setTags(oldTags);
-        notify("error", "Löschen fehlgeschlagen");
+        toast.error("Fehler beim Löschen");
       }
     } catch (err) {
       setTags(oldTags);
-      notify("error", "Löschen fehlgeschlagen");
+      toast.error("Fehler beim Löschen");
     }
   };
 

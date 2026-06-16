@@ -543,6 +543,17 @@ class StatsDB(MariaConnector):
                 logger.error(f"get_active_voice_count fehlgeschlagen: {e}")
                 return 0
 
+    async def clear_active_voice_sessions(self):
+        await self.ensure_connection()
+        async with self.lock:
+            try:
+                async with self.pool.acquire() as conn:
+                    async with conn.cursor() as cur:
+                        await cur.execute('DELETE FROM active_voice_sessions')
+                    await conn.commit()
+            except Exception as e:
+                logger.error(f"clear_active_voice_sessions fehlgeschlagen: {e}")
+
     async def get_dashboard_analytics(self) -> dict:
         await self.ensure_connection()
         async with self.lock:

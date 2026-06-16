@@ -27,7 +27,7 @@ export const LeaderboardPage = memo(function LeaderboardPage() {
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
-                const response = await fetch(`${API_URL}/v1/managerx/leaderboard`);
+                const response = await fetch(`${API_URL}/public/leaderboard`);
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success) {

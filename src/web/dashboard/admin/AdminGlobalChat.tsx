@@ -40,7 +40,7 @@ export default function AdminGlobalChat({ onClose }: AdminGlobalChatProps) {
     setLoading(true);
     try {
       const endpoint = activeTab === 'logs' ? 'logs' : 'blacklist';
-      const res = await fetch(`${API_URL}/dashboard/admin/global-chat/${endpoint}`, {
+      const res = await fetch(`${API_URL}/admin/global-chat/${endpoint}`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const json = await res.json();

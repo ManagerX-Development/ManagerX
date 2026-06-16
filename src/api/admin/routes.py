@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
-from src.api.dashboard.auth_routes import get_current_user
-from .cms.utils import is_admin
+from fastapi import APIRouter, HTTPException, Depends
+from src.api.dashboard.dependencies import get_current_user, get_bot
+from src.api.dashboard.schemas import BlacklistAddRequest
+from src.api.dashboard.cms.utils import is_admin
 from src.bot.core.config import BotConfig
 import discord
 import psutil
@@ -11,10 +12,7 @@ router = APIRouter(
     tags=["admin"]
 )
 
-# Shared bot instance access (imported from .routes)
-def get_bot():
-    from .routes import bot_instance
-    return bot_instance
+
 
 @router.get("/global-stats")
 async def get_admin_global_stats(user: dict = Depends(get_current_user)):
@@ -63,10 +61,9 @@ async def get_admin_blacklist(user: dict = Depends(get_current_user)):
     return {"success": True, "data": data}
 
 @router.post("/blacklist")
-async def add_admin_blacklist(request: Request, user: dict = Depends(get_current_user)):
-    data = await request.json()
-    target_id = data.get("user_id")
-    reason = data.get("reason", "Kein Grund angegeben")
+async def add_admin_blacklist(data: BlacklistAddRequest, user: dict = Depends(get_current_user)):
+    target_id = data.user_id
+    reason = data.reason
     if not target_id:
         raise HTTPException(status_code=400, detail="Target User ID is required")
 

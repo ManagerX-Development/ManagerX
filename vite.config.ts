@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: "../../dist",
+    outDir: "../../build",
     emptyOutDir: true,
 
     // ÄNDERUNG: Wir entfernen 'esbuild' als Minifier, da Vite 8 

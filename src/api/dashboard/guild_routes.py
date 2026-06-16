@@ -1,19 +1,14 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends
 from datetime import timedelta
 import discord
-from src.api.dashboard.auth_routes import get_current_user
+from .dependencies import get_current_user, get_bot
 
 router = APIRouter(
     prefix="/guilds",
     tags=["guilds"]
 )
 
-def get_bot():
-    from .routes import bot_instance
-    return bot_instance
-
-async def check_guild_perms(guild_id: int, user_id: int):
-    bot = get_bot()
+async def check_guild_perms(guild_id: int, user_id: int, bot):
     if bot is None:
         raise HTTPException(status_code=503, detail="Bot-Verbindung nicht verfügbar")
     
@@ -34,14 +29,14 @@ async def check_guild_perms(guild_id: int, user_id: int):
     return guild, member
 
 @router.get("/{guild_id}/channels")
-async def get_guild_channels(guild_id: int, user: dict = Depends(get_current_user)):
-    guild, _ = await check_guild_perms(guild_id, int(user["id"]))
+async def get_guild_channels(guild_id: int, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
+    guild, _ = await check_guild_perms(guild_id, int(user["id"]), bot)
     channels = [{"id": str(c.id), "name": c.name} for c in guild.text_channels]
     return {"channels": channels}
 
 @router.get("/{guild_id}/roles")
-async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user)):
-    guild, _ = await check_guild_perms(guild_id, int(user["id"]))
+async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
+    guild, _ = await check_guild_perms(guild_id, int(user["id"]), bot)
     roles = [
         {"id": str(r.id), "name": r.name, "color": str(r.color)}
         for r in guild.roles
@@ -50,21 +45,20 @@ async def get_guild_roles(guild_id: int, user: dict = Depends(get_current_user))
     return {"roles": roles}
 
 @router.get("/{guild_id}/categories")
-async def get_guild_categories(guild_id: int, user: dict = Depends(get_current_user)):
-    guild, _ = await check_guild_perms(guild_id, int(user["id"]))
+async def get_guild_categories(guild_id: int, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
+    guild, _ = await check_guild_perms(guild_id, int(user["id"]), bot)
     categories = [{"id": str(c.id), "name": c.name} for c in guild.categories]
     return {"categories": categories}
 
 @router.get("/{guild_id}/voice_channels")
-async def get_guild_voice_channels(guild_id: int, user: dict = Depends(get_current_user)):
-    guild, _ = await check_guild_perms(guild_id, int(user["id"]))
+async def get_guild_voice_channels(guild_id: int, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
+    guild, _ = await check_guild_perms(guild_id, int(user["id"]), bot)
     channels = [{"id": str(c.id), "name": c.name} for c in guild.voice_channels]
     return {"channels": channels}
 
 @router.get("/{guild_id}/stats")
-async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user)):
-    bot = get_bot()
-    guild, _ = await check_guild_perms(guild_id, int(user["id"]))
+async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
+    guild, _ = await check_guild_perms(guild_id, int(user["id"]), bot)
 
     today_dt = discord.utils.utcnow()
     today_str = today_dt.strftime('%Y-%m-%d')
@@ -145,12 +139,11 @@ async def get_guild_stats(guild_id: int, user: dict = Depends(get_current_user))
         return {"total_members": guild.member_count, "online_members": 0}
 
 @router.get("/{guild_id}/mega-data")
-async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user)):
-    bot = get_bot()
-    guild, _ = await check_guild_perms(guild_id, int(user["id"]))
+async def get_mega_data(guild_id: int, user: dict = Depends(get_current_user), bot = Depends(get_bot)):
+    guild, _ = await check_guild_perms(guild_id, int(user["id"]), bot)
 
     try:
-        stats = await get_guild_stats(guild_id, user)
+        stats = await get_guild_stats(guild_id, user, bot)
         from mxmariadb import WelcomeDatabase, AntiSpamDatabase, GlobalChatDatabase, LevelDatabase, LoggingDatabase, ManagementDatabase
         
         level_active = LevelDatabase().get_guild_config(guild_id).get("enabled", False) if LevelDatabase().get_guild_config(guild_id) else False

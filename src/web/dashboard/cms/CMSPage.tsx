@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LayoutDashboard, FileText, Image, ArrowLeft, Hash, ListTodo, Map, Users, MessageSquare } from "lucide-react";
-import { Link, Navigate } from "react-router-dom";
+import { LayoutDashboard, FileText, Image, BookOpen, ArrowLeft, Hash, ListTodo } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "../../lib/utils";
-
-// Tabs
 import CMSPostsTab from "./CMSPostsTab";
 import CMSMediaTab from "./CMSMediaTab";
 import CMSChangelogTab from "./CMSChangelogTab";
@@ -13,9 +11,12 @@ import CMSRoadmapTab from "./CMSRoadmapTab";
 import CMSTeamTab from "./CMSTeamTab";
 import CMSFeedbackTab from "./CMSFeedbackTab";
 
-// UI Components
 import { useAuth } from "../../components/core/AuthProvider";
-import { CMSStatusIndicator, StatusType } from "./CMSStatusIndicator";
+import { Navigate, Link } from "react-router-dom";
+import { Map, Users, FileText, Hash, Image, ListTodo, ArrowLeft, LayoutDashboard, MessageSquare } from "lucide-react";
+import { useState } from "react";
+import { cn } from "../../lib/utils";
+import { motion } from "framer-motion";
 
 const TABS = [
   { id: "posts",     label: "Beiträge",  icon: FileText },
@@ -26,39 +27,28 @@ const TABS = [
   { id: "team",      label: "Team",      icon: Users },
   { id: "feedback",  label: "Feedback",  icon: MessageSquare },
 ] as const;
-
 type Tab = typeof TABS[number]["id"];
 
 export default function CMSPage() {
   const { user, isAuthenticated, loading } = useAuth();
   const [tab, setTab] = useState<Tab>("posts");
-  
-  // Global CMS Status
-  const [status, setStatus] = useState<StatusType>("idle");
-  const [statusMessage, setStatusMessage] = useState("");
-
-  const notify = (type: StatusType, msg: string, duration = 2000) => {
-    setStatus(type);
-    setStatusMessage(msg);
-    if (type !== "sending") {
-      setTimeout(() => {
-        setStatus("idle");
-        setStatusMessage("");
-      }, duration);
-    }
-  };
 
   if (loading) return null;
 
+  // Sperre für Nicht-Admins (Frontend-Schutz)
   if (!isAuthenticated) {
     return <Navigate to="/dash/login" />;
   }
 
-  return (
-    <div className="min-h-screen bg-[#050505] text-white p-8 relative">
-      {/* Global Status Indicator for the whole CMS */}
-      <CMSStatusIndicator status={status} message={statusMessage} onClear={() => setStatus("idle")} />
+  // Nur cms_admin oder Bot-Owner zulassen
+  // Hinweis: Die genaue ID-Prüfung erfolgt zusätzlich im Backend
+  if (user?.id !== "cms_admin" && !user?.username?.toLowerCase().includes("admin")) {
+    // Wenn es nicht der cms_admin ist, lassen wir es erst mal durch, 
+    // das Backend wird 403 werfen wenn die Discord-ID nicht passt.
+  }
 
+  return (
+    <div className="min-h-screen bg-[#050505] text-white p-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-10">
           <div className="flex items-center gap-4 mb-4">
@@ -104,14 +94,13 @@ export default function CMSPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* We would pass the notify function to tabs here if they need it */}
-          {tab === "posts"     && <CMSPostsTab notify={notify} />}
-          {tab === "tags"      && <CMSTagsTab notify={notify} />}
-          {tab === "media"     && <CMSMediaTab notify={notify} />}
-          {tab === "changelog" && <CMSChangelogTab notify={notify} />}
-          {tab === "roadmap"   && <CMSRoadmapTab notify={notify} />}
-          {tab === "team"      && <CMSTeamTab notify={notify} />}
-          {tab === "feedback"  && <CMSFeedbackTab notify={notify} />}
+          {tab === "posts"     && <CMSPostsTab />}
+          {tab === "tags"      && <CMSTagsTab />}
+          {tab === "media"     && <CMSMediaTab />}
+          {tab === "changelog" && <CMSChangelogTab />}
+          {tab === "roadmap"   && <CMSRoadmapTab />}
+          {tab === "team"      && <CMSTeamTab />}
+          {tab === "feedback"  && <CMSFeedbackTab />}
         </motion.div>
       </div>
     </div>

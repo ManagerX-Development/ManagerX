@@ -7,7 +7,7 @@
 .vscode/
 data/
 !src/web/data/
-
+build/
 # Python
 __pycache__/
 *.pyc

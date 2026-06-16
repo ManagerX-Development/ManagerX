@@ -6,9 +6,8 @@ import { useAuth } from "../../components/core/AuthProvider";
 import { cn } from "../../lib/utils";
 import { Post, getPostType } from "./cmsTypes";
 import CMSPostEditor from "./CMSPostEditor";
-import { StatusType } from "./CMSStatusIndicator";
 
-export default function CMSPostsTab({ notify }: { notify: (type: StatusType, msg: string) => void }) {
+export default function CMSPostsTab() {
   const { user, token } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +54,6 @@ export default function CMSPostsTab({ notify }: { notify: (type: StatusType, msg
 
   const handleDelete = async (id: number) => {
     if (!confirm("Post wirklich löschen?")) return;
-    notify("sending", "Beitrag wird gelöscht...");
     try {
       const res = await fetch(`${API_URL}/dashboard/cms/posts/${id}`, {
         method: "DELETE",
@@ -66,11 +64,11 @@ export default function CMSPostsTab({ notify }: { notify: (type: StatusType, msg
       });
       const data = await res.json();
       if (data.success) {
-        notify("success", "Post erfolgreich gelöscht");
+        toast.success("Post gelöscht");
         fetchAdminPosts();
       }
     } catch (err) {
-      notify("error", "Löschen fehlgeschlagen");
+      toast.error("Fehler beim Löschen");
     }
   };
 
@@ -78,7 +76,6 @@ export default function CMSPostsTab({ notify }: { notify: (type: StatusType, msg
     // Optimistic Update: Sofort im UI ändern
     const oldPosts = [...posts];
     setPosts(posts.map(p => p.id === post.id ? { ...p, is_published: !p.is_published } : p));
-    notify("sending", post.is_published ? "Beitrag wird versteckt..." : "Beitrag wird veröffentlicht...");
 
     try {
       const res = await fetch(`${API_URL}/dashboard/cms/posts/${post.id}`, {
@@ -93,15 +90,15 @@ export default function CMSPostsTab({ notify }: { notify: (type: StatusType, msg
       if (!res.ok) {
         // Rollback bei Fehler
         setPosts(oldPosts);
-        notify("error", "Status-Update fehlgeschlagen");
+        toast.error("Fehler beim Umschalten");
       } else {
-        notify("success", post.is_published ? "Beitrag jetzt versteckt" : "Beitrag jetzt öffentlich");
+        toast.success(post.is_published ? "Beitrag versteckt" : "Beitrag veröffentlicht");
         // Optional: Nochmal echt laden zur Sicherheit
         fetchAdminPosts();
       }
     } catch (err) {
       setPosts(oldPosts);
-      notify("error", "Verbindungsfehler");
+      toast.error("Fehler beim Umschalten");
     }
   };
 
@@ -244,7 +241,6 @@ export default function CMSPostsTab({ notify }: { notify: (type: StatusType, msg
         <CMSPostEditor 
           post={editingPost} 
           onClose={() => setIsEditorOpen(false)} 
-          notify={notify}
           onSave={() => {
             setIsEditorOpen(false);
             fetchAdminPosts();

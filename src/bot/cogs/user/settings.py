@@ -23,7 +23,9 @@ from mxmariadb import (
     ProfileDB, SettingsDB, AutoDeleteDB,
     AntiSpamDatabase, TempVCDatabase
 )
-from mxmariadb import GlobalChatDatabase
+from mxmariadb import (
+    GlobalChatDatabase, EconomyDatabase
+)
 
 class Settings(ezcord.Cog):
     """Cog für Benutzereinstellungen, Sprache und Datenverwaltung."""
@@ -80,18 +82,17 @@ class Settings(ezcord.Cog):
 
         try:
             # Daten aus den verschiedenen Modulen sammeln
-            # Hinweis: Manche Methoden müssen in deinen DB-Klassen existieren
-            export_data["content"]["settings"] = SettingsDB().get_user_language(uid)
-            export_data["content"]["profile"] = ProfileDB().get_user_profile(uid)
-            export_data["content"]["leveling"] = LevelDatabase().get_user_data(uid)
-            export_data["content"]["global_chat_history"] = global_db.get_user_message_history(uid, limit=50)
+            export_data["content"]["settings"] = await SettingsDB().get_user_language(uid)
+            export_data["content"]["profile"] = await ProfileDB().get_profile(uid)
+            export_data["content"]["economy"] = await EconomyDatabase().get_user_economy_info(uid)
+            export_data["content"]["global_chat_history"] = await GlobalChatDatabase().get_user_message_history(uid, limit=50)
             
             # Moderationsdaten (nur für diesen Server)
             warn_db = WarnDatabase(".")
-            export_data["content"]["local_warnings"] = warn_db.get_warnings(ctx.guild.id, uid)
+            export_data["content"]["local_warnings"] = await warn_db.get_warnings(ctx.guild.id, uid)
             
             notes_db = NotesDatabase(".")
-            export_data["content"]["local_notes"] = notes_db.get_notes(ctx.guild.id, uid)
+            export_data["content"]["local_notes"] = await notes_db.get_notes(ctx.guild.id, uid)
 
         except Exception as e:
             print(f"Export-Fehler: {e}")
@@ -165,12 +166,13 @@ class DeletionConfirmationView(discord.ui.View):
         try:
             # Löschung der persönlichen Daten
             await StatsDB().delete_user_data(uid)
-            LevelDatabase().delete_user_data(uid)
-            ProfileDB().delete_user_data(uid)
-            SettingsDB().delete_user_data(uid)
-            global_db.delete_user_data(uid)
-            AntiSpamDatabase().delete_user_data(uid)
-            TempVCDatabase().delete_user_data(uid)
+            await LevelDatabase().delete_user_data(uid)
+            await ProfileDB().delete_user_data(uid)
+            await SettingsDB().delete_user_data(uid)
+            await GlobalChatDatabase().delete_user_data(uid)
+            await AntiSpamDatabase().delete_user_data(uid)
+            await TempVCDatabase().delete_user_data(uid)
+            await EconomyDatabase().delete_user_data(uid)
             
             # Moderation (Warns/Notes) wird hier NICHT gelöscht!
 

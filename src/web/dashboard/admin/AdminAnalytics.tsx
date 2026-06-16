@@ -26,7 +26,7 @@ export default function AdminAnalytics({ onClose }: AdminAnalyticsProps) {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/dashboard/admin/top-commands`, {
+      const res = await fetch(`${API_URL}/admin/top-commands`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const json = await res.json();
