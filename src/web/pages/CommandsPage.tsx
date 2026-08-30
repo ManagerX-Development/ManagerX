@@ -27,7 +27,7 @@ const CommandCard = memo(({ command }: { command: Command }) => {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.2 }}
-                    className="group p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-primary/20 hover:bg-white/[0.08] transition-all duration-300 relative overflow-hidden flex flex-col h-full"
+                    className="group p-6 rounded-[2rem] bg-white/5 border border-white/5 hover:border-transparent hover:border-animated hover:shine transition-all duration-300 relative overflow-hidden flex flex-col h-full hover:shadow-[0_0_40px_rgba(220,38,38,0.2)]"
                 >
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Terminal className="w-12 h-12 text-primary" />

@@ -137,9 +137,11 @@ const Status = memo(function Status() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 className={cn(
-                  "glass rounded-2xl p-6 border flex flex-col md:flex-row items-center justify-between gap-6 relative",
-                  system.status === "online" ? "border-white/5" : "border-red-500/20 bg-red-500/[0.02]",
-                  system.isParent && system.status === "online" ? "border-primary/20 bg-primary/[0.01]" : ""
+                  "glass rounded-2xl p-6 border flex flex-col md:flex-row items-center justify-between gap-6 relative transition-all duration-300",
+                  system.status === "online" 
+                    ? "border-white/5 hover:border-green-500/20 hover:shadow-[0_0_30px_rgba(34,197,94,0.1)]" 
+                    : "border-red-500/20 bg-red-500/[0.02] hover:border-red-500/35 hover:shadow-[0_0_30px_rgba(239,68,68,0.1)]",
+                  system.isParent && system.status === "online" ? "border-primary/20 bg-primary/[0.01] hover:border-primary/40 hover:shadow-[0_0_35px_rgba(220,38,38,0.15)]" : ""
                 )}
               >
                 <div className="flex items-center gap-5 w-full">

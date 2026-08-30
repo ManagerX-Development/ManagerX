@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../components/core/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { 
-    LayoutDashboard, 
-    Search, 
-    Plus, 
-    ChevronRight, 
-    Shield, 
-    Sparkles, 
-    Users, 
+import {
+    LayoutDashboard,
+    Search,
+    Plus,
+    ChevronRight,
+    Shield,
+    Sparkles,
+    Users,
     Settings,
     Server
 } from "lucide-react";
@@ -23,7 +23,7 @@ export default function GuildSelectionPage() {
     const [search, setSearch] = useState("");
     const navigate = useNavigate();
 
-    const filteredGuilds = guilds.filter(g => 
+    const filteredGuilds = guilds.filter(g =>
         g.name.toLowerCase().includes(search.toLowerCase())
     );
 
@@ -43,7 +43,7 @@ export default function GuildSelectionPage() {
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                     <div className="space-y-4">
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit"
@@ -52,9 +52,9 @@ export default function GuildSelectionPage() {
                             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Willkommen zurück, {user?.username}</span>
                         </motion.div>
                         <motion.div
-                             initial={{ opacity: 0, x: -20 }}
-                             animate={{ opacity: 1, x: 0 }}
-                             transition={{ delay: 0.1 }}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.1 }}
                         >
                             <h1 className="text-5xl md:text-6xl font-black tracking-tighter text-white">
                                 Server <span className="text-primary">Zentrale</span>
@@ -65,14 +65,14 @@ export default function GuildSelectionPage() {
                         </motion.div>
                     </div>
 
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.2 }}
                         className="relative group w-full md:w-80"
                     >
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input 
+                        <Input
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             placeholder="Server suchen..."
@@ -90,18 +90,18 @@ export default function GuildSelectionPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 + index * 0.05 }}
                         >
-                            <Card 
+                            <Card
                                 onClick={() => handleSelect(guild.id)}
-                                className="group relative glass border-white/10 hover:border-primary/40 shadow-2xl rounded-[2.5rem] overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                className="group relative glass border-white/10 hover:border-transparent hover:border-animated hover:shine shadow-2xl rounded-[2.5rem] overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_0_40px_rgba(220,38,38,0.25)]"
                             >
                                 <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 <CardContent className="p-8 relative">
                                     <div className="flex items-center justify-between mb-8">
                                         <div className="w-20 h-20 rounded-[2rem] bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shadow-2xl group-hover:border-primary/20 transition-all">
                                             {guild.icon ? (
-                                                <img 
-                                                    src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=256`} 
-                                                    alt={guild.name} 
+                                                <img
+                                                    src={`https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png?size=256`}
+                                                    alt={guild.name}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
@@ -132,7 +132,7 @@ export default function GuildSelectionPage() {
 
                     {/* Invite Button Card */}
                     <motion.a
-                        href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
+                        href="https://discord.com/oauth2/authorize?client_id=1542970562588975135&permissions=8866461766385655&integration_type=0&scope=bot"
                         target="_blank"
                         rel="noopener noreferrer"
                         initial={{ opacity: 0, y: 20 }}
@@ -155,7 +155,7 @@ export default function GuildSelectionPage() {
                 </div>
 
                 {filteredGuilds.length === 0 && search && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className="text-center py-20"

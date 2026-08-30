@@ -91,7 +91,7 @@ export const FAQ = memo(function FAQ() {
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="glass rounded-2xl px-6 border border-white/5 overflow-hidden hover:bg-white/[0.02] transition-all duration-300"
+                className="glass rounded-2xl px-6 border border-white/5 hover:border-primary/20 [&[data-state=open]]:border-primary/40 [&[data-state=open]]:shadow-[0_0_30px_rgba(220,38,38,0.15)] overflow-hidden hover:bg-white/[0.02] transition-all duration-300"
               >
                 <AccordionTrigger className="text-left text-base md:text-lg font-bold text-foreground/90 hover:no-underline py-5 [&[data-state=open]]:text-primary">
                   <span className="flex items-center gap-4">
