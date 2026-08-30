@@ -16,8 +16,8 @@ export const LEGAL_CONFIG = {
   hosting: {
     provider: "Self-Hosted / Managed Server",
     location: "Deutschland (Frankfurt am Main)",
-    details: "Serverbetrieb durch ManagerX Development Network in einem ISO-zertifizierten Rechenzentrum."
+    details: "Serverbetrieb durch ManagerX Development Network in einem Rechenzentrum in Deutschland."
   },
   version: "2.0.0",
-  lastUpdate: "1. April 2026"
+  lastUpdate: "29. August 2026"
 };

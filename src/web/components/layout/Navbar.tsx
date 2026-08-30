@@ -203,7 +203,7 @@ export function Navbar() {
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
+                href="https://discord.com/oauth2/authorize?client_id=1542970562588975135&permissions=1669118160151&integration_type=0&scope=bot"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary inline-flex items-center gap-2.5 !px-6 !py-2.5 !text-sm"
@@ -281,7 +281,7 @@ export function Navbar() {
                 </Link>
               )}
               <a
-                href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
+                href="https://discord.com/oauth2/authorize?client_id=1542970562588975135&permissions=1669118160151&integration_type=0&scope=bot"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-3 bg-primary text-white p-5 rounded-2xl text-center font-bold tracking-tight shadow-xl shadow-primary/20"

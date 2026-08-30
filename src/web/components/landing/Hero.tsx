@@ -27,6 +27,46 @@ export const Hero = memo(function Hero() {
       {/* High-End Grid Pattern */}
       <div className="absolute inset-0 opacity-[0.07] grid-pattern [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)]" />
 
+      {/* Floating Decorative Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            y: [0, -30, 0],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute top-[20%] left-[10%] w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary/10 to-accent/5 border border-white/5 blur-sm"
+        />
+        <motion.div
+          animate={{
+            y: [0, 40, 0],
+            rotate: [0, -180, -360],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute bottom-[20%] right-[15%] w-32 h-32 rounded-full bg-gradient-to-tr from-accent/10 to-primary/5 border border-white/5 blur-sm"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.4, 0.2],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-[40%] right-[25%] w-16 h-16 rounded-[1.5rem] bg-primary/10 border border-primary/20 blur-xs"
+        />
+      </div>
+
       <div className="container mx-auto relative z-10 px-4">
         <div className="flex flex-col items-center text-center max-w-6xl mx-auto w-full">
           {/* Elite Version Badge */}
@@ -74,12 +114,12 @@ export const Hero = memo(function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center gap-8 mb-32"
+            className="flex flex-col sm:flex-row items-center gap-8 mb-12"
           >
             <motion.a
               whileHover={{ scale: 1.05, y: -4 }}
               whileTap={{ scale: 0.95 }}
-              href="https://discord.com/oauth2/authorize?client_id=1368201272624287754&permissions=1669118160151&integration_type=0&scope=bot"
+              href="https://discord.com/oauth2/authorize?client_id=1542970562588975135&permissions=1669118160151&integration_type=0&scope=bot"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary !px-16 !py-6 !text-2xl shadow-[0_25px_60px_-15px_rgba(220,38,38,0.6)] flex items-center gap-4 group"
@@ -97,6 +137,26 @@ export const Hero = memo(function Hero() {
             </motion.a>
           </motion.div>
 
+          {/* Feature Ticker */}
+          <div className="w-full max-w-3xl overflow-hidden mb-20 relative">
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0a0c10] to-transparent z-10" />
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0a0c10] to-transparent z-10" />
+            <motion.div
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="flex gap-8 whitespace-nowrap"
+            >
+              {[...Array(2)].map((_, ri) =>
+                ["90+ Slash Commands", "Anti-Spam Protection", "Global Leaderboards", "Temp Voice Channels", "XP & Level System", "Open Source GPL-3.0", "Cross-Server Chat", "Moderation Logs"].map((item, i) => (
+                  <div key={`${ri}-${i}`} className="inline-flex items-center gap-3 px-5 py-2 rounded-full glass border border-white/5">
+                    <Zap className="w-3 h-3 text-primary" />
+                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40">{item}</span>
+                  </div>
+                ))
+              )}
+            </motion.div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full max-w-5xl">
             {stats.map((stat, index) => (
               <motion.div
@@ -104,15 +164,15 @@ export const Hero = memo(function Hero() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
-                className="glass-strong rounded-[2.5rem] p-10 border border-white/5 hover:border-primary/40 transition-all duration-500 group relative overflow-hidden"
+                className="glass-strong rounded-[2.5rem] p-10 border border-white/5 hover:border-transparent hover:border-animated hover:shine hover:shadow-[0_0_50px_rgba(220,38,38,0.2)] transition-all duration-500 group relative overflow-hidden cursor-default"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="flex flex-col items-center relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-6 text-primary group-hover:scale-110 group-hover:rotate-6 transition-all border border-white/5">
+                  <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-6 text-primary group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 border border-white/5 group-hover:border-primary/30 group-hover:shadow-[0_0_20px_rgba(220,38,38,0.3)]">
                     <stat.icon className="w-7 h-7" />
                   </div>
-                  <span className="text-4xl font-black text-white mb-2 tracking-tighter italic">{stat.value}</span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 group-hover:text-primary transition-colors">{stat.label}</span>
+                  <span className="text-4xl font-black text-white mb-2 tracking-tighter italic group-hover:text-primary transition-colors">{stat.value}</span>
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-500 group-hover:text-primary/70 transition-colors">{stat.label}</span>
                 </div>
               </motion.div>
             ))}

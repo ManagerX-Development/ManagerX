@@ -6,7 +6,8 @@ import {
   Award,
   Globe,
   Gamepad2,
-  Sparkles
+  Sparkles,
+  ChevronRight,
 } from "lucide-react";
 
 const featureCategories = [
@@ -71,6 +72,8 @@ export const Features = memo(function Features() {
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(220,38,38,0.03)_0%,transparent_70%)]" />
       <div className="absolute top-1/4 -left-48 w-[800px] h-[800px] bg-primary/10 blur-[180px] rounded-full opacity-30" />
       <div className="absolute bottom-1/4 -right-48 w-[900px] h-[900px] bg-accent/10 blur-[180px] rounded-full opacity-30" />
+      {/* Grid pattern overlay */}
+      <div className="absolute inset-0 opacity-[0.04] grid-pattern [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
 
       <div className="container mx-auto relative z-10 px-4">
         {/* Elite Section Header */}
@@ -83,6 +86,8 @@ export const Features = memo(function Features() {
           >
             <Sparkles className="w-4 h-4 text-primary animate-pulse" />
             <span className="text-[12px] font-black uppercase tracking-[0.4em] text-white/70">Next-Gen Architecture</span>
+            <ChevronRight className="w-3 h-3 text-white/30" />
+            <span className="text-[12px] font-black text-primary">4 Module</span>
           </motion.div>
 
           <motion.h2
@@ -106,7 +111,7 @@ export const Features = memo(function Features() {
         </div>
 
         {/* Feature Cards Elite Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {featureCategories.map((category, index) => (
             <FeatureCard
               key={category.title}
@@ -114,7 +119,8 @@ export const Features = memo(function Features() {
               title={category.title}
               features={category.features}
               category={category.category}
-              delay={index * 0.08}
+              delay={index * 0.1}
+              index={index}
             />
           ))}
         </div>

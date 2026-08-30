@@ -60,8 +60,12 @@ export const LeaderboardPage = memo(function LeaderboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay }}
                 className={cn(
-                    "relative flex flex-col items-center p-8 rounded-[2.5rem] glass border border-white/5 group overflow-hidden",
-                    isFirst ? "md:-translate-y-8 z-20 scale-110" : "z-10",
+                    "relative flex flex-col items-center p-8 rounded-[2.5rem] glass border border-white/5 group overflow-hidden hover:shine transition-all duration-500",
+                    isFirst 
+                        ? "md:-translate-y-8 z-20 scale-110 hover:shadow-[0_0_60px_rgba(251,191,36,0.25)] hover:border-yellow-500/50" 
+                        : (rank === 2 
+                            ? "z-10 hover:shadow-[0_0_50px_rgba(156,163,175,0.15)] hover:border-slate-400/50" 
+                            : "z-10 hover:shadow-[0_0_50px_rgba(180,83,9,0.15)] hover:border-amber-700/50"),
                     borderColor
                 )}
             >

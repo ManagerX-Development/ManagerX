@@ -149,7 +149,7 @@ export const PluginsPage = memo(function PluginsPage() {
           <article className="space-y-32">
             <Section id="ai-entertainment" title="AI Entertainment" icon={Gamepad2}>
               <p className="text-lg text-slate-400">Unsere Spiele-Engine basiert auf modernen Algorithmen, die ein forderndes Spielerlebnis direkt in Discord ermöglichen.</p>
-              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-6">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 hover:border-transparent hover:border-animated hover:shine hover:shadow-[0_0_40px_rgba(220,38,38,0.2)] space-y-6 transition-all duration-500 overflow-hidden">
                 <div className="flex items-center gap-4">
                   <Cpu className="w-6 h-6 text-primary" />
                   <h4 className="text-xl font-bold text-white">Neural Minigames</h4>
@@ -161,7 +161,7 @@ export const PluginsPage = memo(function PluginsPage() {
 
             <Section id="global-network" title="Global Network" icon={Globe}>
               <p className="text-lg text-slate-400">Verbinde deine Community mit tausenden anderen Servern weltweit durch unser hochperformantes Globalchat-System.</p>
-              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-6">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 hover:border-transparent hover:border-animated hover:shine hover:shadow-[0_0_40px_rgba(220,38,38,0.2)] space-y-6 transition-all duration-500 overflow-hidden">
                 <div className="flex items-center gap-4">
                   <MessagesSquare className="w-6 h-6 text-primary" />
                   <h4 className="text-xl font-bold text-white">Real-time Syncing</h4>
@@ -173,7 +173,7 @@ export const PluginsPage = memo(function PluginsPage() {
 
             <Section id="security-core" title="Security Core" icon={ShieldCheck}>
               <p className="text-lg text-slate-400">Der Security Core ist das Herzstück der Moderation. Er schützt deinen Server 24/7 vor Spam, Raids und Fehlverhalten.</p>
-              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-6">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 hover:border-transparent hover:border-animated hover:shine hover:shadow-[0_0_40px_rgba(220,38,38,0.2)] space-y-6 transition-all duration-500 overflow-hidden">
                 <div className="flex items-center gap-4">
                   <ShieldAlert className="w-6 h-6 text-primary" />
                   <h4 className="text-xl font-bold text-white">Advanced Protection</h4>
@@ -185,7 +185,7 @@ export const PluginsPage = memo(function PluginsPage() {
 
             <Section id="social-engagement" title="Social & Engagement" icon={Users}>
               <p className="text-lg text-slate-400">Steigere die Aktivität auf deinem Server durch ein motivierendes Leveling-System und automatisierte Interaktionen.</p>
-              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-6">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 hover:border-transparent hover:border-animated hover:shine hover:shadow-[0_0_40px_rgba(220,38,38,0.2)] space-y-6 transition-all duration-500 overflow-hidden">
                 <div className="flex items-center gap-4">
                   <Trophy className="w-6 h-6 text-primary" />
                   <h4 className="text-xl font-bold text-white">Incentive Engine</h4>
@@ -197,7 +197,7 @@ export const PluginsPage = memo(function PluginsPage() {
 
             <Section id="automation" title="Automation" icon={Zap}>
               <p className="text-lg text-slate-400">Spare wertvolle Zeit durch intelligente Automatisierung von Routineaufgaben im Hintergrund.</p>
-              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-6">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 hover:border-transparent hover:border-animated hover:shine hover:shadow-[0_0_40px_rgba(220,38,38,0.2)] space-y-6 transition-all duration-500 overflow-hidden">
                 <div className="flex items-center gap-4">
                   <BellRing className="w-6 h-6 text-primary" />
                   <h4 className="text-xl font-bold text-white">Silent Workers</h4>
@@ -209,7 +209,7 @@ export const PluginsPage = memo(function PluginsPage() {
 
             <Section id="system-control" title="System Control" icon={Settings2}>
               <p className="text-lg text-slate-400">Behalte die volle Kontrolle über alle Bot-Funktionen mit unserem intuitiven Konfigurations-System.</p>
-              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 space-y-6">
+              <div className="p-8 rounded-3xl bg-[#111318] border border-white/5 hover:border-transparent hover:border-animated hover:shine hover:shadow-[0_0_40px_rgba(220,38,38,0.2)] space-y-6 transition-all duration-500 overflow-hidden">
                 <div className="flex items-center gap-4">
                   <UserPlus className="w-6 h-6 text-primary" />
                   <h4 className="text-xl font-bold text-white">Command Center</h4>
