@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [guilds, setGuilds] = useState<any[]>([]);
     const [selectedGuildId, setSelectedGuildId] = useState<string | null>(getSafeItem("selectedGuildId"));
 
-    const login = (newToken: string, newUser: any, newDiscordToken?: string, isSessionOnly: boolean = false) => {
+    const login = (newToken: string, newUser: any, _discordToken?: string, isSessionOnly: boolean = false) => {
         setToken(newToken);
         setUser(newUser);
         const storage = isSessionOnly ? sessionStorage : localStorage;
@@ -47,13 +47,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             storage.setItem("token", newToken);
             storage.setItem("user", JSON.stringify(newUser));
             storage.setItem("is_session_only", isSessionOnly ? "true" : "false");
-            if (newDiscordToken) storage.setItem("discord_token", newDiscordToken);
+            // discord_token is intentionally NOT stored in localStorage/sessionStorage.
+            // It lives exclusively in an httponly cookie set by the backend,
+            // making it invisible to JavaScript and immune to XSS attacks.
         } catch (e) {
             console.error("Error saving to storage:", e);
         }
     };
 
     const logout = () => {
+        // Fire and forget logout to backend to clear httponly cookies
+        fetch(`${API_URL}/dashboard/auth/logout`, { method: "POST", credentials: "include" }).catch(() => {});
+        
         setToken(null);
         setUser(null);
         setGuilds([]);
@@ -71,11 +76,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (token) {
             fetch(`${API_URL}/dashboard/auth/me`, {
                 headers: {
+                    // JWT for identity verification
                     "Authorization": `Bearer ${token}`,
-                    "X-Discord-Token": localStorage.getItem("discord_token") || ""
-                }
+                    // No X-Discord-Token header — the backend reads it from the
+                    // httponly cookie automatically via credentials:'include'.
+                    // This prevents XSS from ever accessing the Discord token.
+                },
+                // This sends the httponly discord_token cookie to the backend.
+                // The discord_token itself is never readable by JavaScript.
+                credentials: "include",
             })
-
                 .then(async (res) => {
                     if (res.status === 401) {
                         logout();

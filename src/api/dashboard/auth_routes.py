@@ -1,4 +1,4 @@
-﻿from fastapi import APIRouter, Request, Response, HTTPException, Depends
+from fastapi import APIRouter, Request, Response, HTTPException, Depends
 from fastapi.responses import RedirectResponse
 import httpx
 import jwt
@@ -168,32 +168,39 @@ async def callback(data: CallbackRequest, request: Request, response: Response):
         })
         
         secure = request.url.scheme == "https"
+
+        # JWT session token — httponly so JS can't steal it
         response.set_cookie(
             key="access_token",
             value=jwt_token,
             httponly=True,
-            samesite="lax",
+            samesite="strict",
             secure=secure,
-            max_age=60 * 24 * 7 * 60,
+            max_age=60 * 60 * 24 * 7,  # 7 days in seconds
             path="/"
         )
-        
+
+        # Discord OAuth token — NEVER exposed to JS, cookie-only
+        # This prevents XSS attacks from stealing Discord tokens
         response.set_cookie(
             key="discord_token",
             value=access_token,
             httponly=True,
-            samesite="lax",
+            samesite="strict",
             secure=secure,
-            max_age=60 * 24 * 7 * 60,
+            max_age=60 * 60 * 24 * 7,
             path="/"
         )
-        
+
+        # Return JWT in body so frontend can use it for API Authorization header.
+        # discord_token is intentionally NOT returned — it lives only in httponly cookie.
         return {
             "access_token": jwt_token,
             "user": {
                 "id": str(user_id),
                 "username": user_json.get("username"),
                 "avatar": user_json.get("avatar")
+                # discord_token deliberately omitted from response body
             }
         }
 
@@ -215,7 +222,9 @@ async def get_me(request: Request, user: dict = Depends(get_current_user), bot =
             pass
     
     user["isAdmin"] = is_bot_admin
-    discord_token = request.cookies.get("discord_token") or request.headers.get("X-Discord-Token")
+    # Read discord_token EXCLUSIVELY from httponly cookie — never from headers.
+    # This ensures the token is never accessible via JavaScript (XSS-safe).
+    discord_token = request.cookies.get("discord_token")
     user_guilds = []
     
     if discord_token:

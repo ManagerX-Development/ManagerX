@@ -21,10 +21,14 @@ import {
     Zap,
     Heart,
     Lock,
-    Search,
     Mic,
     Brain,
-    Radio
+    Radio,
+    Bot,
+    Server,
+    ChevronRight,
+    CheckCircle2,
+    Home
 } from "lucide-react";
 import { useAuth } from "../../components/core/AuthProvider";
 import { Button } from "../../components/ui/button";
@@ -47,22 +51,66 @@ const AutoResponderSettings = lazy(() => import("../../components/settings/AutoR
 const NewsSyncSettings = lazy(() => import("../../components/settings/NewsSyncSettings"));
 const ApplicationSettings = lazy(() => import("../../components/settings/ApplicationSettings"));
 
+import { API_URL } from "../../lib/api";
+import { toast, Toaster } from "sonner";
+
 const TabLoader = () => (
-    <div className="w-full flex items-center justify-center py-20">
+    <div className="w-full flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
-            <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-            <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">Lade Modul...</p>
+            <div className="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Lade Modul...</p>
         </div>
     </div>
 );
 
-const CategoryHeader = ({ children }: { children: React.ReactNode }) => (
-    <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 px-4 mt-6 mb-2">{children}</h3>
-);
-
-import { API_URL } from "../../lib/api";
-import { toast, Toaster } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+// Navigation sections
+const navSections = [
+    {
+        label: null,
+        items: [
+            { value: "overview", icon: LayoutDashboard, label: "Dashboard", badge: null }
+        ]
+    },
+    {
+        label: "Core Suite",
+        items: [
+            { value: "general", icon: Settings, label: "Zentrale", badge: null },
+            { value: "appearance", icon: Palette, label: "Design & Theme", badge: null },
+            { value: "notifications", icon: Bell, label: "Alerts & Logs", badge: "Soon" },
+        ]
+    },
+    {
+        label: "Engagement",
+        items: [
+            { value: "levels", icon: Trophy, label: "Level System", badge: null },
+            { value: "welcome", icon: Heart, label: "Welcome Suite", badge: null },
+        ]
+    },
+    {
+        label: "Protection",
+        items: [
+            { value: "antispam", icon: Zap, label: "Anti-Spam AI", badge: null },
+            { value: "logging", icon: ClipboardList, label: "Advanced Audit", badge: null },
+        ]
+    },
+    {
+        label: "Expansion",
+        items: [
+            { value: "globalchat", icon: Globe, label: "Global Network", badge: null },
+            { value: "autorole", icon: ShieldCheck, label: "Auto-Roles", badge: null },
+            { value: "autodelete", icon: Trash2, label: "Auto-Delete", badge: null },
+            { value: "tempvc", icon: Mic, label: "TempVC Suite", badge: null },
+        ]
+    },
+    {
+        label: "Management",
+        items: [
+            { value: "autoresponder", icon: Brain, label: "Auto-Responder", badge: null },
+            { value: "newssync", icon: Radio, label: "News-Network", badge: null },
+            { value: "applications", icon: ClipboardList, label: "Bewerbungen", badge: null },
+        ]
+    }
+];
 
 export default function SettingsPage() {
     const { token, selectedGuildId } = useAuth();
@@ -86,7 +134,6 @@ export default function SettingsPage() {
     const [language, setLanguage] = useState("de");
     const [userRoleId, setUserRoleId] = useState<string | null>(null);
     const [teamRoleId, setTeamRoleId] = useState<string | null>(null);
-
     const [stats, setStats] = useState<any>(null);
 
     React.useEffect(() => {
@@ -94,17 +141,13 @@ export default function SettingsPage() {
             if (!token || !guildId) return;
             setIsLoading(true);
             try {
-                // Fetch EVERYTHING in ONE call
                 const res = await fetch(`${API_URL}/dashboard/guilds/${guildId}/mega-data`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
-                
                 if (res.ok) {
                     const json = await res.json();
                     if (json.success && json.data) {
                         const { settings, metadata, stats: guildStats } = json.data;
-                        
-                        // Set General Settings
                         setBotName(settings.bot_name || "ManagerX");
                         setPrefix(settings.prefix || "!");
                         setAutoMod(settings.auto_mod ?? true);
@@ -112,16 +155,12 @@ export default function SettingsPage() {
                         setLanguage(settings.language || "de");
                         setUserRoleId(settings.user_role_id || null);
                         setTeamRoleId(settings.team_role_id || null);
-
-                        // Set Guild Metadata
                         setGuildData({
                             channels: metadata.channels || [],
                             roles: metadata.roles || [],
                             categories: metadata.categories || [],
                             voiceChannels: metadata.voice_channels || []
                         });
-
-                        // Set Stats
                         setStats(guildStats);
                     }
                 }
@@ -137,358 +176,404 @@ export default function SettingsPage() {
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            const apiUrl = `${API_URL}/dashboard/settings/${guildId}`;
-
-            const payload = { prefix, autoMod, welcomeMessage, language, user_role_id: userRoleId, team_role_id: teamRoleId };
-
-            const res = await fetch(apiUrl, {
+            const res = await fetch(`${API_URL}/dashboard/settings/${guildId}`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ prefix, autoMod, welcomeMessage, language, user_role_id: userRoleId, team_role_id: teamRoleId })
             });
-
             if (!res.ok) throw new Error("API error");
-
-            toast.success("Einstellungen erfolgreich gespeichert!", {
-                description: "Alle Änderungen wurden auf dem Server übernommen.",
-            });
+            toast.success("Einstellungen gespeichert!", { description: "Alle Änderungen wurden übernommen." });
         } catch (e) {
-            console.error("Save error:", e);
-            toast.error("Fehler beim Speichern der Einstellungen.");
+            toast.error("Fehler beim Speichern.");
         } finally {
             setIsLoading(false);
         }
     };
 
+    // Find active section label for breadcrumb
+    const activeItem = navSections.flatMap(s => s.items).find(i => i.value === activeTab);
+
     return (
-        <div className="min-h-screen bg-background text-foreground p-4 md:p-8 relative overflow-hidden flex flex-col items-center">
+        <div className="min-h-screen bg-[#030305] text-white relative overflow-hidden">
             <Toaster theme="dark" position="bottom-right" />
 
-            {/* Premium Background */}
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[150px] rounded-full pointer-events-none -mr-40 -mt-40" />
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent/5 blur-[120px] rounded-full pointer-events-none -ml-40 -mb-40" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(220,38,38,0.05)_0%,transparent_50%)] pointer-events-none" />
-            <div className="absolute inset-0 opacity-[0.02] grid-pattern pointer-events-none" />
-
-            <div className="w-full max-w-7xl relative z-10 space-y-8 mt-4">
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-6"
-                >
-                    <div className="flex items-center gap-6">
-                        <Link to="/">
-                            <Button variant="outline" size="icon" className="group rounded-2xl w-14 h-14 border-white/10 bg-white/5 hover:bg-white/10 hover:text-white transition-all shadow-xl shadow-black/20">
-                                <ChevronLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
-                            </Button>
-                        </Link>
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 w-fit">
-                                <Sparkles className="w-3.5 h-3.5 text-primary" />
-                                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">ManagerX Suite</span>
-                            </div>
-                            <h1 className="text-5xl font-extrabold tracking-tighter text-white">System <span className="text-primary">Control</span></h1>
-                            <p className="text-muted-foreground text-sm font-medium opacity-70">Konfiguriere deine Bot-Instanz bis ins kleinste Detail.</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 bg-white/5 p-2 rounded-[2rem] border border-white/5 shadow-2xl backdrop-blur-xl">
-                        <GuildSelector />
-                        <div className="w-px h-8 bg-white/10 mx-2" />
-                        <Button
-                            onClick={handleSave}
-                            disabled={isLoading}
-                            className="rounded-2xl px-8 h-12 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xl shadow-primary/30 transition-all hover:scale-[1.05] active:scale-[0.95] font-bold"
-                        >
-                            {isLoading ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : (
-                                <Save className="w-5 h-5" />
-                            )}
-                            Save Changes
-                        </Button>
-                    </div>
-                </motion.div>
-
-                {/* Main Content Layout */}
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <div className="flex flex-col lg:flex-row gap-10">
-                        {/* Sidebar Navigation */}
-                        <aside className="w-full lg:w-72 shrink-0">
-                            <div className="glass rounded-[2rem] border border-white/10 p-4 sticky top-8 shadow-2xl">
-                                <TabsList className="flex flex-col h-auto w-full bg-transparent p-0 gap-1 items-stretch">
-                                    <TabItem value="overview" icon={LayoutDashboard} label="Dashboard" />
-                                    
-                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Core Suite</span>
-                                    </div>
-                                    <TabItem value="general" icon={Settings} label="Zentrale" />
-                                    <TabItem value="appearance" icon={Palette} label="Design & Theme" />
-                                    <TabItem value="notifications" icon={Bell} label="Alerts & Logs" />
-
-                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Engagement</span>
-                                    </div>
-                                    <TabItem value="levels" icon={Trophy} label="Level System" />
-                                    <TabItem value="welcome" icon={Heart} label="Welcome Suite" />
-
-                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Protection</span>
-                                    </div>
-                                    <TabItem value="antispam" icon={Zap} label="Anti-Spam AI" />
-                                    <TabItem value="logging" icon={ClipboardList} label="Advanced Audit" />
-
-                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Expansion</span>
-                                    </div>
-                                    <TabItem value="globalchat" icon={Globe} label="Global Network" />
-                                    <TabItem value="autorole" icon={ShieldCheck} label="Auto-Roles" />
-                                    <TabItem value="autodelete" icon={Trash2} label="Auto-Delete" />
-                                    <TabItem value="tempvc" icon={Mic} label="TempVC Suite" />
-
-                                    <div className="mt-6 mb-2 px-4 flex items-center gap-2">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Management</span>
-                                    </div>
-                                    <TabItem value="autoresponder" icon={Brain} label="Auto-Responder" />
-                                    <TabItem value="newssync" icon={Radio} label="News-Network" />
-                                    <TabItem value="applications" icon={ClipboardList} label="Bewerbungen" />
-                                </TabsList>
-                            </div>
-                        </aside>
-
-                        {/* Setting Panels */}
-                        <div className="flex-1 min-w-0 pb-20">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeTab}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ duration: 0.3, ease: "easeOut" }}
-                                >
-                                    <Suspense fallback={<TabLoader />}>
-                                        <TabsContent value="overview" className="mt-0 outline-none">
-                                            {guildId ? <OverviewSettings guildId={guildId} initialStats={stats} settings={{ auto_mod: autoMod, welcome_message: welcomeMessage }} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="general" className="mt-0 outline-none">
-                                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                                                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] -mr-32 -mt-32 pointer-events-none" />
-                                                <CardHeader className="pb-8 pt-10 px-10">
-                                                    <CardTitle className="text-3xl font-bold tracking-tight">Bot-Zentrale</CardTitle>
-                                                    <CardDescription className="text-base text-muted-foreground/70">Wichtige Kern-Identität deiner Bot-Instanz.</CardDescription>
-                                                </CardHeader>
-                                                <CardContent className="space-y-10 px-10 pb-10">
-                                                    <div className="space-y-4">
-                                                        <Label htmlFor="bot-name" className="text-sm font-bold uppercase tracking-widest text-primary">Branding Name</Label>
-                                                        <div className="relative group">
-                                                            <Input
-                                                                id="bot-name"
-                                                                value={botName}
-                                                                onChange={(e) => setBotName(e.target.value)}
-                                                                className="bg-white/5 border-white/10 focus:border-primary/50 h-14 rounded-2xl text-lg pl-6 transition-all"
-                                                                placeholder="ManagerX"
-                                                            />
-                                                            <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="space-y-4">
-                                                        <Label htmlFor="prefix" className="text-sm font-bold uppercase tracking-widest text-primary">Command Prefix</Label>
-                                                        <div className="flex gap-4">
-                                                            <div className="relative group">
-                                                                <Input
-                                                                    id="prefix"
-                                                                    value={prefix}
-                                                                    onChange={(e) => setPrefix(e.target.value)}
-                                                                    className="bg-white/5 border-white/10 focus:border-primary/50 h-14 w-28 text-center font-mono text-2xl rounded-2xl transition-all"
-                                                                    maxLength={3}
-                                                                />
-                                                                <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                                                            </div>
-                                                            <div className="flex-1 flex items-center px-6 rounded-2xl border border-white/10 bg-white/5 text-sm md:text-base font-medium text-muted-foreground">
-                                                                Beispiel: <span className="text-white font-mono ml-2 font-bold">{prefix}help</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                                                        <div className="space-y-4">
-                                                            <Label className="text-sm font-bold uppercase tracking-widest text-primary">Team Rolle</Label>
-                                                            <select 
-                                                                value={teamRoleId || ""} 
-                                                                onChange={(e) => setTeamRoleId(e.target.value || null)}
-                                                                className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
-                                                            >
-                                                                <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
-                                                                {guildData.roles.map(role => (
-                                                                    <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
-                                                                ))}
-                                                            </select>
-                                                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Mitglieder mit dieser Rolle werden als Staff im Dashboard angezeigt.</p>
-                                                        </div>
-
-                                                        <div className="space-y-4">
-                                                            <Label className="text-sm font-bold uppercase tracking-widest text-primary">User Rolle</Label>
-                                                            <select 
-                                                                value={userRoleId || ""} 
-                                                                onChange={(e) => setUserRoleId(e.target.value || null)}
-                                                                className="w-full bg-white/5 border border-white/10 focus:border-primary/50 h-14 rounded-2xl px-6 text-white transition-all appearance-none outline-none"
-                                                            >
-                                                                <option value="" className="bg-[#1a1a1a]">Keine Rolle ausgewählt</option>
-                                                                {guildData.roles.map(role => (
-                                                                    <option key={role.id} value={role.id} className="bg-[#1a1a1a]">{role.name}</option>
-                                                                ))}
-                                                            </select>
-                                                            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Benutzer mit dieser Rolle werden im User-Quick-View angezeigt.</p>
-                                                        </div>
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        </TabsContent>
-
-                                        <TabsContent value="appearance" className="mt-0 outline-none">
-                                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                                                <CardHeader className="pb-8 pt-10 px-10">
-                                                    <CardTitle className="text-3xl font-bold tracking-tight">Interface Design</CardTitle>
-                                                    <CardDescription className="text-base">Passe das Dashboard deinem Geschmack an.</CardDescription>
-                                                </CardHeader>
-                                                <CardContent className="px-10 pb-10">
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                        <ThemeCard title="Light" active={theme === 'light'} onClick={() => setTheme("light")} icon={Sun} />
-                                                        <ThemeCard title="Dark" active={theme === 'dark'} onClick={() => setTheme("dark")} icon={Moon} />
-                                                        <ThemeCard title="System" active={theme === 'system'} onClick={() => setTheme("system")} icon={Monitor} />
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        </TabsContent>
-
-                                        <TabsContent value="levels" className="mt-0 outline-none">
-                                            {guildId ? <LevelSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="welcome" className="mt-0 outline-none">
-                                            {guildId ? <WelcomeSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="antispam" className="mt-0 outline-none">
-                                            {guildId ? <AntiSpamSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="logging" className="mt-0 outline-none">
-                                            {guildId ? <LoggingSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="globalchat" className="mt-0 outline-none">
-                                            {guildId ? <GlobalChatSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="autorole" className="mt-0 outline-none">
-                                            {guildId ? <AutoRoleSettings guildId={guildId} roles={guildData.roles} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="autodelete" className="mt-0 outline-none">
-                                            {guildId ? <AutoDeleteSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="tempvc" className="mt-0 outline-none">
-                                            {guildId ? (
-                                                <TempVCSettings
-                                                    guildId={guildId}
-                                                    categories={guildData.categories}
-                                                    voiceChannels={guildData.voiceChannels}
-                                                />
-                                            ) : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="autoresponder" className="mt-0 outline-none">
-                                            {guildId ? <AutoResponderSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="newssync" className="mt-0 outline-none">
-                                            {guildId ? <NewsSyncSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="applications" className="mt-0 outline-none">
-                                            {guildId ? <ApplicationSettings guildId={guildId} /> : <NoGuildPlaceholder />}
-                                        </TabsContent>
-
-                                        <TabsContent value="notifications" className="mt-0 outline-none">
-                                            <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-                                                <div className="flex flex-col items-center justify-center py-24 text-center px-10">
-                                                    <div className="w-24 h-24 rounded-[2rem] bg-primary/10 flex items-center justify-center mb-8 border border-primary/20 shadow-2xl">
-                                                        <Lock className="w-10 h-10 text-primary animate-pulse" />
-                                                    </div>
-                                                    <h3 className="text-2xl font-bold text-white mb-3">Enterprise Feature</h3>
-                                                    <p className="text-muted-foreground opacity-70 max-w-sm leading-relaxed">
-                                                        Coming Soon: Webhooks, Email-Alerts und Mobile Push Notifications für maximale Sicherheit.
-                                                    </p>
-                                                </div>
-                                            </Card>
-                                        </TabsContent>
-                                    </Suspense>
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                </Tabs>
+            {/* Ambient bg */}
+            <div className="fixed inset-0 pointer-events-none">
+                <div className="absolute top-[-15%] right-[-5%] w-[600px] h-[600px] rounded-full bg-red-600/[0.06] blur-[120px]" />
+                <div className="absolute bottom-[-20%] left-[-5%] w-[500px] h-[500px] rounded-full bg-red-900/[0.04] blur-[100px]" />
+                <div
+                    className="absolute inset-0 opacity-[0.02]"
+                    style={{
+                        backgroundImage: `linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)`,
+                        backgroundSize: "60px 60px"
+                    }}
+                />
             </div>
 
-            {/* Dedicated Footer */}
-            <div className="mt-auto pt-10 pb-10 w-full text-center opacity-30 border-t border-white/5 flex flex-col items-center gap-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.4em] text-white">© 2026 OPPRO.NET DEVELOPMENT</p>
-                <div className="flex items-center gap-2">
-                    <Zap className="w-3 h-3 text-primary" />
-                    <span className="text-[10px] uppercase font-bold tracking-widest">Powered by ManagerX Engine</span>
+            <div className="relative z-10 flex min-h-screen">
+                {/* SIDEBAR */}
+                <motion.aside
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="hidden lg:flex flex-col w-72 shrink-0 border-r border-white/[0.06] bg-white/[0.015] backdrop-blur-xl"
+                >
+                    {/* Brand */}
+                    <div className="p-6 border-b border-white/[0.06]">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-red-700 flex items-center justify-center shadow-lg shadow-primary/30">
+                                <Bot className="w-4.5 h-4.5 text-white" />
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-primary/60">ManagerX</p>
+                                <p className="text-sm font-bold text-white/80 -mt-0.5">Control Panel</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Guild Selector */}
+                    <div className="p-4 border-b border-white/[0.06]">
+                        <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/20 mb-2 px-1">Aktiver Server</p>
+                        <GuildSelector />
+                    </div>
+
+                    {/* Navigation */}
+                    <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+                        {navSections.map((section, si) => (
+                            <div key={si} className={si > 0 ? "pt-4" : ""}>
+                                {section.label && (
+                                    <p className="text-[9px] font-black uppercase tracking-[0.25em] text-white/20 px-3 mb-2">
+                                        {section.label}
+                                    </p>
+                                )}
+                                {section.items.map(item => (
+                                    <SidebarItem
+                                        key={item.value}
+                                        {...item}
+                                        active={activeTab === item.value}
+                                        onClick={() => setActiveTab(item.value)}
+                                    />
+                                ))}
+                            </div>
+                        ))}
+                    </nav>
+
+                    {/* Bottom CTA */}
+                    <div className="p-4 border-t border-white/[0.06]">
+                        <button
+                            onClick={handleSave}
+                            disabled={isLoading}
+                            className="w-full flex items-center justify-center gap-2.5 h-12 rounded-2xl bg-gradient-to-r from-primary to-red-700 hover:from-red-600 hover:to-primary text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-primary/30 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                        >
+                            {isLoading ? (
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <Save className="w-4 h-4" />
+                            )}
+                            Speichern
+                        </button>
+                    </div>
+                </motion.aside>
+
+                {/* MAIN CONTENT */}
+                <div className="flex-1 flex flex-col min-w-0">
+                    {/* Top Bar */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="sticky top-0 z-20 flex items-center justify-between gap-4 px-6 py-4 bg-[#030305]/80 backdrop-blur-xl border-b border-white/[0.06]"
+                    >
+                        {/* Breadcrumb */}
+                        <div className="flex items-center gap-2 text-sm">
+                            <Link to="/">
+                                <button className="flex items-center justify-center w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.07] hover:bg-white/[0.08] transition-all">
+                                    <ChevronLeft className="w-4 h-4 text-white/50" />
+                                </button>
+                            </Link>
+                            <ChevronRight className="w-3 h-3 text-white/20" />
+                            <span className="text-white/30 font-medium">Dashboard</span>
+                            <ChevronRight className="w-3 h-3 text-white/20" />
+                            <span className="text-white font-bold">{activeItem?.label}</span>
+                        </div>
+
+                        {/* Mobile Guild + Save */}
+                        <div className="flex items-center gap-3 lg:hidden">
+                            <GuildSelector />
+                            <button
+                                onClick={handleSave}
+                                disabled={isLoading}
+                                className="flex items-center gap-2 h-10 px-4 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-primary/30"
+                            >
+                                {isLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+                                Save
+                            </button>
+                        </div>
+
+                        {/* Desktop Save */}
+                        <div className="hidden lg:flex items-center gap-3">
+                            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-emerald-500/80">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                Änderungen aktiv
+                            </div>
+                            <button
+                                onClick={handleSave}
+                                disabled={isLoading}
+                                className="flex items-center gap-2 h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-sm uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-lg shadow-primary/30"
+                            >
+                                {isLoading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+                                Speichern
+                            </button>
+                        </div>
+                    </motion.div>
+
+                    {/* Mobile Sidebar Nav */}
+                    <div className="lg:hidden overflow-x-auto border-b border-white/[0.06] bg-white/[0.01]">
+                        <div className="flex gap-1 p-3 min-w-max">
+                            {navSections.flatMap(s => s.items).map(item => (
+                                <button
+                                    key={item.value}
+                                    onClick={() => setActiveTab(item.value)}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-all",
+                                        activeTab === item.value
+                                            ? "bg-primary text-white shadow-lg shadow-primary/30"
+                                            : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                                    )}
+                                >
+                                    <item.icon className="w-3.5 h-3.5" />
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Tab Content */}
+                    <div className="flex-1 p-6 md:p-8 pb-24">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+                            >
+                                <Suspense fallback={<TabLoader />}>
+                                    {/* Overview */}
+                                    {activeTab === "overview" && (
+                                        guildId ? <OverviewSettings guildId={guildId} initialStats={stats} settings={{ auto_mod: autoMod, welcome_message: welcomeMessage }} /> : <NoGuildPlaceholder />
+                                    )}
+
+                                    {/* General */}
+                                    {activeTab === "general" && (
+                                        <div className="space-y-6 max-w-2xl">
+                                            <SectionHeader title="Bot-Zentrale" desc="Kern-Identität deiner Bot-Instanz." />
+                                            <PanelCard>
+                                                <FieldGroup label="Branding Name" hint="Angezeigter Name des Bots in Commands.">
+                                                    <StyledInput
+                                                        id="bot-name"
+                                                        value={botName}
+                                                        onChange={(e) => setBotName(e.target.value)}
+                                                        placeholder="ManagerX"
+                                                    />
+                                                </FieldGroup>
+                                                <FieldGroup label="Command Prefix" hint={`Beispiel: ${prefix}help`}>
+                                                    <div className="flex gap-3">
+                                                        <StyledInput
+                                                            id="prefix"
+                                                            value={prefix}
+                                                            onChange={(e) => setPrefix(e.target.value)}
+                                                            className="w-24 text-center font-mono text-2xl"
+                                                            maxLength={3}
+                                                        />
+                                                        <div className="flex-1 flex items-center px-5 rounded-2xl border border-white/[0.07] bg-white/[0.03] text-sm font-medium text-white/40 font-mono">
+                                                            {prefix}help · {prefix}ban · {prefix}kick
+                                                        </div>
+                                                    </div>
+                                                </FieldGroup>
+                                                <div className="grid md:grid-cols-2 gap-6 pt-2">
+                                                    <FieldGroup label="Team Rolle" hint="Staff-Mitglieder im Dashboard.">
+                                                        <StyledSelect value={teamRoleId || ""} onChange={(e) => setTeamRoleId(e.target.value || null)}>
+                                                            <option value="" className="bg-[#0a0a0a]">Keine Rolle</option>
+                                                            {guildData.roles.map(role => (
+                                                                <option key={role.id} value={role.id} className="bg-[#0a0a0a]">{role.name}</option>
+                                                            ))}
+                                                        </StyledSelect>
+                                                    </FieldGroup>
+                                                    <FieldGroup label="User Rolle" hint="Benutzer im Quick-View.">
+                                                        <StyledSelect value={userRoleId || ""} onChange={(e) => setUserRoleId(e.target.value || null)}>
+                                                            <option value="" className="bg-[#0a0a0a]">Keine Rolle</option>
+                                                            {guildData.roles.map(role => (
+                                                                <option key={role.id} value={role.id} className="bg-[#0a0a0a]">{role.name}</option>
+                                                            ))}
+                                                        </StyledSelect>
+                                                    </FieldGroup>
+                                                </div>
+                                            </PanelCard>
+                                        </div>
+                                    )}
+
+                                    {/* Appearance */}
+                                    {activeTab === "appearance" && (
+                                        <div className="space-y-6 max-w-2xl">
+                                            <SectionHeader title="Interface Design" desc="Passe das Dashboard deinem Geschmack an." />
+                                            <PanelCard>
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <ThemeCard title="Light" active={theme === 'light'} onClick={() => setTheme("light")} icon={Sun} />
+                                                    <ThemeCard title="Dark" active={theme === 'dark'} onClick={() => setTheme("dark")} icon={Moon} />
+                                                    <ThemeCard title="System" active={theme === 'system'} onClick={() => setTheme("system")} icon={Monitor} />
+                                                </div>
+                                            </PanelCard>
+                                        </div>
+                                    )}
+
+                                    {/* Notifications */}
+                                    {activeTab === "notifications" && <ComingSoonPanel icon={Lock} title="Enterprise Feature" desc="Webhooks, Email-Alerts und Mobile Push Notifications — coming soon." />}
+
+                                    {/* Feature tabs */}
+                                    {activeTab === "levels" && (guildId ? <LevelSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "welcome" && (guildId ? <WelcomeSettings guildId={guildId} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "antispam" && (guildId ? <AntiSpamSettings guildId={guildId} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "logging" && (guildId ? <LoggingSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "globalchat" && (guildId ? <GlobalChatSettings guildId={guildId} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "autorole" && (guildId ? <AutoRoleSettings guildId={guildId} roles={guildData.roles} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "autodelete" && (guildId ? <AutoDeleteSettings guildId={guildId} channels={guildData.channels} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "tempvc" && (guildId ? <TempVCSettings guildId={guildId} categories={guildData.categories} voiceChannels={guildData.voiceChannels} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "autoresponder" && (guildId ? <AutoResponderSettings guildId={guildId} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "newssync" && (guildId ? <NewsSyncSettings guildId={guildId} /> : <NoGuildPlaceholder />)}
+                                    {activeTab === "applications" && (guildId ? <ApplicationSettings guildId={guildId} /> : <NoGuildPlaceholder />)}
+                                </Suspense>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
-// Helper Components
-const TabItem = ({ value, icon: Icon, label }: { value: string, icon: any, label: string }) => (
-    <TabsTrigger
-        value={value}
-        className="data-[state=active]:bg-primary data-[state=active]:text-white shadow-none justify-start gap-4 px-5 py-3.5 rounded-2xl hover:bg-white/5 transition-all text-muted-foreground font-bold group"
-    >
-        <Icon className="w-5 h-5 group-data-[state=active]:text-white text-muted-foreground transition-colors" />
-        {label}
-    </TabsTrigger>
-);
+// ─── Helper Components ───────────────────────────────────────────────────────
 
-const ThemeCard = ({ title, active, onClick, icon: Icon }: { title: string, active: boolean, onClick: () => void, icon: any }) => (
+const SidebarItem = ({ value, icon: Icon, label, badge, active, onClick }: {
+    value: string; icon: any; label: string; badge: string | null; active: boolean; onClick: () => void;
+}) => (
     <button
         onClick={onClick}
         className={cn(
-            "flex flex-col items-center justify-center p-10 rounded-[2.5rem] border-2 transition-all duration-300 relative group",
+            "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 group relative",
             active
-                ? "border-primary bg-primary/20 shadow-[0_0_50px_-12px_rgba(220,38,38,0.4)]"
-                : "border-white/5 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20"
+                ? "bg-primary/15 text-white"
+                : "text-white/40 hover:text-white/70 hover:bg-white/[0.04]"
         )}
     >
-        <Icon className={cn("w-12 h-12 mb-6 transition-all duration-300", active ? "text-primary scale-110" : "text-white/40 group-hover:text-white")} />
-        <span className={cn("font-bold text-lg", active ? "text-white" : "text-white/60 group-hover:text-white")}>{title}</span>
-        {active && <motion.div layoutId="active-theme" className="absolute -top-3 -right-3 bg-primary p-2 rounded-xl shadow-xl"><Shield className="w-4 h-4 text-white" /></motion.div>}
+        {/* Active indicator */}
+        {active && (
+            <motion.div
+                layoutId="sidebar-active"
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full bg-primary shadow-[0_0_8px_rgba(220,38,38,0.8)]"
+            />
+        )}
+        <Icon className={cn("w-4 h-4 shrink-0 transition-colors", active ? "text-primary" : "text-white/30 group-hover:text-white/50")} />
+        <span className="flex-1 text-left">{label}</span>
+        {badge && (
+            <span className="px-1.5 py-0.5 rounded-md bg-white/[0.06] text-[9px] font-black uppercase tracking-wider text-white/30">
+                {badge}
+            </span>
+        )}
+        {active && <ChevronRight className="w-3 h-3 text-primary/60 shrink-0" />}
     </button>
 );
 
-const NoGuildPlaceholder = () => (
-    <Card className="glass border-white/10 shadow-2xl rounded-[2.5rem] overflow-hidden">
-        <CardContent className="py-24 text-center px-10">
-            <div className="w-20 h-20 bg-white/5 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <LayoutDashboard className="w-10 h-10 text-muted-foreground opacity-30" />
+const SectionHeader = ({ title, desc }: { title: string; desc: string }) => (
+    <div>
+        <h2 className="text-2xl font-black text-white tracking-tight">{title}</h2>
+        <p className="text-white/40 text-sm mt-1 font-medium">{desc}</p>
+    </div>
+);
+
+const PanelCard = ({ children }: { children: React.ReactNode }) => (
+    <div className="p-7 rounded-3xl bg-white/[0.03] border border-white/[0.07] space-y-7">
+        {children}
+    </div>
+);
+
+const FieldGroup = ({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) => (
+    <div className="space-y-2.5">
+        <label className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/70">{label}</label>
+        {children}
+        {hint && <p className="text-[10px] text-white/25 font-medium">{hint}</p>}
+    </div>
+);
+
+const StyledInput = ({ className, ...props }: React.InputHTMLAttributes<HTMLInputElement>) => (
+    <input
+        className={cn(
+            "w-full h-13 px-5 rounded-2xl bg-white/[0.04] border border-white/[0.08] focus:border-primary/40 text-white placeholder:text-white/20 outline-none transition-all duration-300 text-sm font-medium",
+            className
+        )}
+        style={{ height: "3.25rem" }}
+        {...props}
+    />
+);
+
+const StyledSelect = ({ children, className, ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) => (
+    <select
+        className={cn(
+            "w-full h-13 px-5 rounded-2xl bg-white/[0.04] border border-white/[0.08] focus:border-primary/40 text-white outline-none transition-all duration-300 appearance-none text-sm font-medium",
+            className
+        )}
+        style={{ height: "3.25rem" }}
+        {...props}
+    >
+        {children}
+    </select>
+);
+
+const ThemeCard = ({ title, active, onClick, icon: Icon }: { title: string; active: boolean; onClick: () => void; icon: any }) => (
+    <button
+        onClick={onClick}
+        className={cn(
+            "flex flex-col items-center justify-center p-8 rounded-2xl border-2 transition-all duration-300 relative group",
+            active
+                ? "border-primary bg-primary/10 shadow-[0_0_30px_-10px_rgba(220,38,38,0.5)]"
+                : "border-white/[0.07] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.15]"
+        )}
+    >
+        <Icon className={cn("w-10 h-10 mb-4 transition-all duration-300", active ? "text-primary scale-110" : "text-white/30 group-hover:text-white/60")} />
+        <span className={cn("font-black text-base", active ? "text-white" : "text-white/40 group-hover:text-white/70")}>{title}</span>
+        {active && (
+            <motion.div layoutId="active-theme" className="absolute -top-2.5 -right-2.5 bg-primary p-1.5 rounded-xl shadow-lg shadow-primary/40">
+                <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+            </motion.div>
+        )}
+    </button>
+);
+
+const ComingSoonPanel = ({ icon: Icon, title, desc }: { icon: any; title: string; desc: string }) => (
+    <div className="max-w-2xl">
+        <div className="p-12 rounded-3xl bg-white/[0.02] border border-white/[0.06] flex flex-col items-center text-center gap-6">
+            <div className="w-20 h-20 rounded-3xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-xl shadow-primary/10">
+                <Icon className="w-10 h-10 text-primary/60" />
             </div>
-            <p className="text-xl text-muted-foreground font-bold italic">Bitte wähle zuerst einen Server aus...</p>
-        </CardContent>
-    </Card>
+            <div>
+                <h3 className="text-xl font-black text-white/60 mb-2">{title}</h3>
+                <p className="text-white/30 text-sm max-w-sm leading-relaxed">{desc}</p>
+            </div>
+        </div>
+    </div>
+);
+
+const NoGuildPlaceholder = () => (
+    <div className="max-w-2xl">
+        <div className="p-12 rounded-3xl bg-white/[0.02] border border-white/[0.06] flex flex-col items-center text-center gap-6">
+            <div className="w-20 h-20 rounded-3xl bg-white/[0.04] border border-white/[0.07] flex items-center justify-center">
+                <Server className="w-9 h-9 text-white/15" />
+            </div>
+            <div>
+                <h3 className="text-xl font-black text-white/30 mb-2">Kein Server ausgewählt</h3>
+                <p className="text-white/20 text-sm">Wähle zuerst einen Server über den Selektor aus.</p>
+            </div>
+        </div>
+    </div>
 );

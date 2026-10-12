@@ -9,7 +9,6 @@ import { Toaster } from "sonner";
 // Lazy load all route components
 const Index = lazy(() => import("./pages/Index"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Impressum = lazy(() => import("./pages/Impressum"));
 const Datenschutz = lazy(() => import("./pages/Datenschutz"));
 const Nutzungsbedingungen = lazy(() => import("./pages/Nutzungsbedingungen"));
 const PluginsPage = lazy(() => import("./pages/PluginsPage"));
@@ -93,8 +92,6 @@ const AppRoutes = () => (
         <Route path="/tutorials" element={<BlogPage />} />
 
         {/* ── Legal ── */}
-        <Route path="/legal/imprint" element={<Impressum />} />
-        <Route path="/impressum.html" element={<Impressum />} />
         <Route path="/legal/privacy" element={<Datenschutz />} />
         <Route path="/datenschutz.html" element={<Datenschutz />} />
         <Route path="/legal/terms" element={<Nutzungsbedingungen />} />

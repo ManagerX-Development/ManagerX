@@ -121,7 +121,7 @@ export const Footer = memo(function Footer() {
             <div className="flex flex-col gap-5">
               <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary mb-2">Rechtliches</span>
               <Link to="/legal/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Datenschutz</Link>
-              <Link to="/legal/imprint" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Impressum</Link>
+              <Link to="https://legal.oppro-network.de/" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Impressum</Link>
               <Link to="/legal/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Nutzungsbedingungen</Link>
               <Link to="/legal/license" className="text-sm text-muted-foreground hover:text-foreground transition-colors font-medium">Lizenz (GPL-3.0)</Link>
             </div>
