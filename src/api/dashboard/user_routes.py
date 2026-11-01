@@ -28,7 +28,7 @@ async def get_user_settings(user: dict = Depends(get_current_user), bot = Depend
         user_id = int(user["id"])
         
         # Get language setting from SettingsDB
-        language = settings_db.get_user_language(user_id)
+        language = await settings_db.get_user_language(user_id)
         
         # Get global stats from StatsDB
         stats_db = StatsDB()
@@ -112,8 +112,8 @@ async def get_user_settings(user: dict = Depends(get_current_user), bot = Depend
                     "total_messages": global_chat_messages
                 },
                 "economy": {
-                    "global_coins": EconomyDatabase().get_global_balance(user_id),
-                    "overrides": EconomyDatabase().get_equipped_overrides(user_id)
+                    "global_coins": await EconomyDatabase().get_global_balance(user_id),
+                    "overrides": await EconomyDatabase().get_equipped_overrides(user_id)
                 },
                 "top_servers": top_servers,
                 "is_private": global_info.get('is_private', 0) if global_info else 0

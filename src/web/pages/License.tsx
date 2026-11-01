@@ -367,7 +367,7 @@ export const License = memo(function License() {
             {/* Quick Links */}
             <div className="space-y-2">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 px-2">Weitere Dokumente</p>
-              <Link to="/legal/imprint" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 hover:translate-x-0.5 border border-transparent hover:border-white/5 transition-all text-sm font-semibold text-slate-400 hover:text-white">
+              <Link to="https://legal.oppro-network.de/" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 hover:translate-x-0.5 border border-transparent hover:border-white/5 transition-all text-sm font-semibold text-slate-400 hover:text-white">
                 <Info className="w-4 h-4 text-slate-500" />
                 Impressum
               </Link>

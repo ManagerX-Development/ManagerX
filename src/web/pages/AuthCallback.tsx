@@ -21,28 +21,32 @@ export default function AuthCallback() {
 
         const handleAuth = async () => {
             try {
-                // Adjust to your actual backend domain/port, 8040 is what the python API uses
                 const apiUrl = `${API_URL}/dashboard/auth/callback`;
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ code }),
+                    // Required: tells the browser to accept Set-Cookie headers
+                    // from the backend — this is how the httponly discord_token
+                    // cookie gets stored (never accessible to JavaScript).
+                    credentials: "include",
                 });
 
                 if (!response.ok) {
-                    throw new Error("Authentifizierung fehlgeschlagen");
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.detail || "Authentifizierung fehlgeschlagen");
                 }
 
                 const data = await response.json();
 
-                // data should contain access_token and user object
-                login(data.access_token, data.user, data.discord_token);
+                // discord_token is NOT in data (httponly cookie, set by backend).
+                // Only the JWT and user object are passed here.
+                login(data.access_token, data.user);
 
                 const username = data.user?.username || "User";
                 toast.success(`Willkommen zurück, ${username}!`);
-                
-                // Kurze Verzögerung für den Toast-Effekt vor dem Redirect
+
                 setTimeout(() => {
                     navigate("/dash/guilds");
                 }, 1000);
@@ -51,6 +55,7 @@ export default function AuthCallback() {
                 setError(err.message || "Es gab ein Problem beim Anmelden.");
             }
         };
+
 
         handleAuth();
     }, [searchParams, navigate, login]);
